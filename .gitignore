@@ -6,6 +6,7 @@ doxygen_objdb_*
 
 *~
 *.link
+*.html
 *.a
 *.o
 *.so
