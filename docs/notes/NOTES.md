@@ -6,8 +6,8 @@ The process of developing and deploying a program on the cluster has many stages
 - Edit
   * Use your favorite editor to make a change to the source code of the program.
 
-- Sync
-  * Ensure all local headers, libraries, and configuration files are identical to those on each of the cells. This may be accomplished using [rsync][].
+- Sync (optional)
+  * Ensure all local headers, libraries, and configuration files are identical to those on each of the cells. This may be accomplished using [rsync][]. This only needs to be done after some library or package is installed to the cluster cells.
 
 - Compile/Link
   * Use your cross-compiler environment to compile and link your program.
@@ -19,10 +19,8 @@ The process of developing and deploying a program on the cluster has many stages
 - Control/Monitor
   * Send the start signal to each cell and provide control signals over the network. This may be accomplished using [0mq][] or [osc][].
 
-- Kill
+- Kill/Clean
   * Send the kill signal to each cell.
-
-- Clean
   * Ensure the program is off on each cell and that there are no problems on the cluster. 
 
 ...
@@ -32,19 +30,27 @@ The process of developing and deploying a program on the cluster has many stages
 Here's some open questions:
 
 - How do we measure the synchronization the displays?
-
-- How do we measure the synchronization the clocks on each cell?
-
-- Is there a faster than 10/100 ethernet way to distribute state to each of the cells?
+  * I'm considering installing light sensors at the bottom left corner of each display and alternating black/white in a 10 by 10 pixel square. Then looking at the "square waves" on an oscilloscope or logic analyser.
+  * Another idea is tapping into the DVI cable electrically somehow.
+  * The easiest thing would be if we could query the GPU for the state of the HDMI/DVI signal or get a callback somehow.
 
 - Is there a way to influence or even know the HDMI/DVI/LCD clock rate?
 
-- How is Edgar Berdahl's image different than the mainstream image?
+- How do we measure the synchronization the clocks on each cell?
+  * Each cell runs the Network Time Protocol daemon ([ntpd][]). This daemon may have configuration options that tighten-up the timing of the clocks in the cluster. There also may be a tool that uses some fancy algorithm to measure the sync between ntp-sync'd clocks.
 
-- Is it possible or useful to increase the MTU of the network?
+- Is there a faster than 10/100 ethernet way to distribute state to each of the cells?
+  * Maybe it will eventually be possible to use the [CSI-2][] interface, but as of today the camera interface is not supported.
+
+- How is Edgar Berdahl's [Satellite CCRMA][] image different than the mainstream image?
+  * We need to email Edgar and ask or maybe do some diff on the entire filesystem to determine this.
+
+- Is it possible or useful to increase the [MTU][] of the network?
+  * Most switches, routers, and computers fragment network data into ~1400 byte chunks at the MAC/PHYS network layer, so if your application sends packets larger that one [MTU][], there will be overhead on the MAC/PHYS layer as your big packets get fragmented. In special cases, it is possible to configure your network with an [MTU][] larger than ~1400 bytes. Is this possible in our system? Would it help or hurt?
 
 - How long does glReadPixels(...) take?
 
+- Will [murder][] work easily from within the cross-compiler environment (a virtual machine)?
 
 ...
 
@@ -84,7 +90,8 @@ Not available from the package manager:
 
 # References #
 
-[git][], [ssh][], [mpssh][], [rsync][], [ganglia][], [murder][], [puppet][]
+[git][], [ssh][], [mpssh][], [rsync][], [ganglia][], [murder][], [puppet][],
+[0mq][], [osc][], [CSI-2][], [ntpd][], [Satellite CCRMA][], [MTU][]
 
 [git]: http://git-scm.com/
 [ssh]: http://en.wikipedia.org/wiki/Secure_Shell
@@ -95,5 +102,9 @@ Not available from the package manager:
 [puppet]: http://en.wikipedia.org/wiki/Puppet_(software)
 [0mq]: http://www.zeromq.org/
 [osc]: http://en.wikipedia.org/wiki/Open_Sound_Control
+[CSI-2]: http://www.mipi.org/specifications/camera-interface#CSI2
+[ntpd]: http://en.wikipedia.org/wiki/Ntpd
+[Satellite CCRMA]: https://ccrma.stanford.edu/~eberdahl/Satellite
+[MTU]: http://en.wikipedia.org/wiki/Maximum_transmission_unit
 
 <link href="http://kevinburke.bitbucket.org/markdowncss/markdown.css" rel="stylesheet"></link>
