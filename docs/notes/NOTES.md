@@ -27,6 +27,27 @@ The process of developing and deploying a program on the cluster has many stages
 
 ...
 
+# Questions #
+
+Here's some open questions:
+
+- How do we measure the synchronization the displays?
+
+- How do we measure the synchronization the clocks on each cell?
+
+- Is there a faster than 10/100 ethernet way to distribute state to each of the cells?
+
+- Is there a way to influence or even know the HDMI/DVI/LCD clock rate?
+
+- How is Edgar Berdahl's image different than the mainstream image?
+
+- Is it possible or useful to increase the MTU of the network?
+
+- How long does glReadPixels(...) take?
+
+
+...
+
 # Performance #
 
 TBD: need to test all this stuff.
