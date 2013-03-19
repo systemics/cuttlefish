@@ -38,6 +38,7 @@ Here's some open questions:
 
 - How do we measure the synchronization the clocks on each cell?
   * Each cell runs the Network Time Protocol daemon ([ntpd][]). This daemon may have configuration options that tighten-up the timing of the clocks in the cluster. There also may be a tool that uses some fancy algorithm to measure the sync between ntp-sync'd clocks.
+  * The Precision Time Protocol daemon ([ptpd][]) will sync our cluster better than [ntpd][].
 
 - Is there a faster than 10/100 ethernet way to distribute state to each of the cells?
   * Maybe it will eventually be possible to use the [CSI-2][] interface, but as of today the camera interface is not supported.
@@ -54,14 +55,18 @@ Here's some open questions:
 
 ...
 
-# Performance #
+# Performance/Testing #
 
-TBD: need to test all this stuff.
+- The network consists of 7 hosts, each with 10/100 ethernet (aka "fast ethernet"). An 8-port switch connects each host via cat5 ethernet cables. Results:
+  * tcp: ~80Mbps from one display cell to the master
+  * tcp: ~15Mbps for each of 6 display cells connected to the master
+  * udp: ~80Mbps from one display cell to the master
+  * multicast: ~32Mbps multicasting from the master to each display cell
 
-- Network
 - CPU
 - Graphics
 - Audio
+- Time
 
 ...
 
@@ -91,7 +96,7 @@ Not available from the package manager:
 # References #
 
 [git][], [ssh][], [mpssh][], [rsync][], [ganglia][], [murder][], [puppet][],
-[0mq][], [osc][], [CSI-2][], [ntpd][], [Satellite CCRMA][], [MTU][]
+[0mq][], [osc][], [CSI-2][], [ntpd][], [Satellite CCRMA][], [MTU][], [ptpd][]
 
 [git]: http://git-scm.com/
 [ssh]: http://en.wikipedia.org/wiki/Secure_Shell
@@ -106,5 +111,6 @@ Not available from the package manager:
 [ntpd]: http://en.wikipedia.org/wiki/Ntpd
 [Satellite CCRMA]: https://ccrma.stanford.edu/~eberdahl/Satellite
 [MTU]: http://en.wikipedia.org/wiki/Maximum_transmission_unit
+[ptpd]: http://en.wikipedia.org/wiki/Precision_Time_Protocol
 
 <link href="http://kevinburke.bitbucket.org/markdowncss/markdown.css" rel="stylesheet"></link>
