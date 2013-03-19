@@ -1,0 +1,71 @@
+------------------------------------------------------------
+Server listening on UDP port 5001
+Receiving 1470 byte datagrams
+UDP buffer size:  160 KByte (default)
+------------------------------------------------------------
+[  3] local 128.111.26.166 port 5001 connected with 128.111.26.168 port 45821
+[  5] local 128.111.26.166 port 5001 connected with 128.111.26.171 port 39106
+[  4] local 128.111.26.166 port 5001 connected with 128.111.26.167 port 55559
+[  6] local 128.111.26.166 port 5001 connected with 128.111.26.169 port 55805
+[  7] local 128.111.26.166 port 5001 connected with 128.111.26.172 port 47138
+[  8] local 128.111.26.166 port 5001 connected with 128.111.26.170 port 50585
+[ ID] Interval       Transfer     Bandwidth        Jitter   Lost/Total Datagrams
+[  3]  0.0-10.0 sec  1.26 MBytes  1.06 Mbits/sec   0.275 ms    0/  893 (0%)
+[  5]  0.0-10.0 sec  1.25 MBytes  1.05 Mbits/sec   0.235 ms    1/  893 (0.11%)
+[  6]  0.0-10.0 sec  1.25 MBytes  1.05 Mbits/sec   0.176 ms    2/  893 (0.22%)
+[  7]  0.0-10.0 sec  1.25 MBytes  1.05 Mbits/sec   0.694 ms    2/  893 (0.22%)
+[  8]  0.0-10.0 sec  1.25 MBytes  1.05 Mbits/sec   0.300 ms    3/  893 (0.34%)
+[  4]  0.0-10.0 sec  1.25 MBytes  1.05 Mbits/sec   1.447 ms    0/  893 (0%)
+[  4]  0.0-10.0 sec  1 datagrams received out-of-order
+[  9] local 128.111.26.166 port 5001 connected with 128.111.26.167 port 60258
+[  3] local 128.111.26.166 port 5001 connected with 128.111.26.168 port 53822
+[  4] local 128.111.26.166 port 5001 connected with 128.111.26.172 port 42301
+[  5] local 128.111.26.166 port 5001 connected with 128.111.26.170 port 58014
+[  6] local 128.111.26.166 port 5001 connected with 128.111.26.171 port 45867
+[  7] local 128.111.26.166 port 5001 connected with 128.111.26.169 port 53899
+[  3]  0.0-10.0 sec  1.25 MBytes  1.05 Mbits/sec   0.619 ms    0/  893 (0%)
+[  6]  0.0-10.0 sec  1.25 MBytes  1.05 Mbits/sec   1.170 ms    1/  893 (0.11%)
+[  7]  0.0-10.0 sec  1.25 MBytes  1.05 Mbits/sec   0.499 ms    2/  893 (0.22%)
+[  4]  0.0-10.0 sec  1.25 MBytes  1.05 Mbits/sec   1.511 ms    1/  893 (0.11%)
+[  5]  0.0-10.0 sec  1.25 MBytes  1.05 Mbits/sec   1.526 ms    1/  893 (0.11%)
+[  9]  0.0-10.0 sec  1.26 MBytes  1.05 Mbits/sec   2.341 ms    0/  893 (0%)
+[  8] local 128.111.26.166 port 5001 connected with 128.111.26.167 port 47271
+[  3] local 128.111.26.166 port 5001 connected with 128.111.26.169 port 60726
+[  4] local 128.111.26.166 port 5001 connected with 128.111.26.168 port 33019
+[  5] local 128.111.26.166 port 5001 connected with 128.111.26.171 port 40068
+[  6] local 128.111.26.166 port 5001 connected with 128.111.26.172 port 47617
+[  7] local 128.111.26.166 port 5001 connected with 128.111.26.170 port 52392
+[  3]  0.0-10.0 sec  1.25 MBytes  1.05 Mbits/sec   0.076 ms    0/  893 (0%)
+[  3]  0.0-10.0 sec  1 datagrams received out-of-order
+[  4]  0.0-10.0 sec  1.25 MBytes  1.05 Mbits/sec   0.075 ms    2/  893 (0.22%)
+[  5]  0.0-10.0 sec  1.25 MBytes  1.05 Mbits/sec   0.249 ms    2/  893 (0.22%)
+[  6]  0.0-10.0 sec  1.25 MBytes  1.05 Mbits/sec   1.320 ms    2/  893 (0.22%)
+[  7]  0.0-10.0 sec  1.25 MBytes  1.05 Mbits/sec   0.573 ms    4/  893 (0.45%)
+[  8]  0.0-10.0 sec  1.26 MBytes  1.06 Mbits/sec   0.122 ms    0/  893 (0%)
+[  8]  0.0-10.0 sec  1 datagrams received out-of-order
+[  9] local 128.111.26.166 port 5001 connected with 128.111.26.167 port 49407
+[  4] local 128.111.26.166 port 5001 connected with 128.111.26.172 port 45435
+[  3] local 128.111.26.166 port 5001 connected with 128.111.26.168 port 49382
+[  6] local 128.111.26.166 port 5001 connected with 128.111.26.170 port 45794
+[  5] local 128.111.26.166 port 5001 connected with 128.111.26.169 port 53825
+[  7] local 128.111.26.166 port 5001 connected with 128.111.26.171 port 34315
+[  3]  0.0-10.0 sec  1.25 MBytes  1.05 Mbits/sec   0.081 ms    0/  893 (0%)
+[  6]  0.0-10.0 sec  1.25 MBytes  1.05 Mbits/sec   1.147 ms    2/  893 (0.22%)
+[  5]  0.0-10.0 sec  1.25 MBytes  1.05 Mbits/sec   0.062 ms    2/  893 (0.22%)
+[  7]  0.0-10.0 sec  1.25 MBytes  1.05 Mbits/sec   0.674 ms    4/  893 (0.45%)
+[  9]  0.0-10.0 sec  1.26 MBytes  1.06 Mbits/sec   0.060 ms    0/  893 (0%)
+[  4]  0.0-10.0 sec  1.25 MBytes  1.05 Mbits/sec   0.509 ms    0/  893 (0%)
+[  4]  0.0-10.0 sec  1 datagrams received out-of-order
+[  8] local 128.111.26.166 port 5001 connected with 128.111.26.167 port 55723
+[  4] local 128.111.26.166 port 5001 connected with 128.111.26.170 port 35248
+[  3] local 128.111.26.166 port 5001 connected with 128.111.26.168 port 42378
+[  5] local 128.111.26.166 port 5001 connected with 128.111.26.171 port 39622
+[  6] local 128.111.26.166 port 5001 connected with 128.111.26.169 port 46271
+[  7] local 128.111.26.166 port 5001 connected with 128.111.26.172 port 44826
+[  3]  0.0-10.0 sec  1.25 MBytes  1.05 Mbits/sec   0.131 ms    0/  893 (0%)
+[  3]  0.0-10.0 sec  1 datagrams received out-of-order
+[  6]  0.0-10.0 sec  1.25 MBytes  1.05 Mbits/sec   0.055 ms    1/  893 (0.11%)
+[  8]  0.0-10.0 sec  1.26 MBytes  1.06 Mbits/sec   0.310 ms    0/  893 (0%)
+[  4]  0.0-10.0 sec  1.25 MBytes  1.05 Mbits/sec   0.918 ms    1/  893 (0.11%)
+[  5]  0.0-10.0 sec  1.25 MBytes  1.05 Mbits/sec   0.638 ms    1/  893 (0.11%)
+[  7]  0.0-10.0 sec  1.25 MBytes  1.05 Mbits/sec   0.553 ms    3/  893 (0.34%)

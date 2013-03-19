@@ -1,0 +1,65 @@
+------------------------------------------------------------
+Server listening on TCP port 5001
+TCP window size: 85.3 KByte (default)
+------------------------------------------------------------
+[  8] local 128.111.26.166 port 5001 connected with 128.111.26.172 port 45738
+[  7] local 128.111.26.166 port 5001 connected with 128.111.26.169 port 45679
+[  6] local 128.111.26.166 port 5001 connected with 128.111.26.168 port 34350
+[  5] local 128.111.26.166 port 5001 connected with 128.111.26.167 port 43658
+[  9] local 128.111.26.166 port 5001 connected with 128.111.26.171 port 34272
+[ 10] local 128.111.26.166 port 5001 connected with 128.111.26.170 port 50157
+[ ID] Interval       Transfer     Bandwidth
+[  9]  0.0-10.2 sec  19.2 MBytes  15.9 Mbits/sec
+[  6]  0.0-10.2 sec  19.0 MBytes  15.6 Mbits/sec
+[  5]  0.0-10.2 sec  18.9 MBytes  15.5 Mbits/sec
+[ 10]  0.0-10.2 sec  19.0 MBytes  15.6 Mbits/sec
+[  8]  0.0-10.3 sec  19.1 MBytes  15.6 Mbits/sec
+[  7]  0.0-10.3 sec  19.4 MBytes  15.8 Mbits/sec
+[  8] local 128.111.26.166 port 5001 connected with 128.111.26.170 port 50159
+[  7] local 128.111.26.166 port 5001 connected with 128.111.26.172 port 45740
+[  6] local 128.111.26.166 port 5001 connected with 128.111.26.169 port 45682
+[  5] local 128.111.26.166 port 5001 connected with 128.111.26.168 port 34352
+[ 11] local 128.111.26.166 port 5001 connected with 128.111.26.167 port 43661
+[  9] local 128.111.26.166 port 5001 connected with 128.111.26.171 port 34275
+[  7]  0.0-10.2 sec  18.9 MBytes  15.5 Mbits/sec
+[  9]  0.0-10.2 sec  19.0 MBytes  15.6 Mbits/sec
+[  5]  0.0-10.3 sec  19.0 MBytes  15.5 Mbits/sec
+[ 11]  0.0-10.3 sec  19.2 MBytes  15.8 Mbits/sec
+[  6]  0.0-10.3 sec  19.0 MBytes  15.5 Mbits/sec
+[  8]  0.0-10.3 sec  19.4 MBytes  15.8 Mbits/sec
+[  8] local 128.111.26.166 port 5001 connected with 128.111.26.170 port 50161
+[  7] local 128.111.26.166 port 5001 connected with 128.111.26.172 port 45743
+[  6] local 128.111.26.166 port 5001 connected with 128.111.26.169 port 45684
+[  5] local 128.111.26.166 port 5001 connected with 128.111.26.168 port 34354
+[ 10] local 128.111.26.166 port 5001 connected with 128.111.26.167 port 43663
+[  9] local 128.111.26.166 port 5001 connected with 128.111.26.171 port 34277
+[  7]  0.0-10.2 sec  18.9 MBytes  15.6 Mbits/sec
+[ 10]  0.0-10.2 sec  19.0 MBytes  15.7 Mbits/sec
+[  9]  0.0-10.2 sec  18.9 MBytes  15.6 Mbits/sec
+[  6]  0.0-10.2 sec  19.2 MBytes  15.8 Mbits/sec
+[  8]  0.0-10.2 sec  19.1 MBytes  15.7 Mbits/sec
+[  5]  0.0-10.2 sec  18.9 MBytes  15.4 Mbits/sec
+[  5] local 128.111.26.166 port 5001 connected with 128.111.26.169 port 45686
+[ 11] local 128.111.26.166 port 5001 connected with 128.111.26.167 port 43665
+[  6] local 128.111.26.166 port 5001 connected with 128.111.26.172 port 45745
+[  8] local 128.111.26.166 port 5001 connected with 128.111.26.171 port 34279
+[  7] local 128.111.26.166 port 5001 connected with 128.111.26.170 port 50163
+[  9] local 128.111.26.166 port 5001 connected with 128.111.26.168 port 34357
+[  5]  0.0-10.3 sec  19.1 MBytes  15.6 Mbits/sec
+[  9]  0.0-10.2 sec  19.2 MBytes  15.8 Mbits/sec
+[ 11]  0.0-10.3 sec  19.0 MBytes  15.5 Mbits/sec
+[  8]  0.0-10.3 sec  19.1 MBytes  15.6 Mbits/sec
+[  7]  0.0-10.3 sec  19.1 MBytes  15.6 Mbits/sec
+[  6]  0.0-10.3 sec  19.5 MBytes  15.9 Mbits/sec
+[  9] local 128.111.26.166 port 5001 connected with 128.111.26.171 port 34282
+[  8] local 128.111.26.166 port 5001 connected with 128.111.26.170 port 50166
+[  7] local 128.111.26.166 port 5001 connected with 128.111.26.172 port 45748
+[  6] local 128.111.26.166 port 5001 connected with 128.111.26.169 port 45689
+[  5] local 128.111.26.166 port 5001 connected with 128.111.26.168 port 34359
+[ 10] local 128.111.26.166 port 5001 connected with 128.111.26.167 port 43668
+[ 10]  0.0-10.3 sec  19.1 MBytes  15.6 Mbits/sec
+[  7]  0.0-10.3 sec  19.2 MBytes  15.7 Mbits/sec
+[  9]  0.0-10.3 sec  19.5 MBytes  15.8 Mbits/sec
+[  5]  0.0-10.3 sec  19.2 MBytes  15.6 Mbits/sec
+[  6]  0.0-10.4 sec  19.4 MBytes  15.7 Mbits/sec
+[  8]  0.0-10.4 sec  19.5 MBytes  15.8 Mbits/sec

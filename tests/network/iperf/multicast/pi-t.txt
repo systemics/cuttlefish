@@ -1,0 +1,35 @@
+------------------------------------------------------------
+Server listening on UDP port 5001
+Binding to local address 225.0.0.5
+Joining multicast group  225.0.0.5
+Receiving 1470 byte datagrams
+UDP buffer size:  160 KByte (default)
+------------------------------------------------------------
+[  3] local 225.0.0.5 port 5001 connected with 128.111.26.166 port 55436
+[ ID] Interval       Transfer     Bandwidth        Jitter   Lost/Total Datagrams
+[  3]  0.0-10.0 sec  38.2 MBytes  32.0 Mbits/sec   0.108 ms    0/27221 (0%)
+[  3]  0.0-10.0 sec  1 datagrams received out-of-order
+[  4] local 225.0.0.5 port 5001 connected with 128.111.26.166 port 38838
+[  4]  0.0-10.0 sec  38.2 MBytes  32.0 Mbits/sec   0.049 ms    0/27234 (0%)
+[  4]  0.0-10.0 sec  1 datagrams received out-of-order
+[  3] local 225.0.0.5 port 5001 connected with 128.111.26.166 port 52097
+[  3]  0.0-10.0 sec  38.2 MBytes  32.0 Mbits/sec   0.167 ms    0/27218 (0%)
+[  3]  0.0-10.0 sec  1 datagrams received out-of-order
+[  4] local 225.0.0.5 port 5001 connected with 128.111.26.166 port 57234
+[  4]  0.0-10.0 sec  38.0 MBytes  31.9 Mbits/sec   0.039 ms    0/27096 (0%)
+[  4]  0.0-10.0 sec  1 datagrams received out-of-order
+[  3] local 225.0.0.5 port 5001 connected with 128.111.26.166 port 34236
+[  3]  0.0-10.0 sec  38.1 MBytes  31.9 Mbits/sec   0.074 ms    0/27153 (0%)
+[  3]  0.0-10.0 sec  1 datagrams received out-of-order
+[  4] local 225.0.0.5 port 5001 connected with 128.111.26.166 port 38957
+[  4]  0.0-10.0 sec  38.2 MBytes  32.0 Mbits/sec   0.037 ms    0/27226 (0%)
+[  4]  0.0-10.0 sec  1 datagrams received out-of-order
+[  3] local 225.0.0.5 port 5001 connected with 128.111.26.166 port 33275
+[  3]  0.0-10.0 sec  38.1 MBytes  31.9 Mbits/sec   0.091 ms    0/27154 (0%)
+[  3]  0.0-10.0 sec  1 datagrams received out-of-order
+[  4] local 225.0.0.5 port 5001 connected with 128.111.26.166 port 60592
+[  4]  0.0-10.0 sec  38.1 MBytes  32.0 Mbits/sec   0.038 ms    0/27197 (0%)
+[  4]  0.0-10.0 sec  1 datagrams received out-of-order
+[  3] local 225.0.0.5 port 5001 connected with 128.111.26.166 port 57185
+[  3]  0.0-10.0 sec  38.1 MBytes  32.0 Mbits/sec   0.151 ms    0/27190 (0%)
+[  3]  0.0-10.0 sec  1 datagrams received out-of-order
