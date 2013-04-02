@@ -1,3 +1,11 @@
+# State Of The Art #
+
+It seems like most most Large Display Walls ([LDW][]) are perminent/stationary, expensive, and emphasize high bandwidth.
+
+- Hiperwall
+- ?
+
+
 
 # Development/Deployment #
 
@@ -96,7 +104,8 @@ Not available from the package manager:
 # References #
 
 [git][], [ssh][], [mpssh][], [rsync][], [ganglia][], [murder][], [puppet][],
-[0mq][], [osc][], [CSI-2][], [ntpd][], [Satellite CCRMA][], [MTU][], [ptpd][]
+[0mq][], [osc][], [CSI-2][], [ntpd][], [Satellite CCRMA][], [MTU][], [ptpd][],
+[LDW][]
 
 [git]: http://git-scm.com/
 [ssh]: http://en.wikipedia.org/wiki/Secure_Shell
@@ -112,5 +121,6 @@ Not available from the package manager:
 [Satellite CCRMA]: https://ccrma.stanford.edu/~eberdahl/Satellite
 [MTU]: http://en.wikipedia.org/wiki/Maximum_transmission_unit
 [ptpd]: http://en.wikipedia.org/wiki/Precision_Time_Protocol
+[LDW]: http://en.wikipedia.org/wiki/Video_wall#Latest_Advancements
 
 <link href="http://kevinburke.bitbucket.org/markdowncss/markdown.css" rel="stylesheet"></link>

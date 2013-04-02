@@ -1,0 +1,41 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+@ARGV > 0 or die<<EOF;
+
+  ./push <file> ...
+
+  pushes files or folders to each cluster cell.
+
+EOF
+
+my @file = ();
+my @host = (
+  'pi@pi-z.mat.ucsb.edu',
+  'pi@pi-t.mat.ucsb.edu',
+  'pi@pi-m.mat.ucsb.edu',
+  'pi@pi-c.mat.ucsb.edu',
+  'pi@pi-b.mat.ucsb.edu',
+  'pi@pi-l.mat.ucsb.edu',
+  'pi@pi-r.mat.ucsb.edu');
+
+for (0..@ARGV-1) {
+  chomp;
+  die unless (-f $ARGV[$_] || -d $ARGV[$_]);
+  push @file, $ARGV[$_];
+}
+
+for my $file (@file) {
+  if (-f $file) {
+    for my $host (@host) {
+      print "scp $file $host: &\n";
+    }
+  }
+  if (-d $file) {
+    for my $host (@host) {
+      print "scp -r $file $host: &\n";
+    }
+  }
+}
