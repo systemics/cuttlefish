@@ -1,5 +1,5 @@
 PORT = 22
-HOST = pi
+HOST = pi-r
 NAME = main
 ROOT = $(HOME)/code/pi/root
 
@@ -20,17 +20,14 @@ LIB += -lvchiq_arm
 $(NAME): $(NAME).o EGLConfig.o EGLWindow.o
 	$(CXX) -o $@ $^ $(OPT) $(LIB)
 
-header: EGLConfig.hpp.gch EGLWindow.hpp.gch
-
-%.hpp.gch :: %.hpp
-	$(CXX) -o $@ $< $(OPT) $(INC)
-
-%.o :: %.cpp header
+%.o :: %.cpp
 	$(CXX) -o $@ -c $< $(OPT) $(INC)
 
+kill:
+	ssh $(HOST) "pkill $(NAME) && rm /tmp/$(NAME)"
+
 deploy:
-	scp -P $(PORT) $(NAME) $(HOST):/tmp
-	ssh -t -p $(PORT) $(HOST) /tmp/$(NAME)
+	ssh -o 'LocalCommand=scp $(NAME) $(HOST):/tmp/' $(HOST) /tmp/$(NAME)
 
 clean:
 	rm -f *.o *.gch $(NAME)
