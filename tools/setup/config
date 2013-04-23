@@ -1,0 +1,4 @@
+Host pi-r
+  HostName pi-r.mat.ucsb.edu
+  User pi
+  IdentityFile ~/.ssh/id_rsa.pi
