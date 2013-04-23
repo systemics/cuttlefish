@@ -1,0 +1,40 @@
+EGL_EXTENSIONS DUMP (from egl_extensions.c)
+
+EGL
+  Vendor: Broadcom
+  Version: 1.4
+  Client APIs: OpenGL_ES OpenVG
+  Extensions: EGL_KHR_image EGL_KHR_image_base EGL_KHR_image_pixmap EGL_KHR_vg_parent_image EGL_KHR_gl_texture_2D_image EGL_KHR_gl_texture_cubemap_image EGL_KHR_lock_surface 
+OpenGL ES
+  Vendor: Broadcom
+  Renderer: VideoCore IV HW
+  Version: OpenGL ES 2.0
+  GLSL version: OpenGL ES GLSL ES 1.00
+  Extensions: 
+
+GL_OES_compressed_ETC1_RGB8_texture 
+GL_OES_compressed_paletted_texture 
+GL_OES_texture_npot GL_OES_depth24 
+GL_OES_vertex_half_float 
+GL_OES_EGL_image 
+GL_OES_EGL_image_external 
+GL_EXT_discard_framebuffer 
+GL_OES_rgb8_rgba8 
+GL_OES_depth32 
+GL_OES_mapbuffer 
+GL_EXT_texture_format_BGRA8888 
+GL_APPLE_rgb_422 
+GL_EXT_debug_marker 
+
+  Implementation limits:
+    GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS = 8
+    GL_MAX_CUBE_MAP_TEXTURE_SIZE = 2048
+    GL_MAX_FRAGMENT_UNIFORM_VECTORS = 136
+    GL_MAX_RENDERBUFFER_SIZE = 2048
+    GL_MAX_TEXTURE_IMAGE_UNITS = 8
+    GL_MAX_TEXTURE_SIZE = 2048
+    GL_MAX_VARYING_VECTORS = 8
+    GL_MAX_VERTEX_ATTRIBS = 8
+    GL_MAX_VERTEX_TEXTURE_IMAGE_UNITS = 8
+    GL_MAX_VERTEX_UNIFORM_VECTORS = 136
+    GL_MAX_VIEWPORT_DIMS = 2048, 2048
