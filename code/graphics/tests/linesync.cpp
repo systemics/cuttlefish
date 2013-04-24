@@ -1,5 +1,5 @@
 //
-//  blinksync.cpp
+//  linesync.cpp
 //
 //  Created by Karl Yerkes on Tue Apr 23 16:52:23 PDT 2013
 //  Copyright (c) 2013. All rights reserved.
@@ -9,21 +9,16 @@
 #include "ctl_gl.h"
 #include <iostream>
 
+#include <lo/lo.h>
 #include "ShaderManager.h"
 
 using namespace std;
 using namespace ctl::EGL;
-
-GLfloat rectangle[12] = {
-  -1, -1,  0,
-  -1,  1,  0,
-   1,  0,  0,
-   1,  0,  0,
-//   1,  1,  0,
-//   1, -1,  0,
-};
-
 using namespace ctl;
+
+GLfloat rectangle[8] = { 0, 0, 0, 1, 1, 1, 1, 0 };
+//GLfloat rectangle[8] = { -1, -1, -1,  1, 1,  1, 1, -1, };
+GLubyte rectangle_index[] = { 0, 1, 2, 0, 2, 3, };
 
 struct MyWindow : public Window {
 
@@ -37,33 +32,28 @@ struct MyWindow : public Window {
 
   void initGL(){
     glClearColor(1, 1, 1, 1);
+    shaderManager.make("basic",
+      STRINGIFY(
+        attribute vec2 position;
+        void main(void) {
+          gl_Position = vec4(position.x * 2.0 - 1.0, position.y * 2.0 - 1.0, 0., 1.);
+        }
+      ),
+      STRINGIFY(
+        void main(void) {
+          gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0); 
+        }
+      )
+    );
   }
 
   virtual void onDraw() {
-    glVertexAttribPointer(shaderManager.locationOf("position"), 3, GL_FLOAT, 0, 0, rectangle);
+    glVertexAttribPointer(shaderManager.locationOf("position"), 2, GL_FLOAT, 0, 0, rectangle);
     glEnableVertexAttribArray(shaderManager.locationOf("position"));
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, rectangle_index);
   }
 
   virtual void onFrame() {
-    static bool firstTime = true;
-    if (firstTime) {
-      firstTime = false;
-      shaderManager.make("basic",
-        STRINGIFY(
-          attribute vec4 position;
-          void main(void) {
-            gl_Position = position;
-          }
-        ),
-        STRINGIFY(
-          void main(void) {
-            gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0); 
-          }
-        )
-      );
-    }
-
     glClearColor(0, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     onDraw();
@@ -76,13 +66,22 @@ void quit(int) {
   running = false;
 }
 
+int update_rectangle(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) {
+  for (int i = 0; i < 8; ++i)
+    rectangle[i] = argv[i]->f;
+  return 0;
+}
+
 int main() {
   bcm_host_init();
   signal(SIGABRT, quit);
   signal(SIGTERM, quit);
   signal(SIGINT, quit);
 
-    cout << "GOTHERE" << endl;
+  lo_server_thread st = lo_server_thread_new("7770", 0);
+  lo_server_thread_add_method(st, "/rectangle", "ffffffff", update_rectangle, 0);
+  lo_server_thread_start(st);
+
   MyWindow win;
 
   while (running) {

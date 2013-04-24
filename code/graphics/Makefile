@@ -26,7 +26,7 @@ VPATH = $(INC_DIR):\
 
 IPATH = -Ictl -I$(PIROOT)usr/include -I$(PIROOT)opt/vc/include -I$(PIROOT)opt/vc/include/interface/vcos/pthreads -I$(PIROOT)opt/vc/include/interface/vmcs_host/linux
 LDFLAGS =  -L$(PIROOT)usr/lib -lstdc++ -lm
-LDFLAGS += -L$(PIROOT)/opt/vc/lib/ -lGLESv2 -lEGL -lstdc++ -lm -lbcm_host -lvcos -lvchiq_arm
+LDFLAGS += -L$(PIROOT)/opt/vc/lib/ -lGLESv2 -lEGL -lstdc++ -lm -lbcm_host -lvcos -lvchiq_arm -llo
 
 #OBJS = 
 
