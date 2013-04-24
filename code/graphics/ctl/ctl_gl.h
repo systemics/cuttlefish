@@ -9,6 +9,7 @@
 #ifndef Versor_ctl_gl_h
 #define Versor_ctl_gl_h
 
+using namespace std;
 
 #include <string>
 #include <vector>
@@ -16,6 +17,7 @@
 #include "ctl_gxlib.h"
 #include "ctl_matrix.h"
 
+#include <stdio.h>
 
 namespace ctl {
 
@@ -190,12 +192,141 @@ namespace ctl {
 
         
 
-         GLenum type(GLenum); //type from vectype
-         int cmp(GLenum); //components
-         void error(string msg = "");
-         int bpp(GLenum);
-         int planes(GLenum );
-         GLsizeiptr dataSize(GLenum, GLenum, int);
+         // GLenum type(GLenum); //type from vectype
+         // int cmp(GLenum); //components
+         // void error(string msg = "");
+         // int bpp(GLenum);
+         // int planes(GLenum );
+         // GLsizeiptr dataSize(GLenum, GLenum, int);
+	   inline void error(string tmsg){
+
+	        GLenum err = glGetError();
+
+	        const char * msg = tmsg.c_str();
+
+	        switch(err) {
+	            case GL_INVALID_ENUM:
+	                printf("%s:\n %s\n", msg, "An unacceptable value is specified for an enumerated argument. The offending command is ignored and has no other side effect than to set the error flag.");
+	                break;
+
+	            case GL_INVALID_VALUE:
+	                printf("%s:\n %s\n", msg, "A numeric argument is out of range. The offending command is ignored and has no other side effect than to set the error flag.");
+	                break;
+
+	            case GL_INVALID_OPERATION:
+	                printf("%s:\n %s\n", msg, "The specified operation is not allowed in the current state. The offending command is ignored and has no other side effect than to set the error flag.");
+	                break;
+
+	            case GL_INVALID_FRAMEBUFFER_OPERATION:
+	                printf("%s:\n %s\n", msg, "Framebuffer is Incomplete");
+	                break;
+ #ifndef __raspberry__
+
+	            case GL_STACK_OVERFLOW:
+	                printf("%s:\n %s\n", msg, "This command would cause a stack overflow. The offending command is ignored and has no other side effect than to set the error flag.");
+	                break;
+
+           
+
+	            case GL_STACK_UNDERFLOW:
+	                printf("%s:\n %s\n", msg, "This command would cause a stack underflow. The offending command is ignored and has no other side effect than to set the error flag.");
+	                break;
+#endif
+	            case GL_OUT_OF_MEMORY:
+	                printf("%s:\n %s\n", msg, "There is not enough memory left to execute the command.  The state of the GL is undefined, except for the state of the error flags, after this error is recorded.");
+	                break;
+			
+	                //		case GL_TABLE_TOO_LARGE:
+	                //			printf("%s:\n %s\n", msg, "The specified table exceeds the implementation's maximum supported table size.  The offending command is ignored and has no other side effect than to set the error flag.");
+	                //			break;
+
+	            case GL_NO_ERROR:
+	                break;
+
+	            default:
+	                break;
+	        }
+
+	        //return 10;
+	    }
+
+
+
+
+
+	    inline int  planes(GLenum format) {
+	        switch(format) {
+	                //		case GL_COLOR_INDEX:
+	            case GL_STENCIL_INDEX:
+	            case GL_DEPTH_COMPONENT:
+	                //		case GL_RED:
+	                //		case GL_GREEN:
+	                //		case GL_BLUE:
+	            case GL_ALPHA:
+	            case GL_LUMINANCE:			return 1;
+
+	            case GL_LUMINANCE_ALPHA:	return 2;
+	            case GL_RGB:				return 3;
+	            case GL_RGBA:
+	            default:					return 4;
+	        }
+	    }
+	
+	    // bytes/px
+	    inline int bpp(GLenum type) {
+	        switch(type) {
+	                /*
+	                 case GL_BITMAP:	??????
+	                 type = sizeof(GLbitfield);
+	                 break;
+	                 */
+
+	            case GL_UNSIGNED_SHORT:	return sizeof(GLushort);
+	            case GL_SHORT:			return sizeof(GLshort);
+	            case GL_UNSIGNED_INT:	return sizeof(GLuint);
+	            case GL_INT:			return sizeof(GLint);
+	            case GL_FLOAT:			return sizeof(GLfloat);
+	                //case GL_
+	            case GL_BYTE:			return sizeof(GLbyte);
+
+	            case GL_UNSIGNED_BYTE:
+	            default:				return sizeof(GLubyte);
+	        }
+	    }
+	
+	    inline GLsizeiptr dataSize(GLenum format, GLenum type, int num) {
+	        int p = planes(format);
+	        int b = bpp(type);
+	        return p * b * num;
+	    }
+
+
+	    inline GLenum type(GLenum t){
+	        switch(t){
+	            case GL_FLOAT_MAT2:
+	            case GL_FLOAT_MAT4:
+	            case GL_FLOAT_VEC2: 
+	            case GL_FLOAT_VEC3: 
+	            case GL_FLOAT_VEC4: return GL_FLOAT;         
+	        }
+	        return GL_FLOAT;
+	    }
+	   inline  int cmp( GLenum type) {
+	        switch (type){
+
+	            case GL_FLOAT_MAT2: 
+	            case GL_FLOAT_VEC2: return 2;
+	            case GL_FLOAT_VEC3: return 3;
+	            case GL_FLOAT_VEC4: return 4;
+
+	            default:            return 3;
+
+	        }
+	        return 0;
+	    }
+
+
+
         
         static const string Get(GLenum t){
             switch (t){
