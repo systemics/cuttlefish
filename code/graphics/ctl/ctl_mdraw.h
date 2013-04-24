@@ -209,7 +209,8 @@ namespace ctl{
 //                }
                 
                 template<class A> void RenderES ( const A& a, ShaderProgram& program ) {
- 	               static MBO circle ( Mesh::Circle(.5) );
+ 	               
+					static MBO circle ( Mesh::Circle(.5) );
 	                static float mf[16];
                 
 					Mat4f mat = XMat::identity();//Draw::Mat(cir);

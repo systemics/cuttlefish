@@ -538,9 +538,9 @@ class ShaderProgram {
 	    bLoaded = true;
 	    bActive = true;
 
-	    bind();
+//	    bind();
 	    get();
-	    unbind();
+//	    unbind();
 	}
 
 inline 	void ShaderProgram::unload(){
