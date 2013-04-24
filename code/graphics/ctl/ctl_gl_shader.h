@@ -286,12 +286,12 @@ class ShaderProgram {
 //            return *this;
 //        }
 
-        const ShaderProgram& uniform43(const char * name, float vo[12]) {
-            glUniformMatrix4x3fv(uniform(name), 1, GL_FALSE, vo); 
-            //cout << "setting" << endl; 
-            GL::error("Set Shader Program UniformMat4fv");
-            return *this;
-        }
+        // const ShaderProgram& uniform43(const char * name, float vo[12]) {
+        //     glUniformMatrix4x3fv(uniform(name), 1, GL_FALSE, vo); 
+        //     //cout << "setting" << endl; 
+        //     GL::error("Set Shader Program UniformMat4fv");
+        //     return *this;
+        // }
     
     const ShaderProgram& attribute(const char * name, float x, float y, float z){
         glVertexAttrib3f(attribute(name), x, y, z);

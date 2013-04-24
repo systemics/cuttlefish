@@ -13,7 +13,7 @@
 #include <fstream>
 #include <sstream>
 
-#include "vsr/vsr_frame.h"
+//#include "vsr/vsr_frame.h"
 
 #include "ctl_matrix.h"
 #include "ctl_gl.h"
@@ -125,7 +125,7 @@ namespace ctl {
         Mesh& add(const Vertex& v) { mVertex.push_back(v); return *this;}        
         Mesh& add(const Vec3f& v) { mVertex.push_back( Vertex(v) ); return *this; }
         
-        Mesh& add(const Vec& p, const Vec& n) { mVertex.push_back( Vertex( Vec3f(p), Vec3f(n) ) ); return *this; }
+        // Mesh& add(const Vec& p, const Vec& n) { mVertex.push_back( Vertex( Vec3f(p), Vec3f(n) ) ); return *this; }
         
         Mesh& add(float x, float y, float z) { mVertex.push_back( Vertex( Vec3f(x,y,z) ) ); return *this; }
         //Mesh& add(const Vec& v) { mVertex.push_back( Vertex( Vec3f(v[0], v[1], v[2]) ) ); return *this; }
@@ -238,7 +238,7 @@ namespace ctl {
         static Mesh Point(float x, float y, float z);
         static Mesh Grid(int w = 10, int h = 10, float spacing = .2);
         static Mesh Sphere(double rad = 1.0, int slices = 20, int stacks = 20);
-        static Mesh Line( Vec a, Vec b);
+        static Mesh Line( Vec3f a, Vec3f b);
         static Mesh Cone( double rad = 1.0 , double h = 1.0, int slices = 10, int stacks = 4);
         static Mesh Dir();
         static Mesh Circle(double scale = 1);
@@ -251,7 +251,7 @@ namespace ctl {
             @param number of Circles in array
             @param resolution (default 100)
         */
-        static Mesh Skin (Cir * cir, int num, int res = 100);
+        // static Mesh Skin (Cir * cir, int num, int res = 100);
     };
     
     
@@ -284,65 +284,66 @@ namespace ctl {
         m.mode(GL::LS);
         return m;
     }
+ 
+    //    
+    // inline Mesh Mesh::Sphere(double rad, int slices, int stacks){
+    //     Mesh m;
+    //             
+    //     for (int i = 0; i <= stacks; ++i){
+    //     
+    //         float v = -1.0 + 2.0* i/stacks;
+    //         
+    //         for (int j = 0; j < slices; ++j){
+    //             
+    //             float u = 1.0* j/slices;
+    //             Vec tv = Vec::x.sp( Gen::rot( PI * u, PIOVERFOUR * v) ) * rad;
+    //             Vec n = tv.unit();
+    //             m.add( tv, n );
+    // 
+    //             if (i == 0 || i == stacks) {
+    //                 break;
+    //             }
+    //                             
+    //         }
+    //     }
+    //     
+    //     
+    //     //BOTTOM 
+    //     for (int j = 0; j < slices; ++j){
+    //         m.add(j+1).add(0);
+    //     }
+    //     
+    //     //m.add(1);
+    //     
+    //     for (int i = 0; i < stacks -1; ++i){
+    //         static bool color = 0;
+    //         color = !color;
+    //         for (int j = 0; j < slices; ++j){
+    //             static bool xcolor = 0;
+    //             xcolor = !xcolor;                
+    //             int a = 1 + i * slices + j;
+    //             if (a == 0) continue;
+    //             
+    //             int b =  ( i < stacks - 2) ? a + slices : m.num() - 1;  // Higher Latitue or North Pole
+    //             
+    //            // int c = ( j < slices - 1 ) ? a + 1 : 1 + i * slices;
+    //             
+    //             int idx[2] = {a,b};
+    //             m.add(idx,2);
+    //             m[a].Col.set(color,xcolor,1,1);
+    //             m[b].Col.set(color,xcolor,1,1);
+    //         }
+    //         m.add( 1 + i * slices );
+    //     }
+    //     
+    //     
+    //     m.last().Col.set(0,1,0,1);
+    //     
+    //     m.mode(GL::TS);
+    //     return m;
+    // }
     
-    inline Mesh Mesh::Sphere(double rad, int slices, int stacks){
-        Mesh m;
-                
-        for (int i = 0; i <= stacks; ++i){
-        
-            float v = -1.0 + 2.0* i/stacks;
-            
-            for (int j = 0; j < slices; ++j){
-                
-                float u = 1.0* j/slices;
-                Vec tv = Vec::x.sp( Gen::rot( PI * u, PIOVERFOUR * v) ) * rad;
-                Vec n = tv.unit();
-                m.add( tv, n );
-
-                if (i == 0 || i == stacks) {
-                    break;
-                }
-                                
-            }
-        }
-        
-        
-        //BOTTOM 
-        for (int j = 0; j < slices; ++j){
-            m.add(j+1).add(0);
-        }
-        
-        //m.add(1);
-        
-        for (int i = 0; i < stacks -1; ++i){
-            static bool color = 0;
-            color = !color;
-            for (int j = 0; j < slices; ++j){
-                static bool xcolor = 0;
-                xcolor = !xcolor;                
-                int a = 1 + i * slices + j;
-                if (a == 0) continue;
-                
-                int b =  ( i < stacks - 2) ? a + slices : m.num() - 1;  // Higher Latitue or North Pole
-                
-               // int c = ( j < slices - 1 ) ? a + 1 : 1 + i * slices;
-                
-                int idx[2] = {a,b};
-                m.add(idx,2);
-                m[a].Col.set(color,xcolor,1,1);
-                m[b].Col.set(color,xcolor,1,1);
-            }
-            m.add( 1 + i * slices );
-        }
-        
-        
-        m.last().Col.set(0,1,0,1);
-        
-        m.mode(GL::TS);
-        return m;
-    }
-    
-    inline Mesh Mesh::Line (Vec a, Vec b){
+    inline Mesh Mesh::Line (Vec3f a, Vec3f b){
     
         Mesh m;
         m.add(a).add(b);
@@ -482,69 +483,83 @@ namespace ctl {
     
     
 
-    inline Mesh Mesh::Skin (Cir * cir, int num, int res){
-        
-        Mesh m;
-        
-        for (int i = 0;  i < res; ++i){
-            double t= 1.0 * i/res;
-            
-            for (int j = 0; j < num; ++j){
-                double jt = 1.0 * j/num;
-                Vec v = Ro::pnt_cir( cir[j], TWOPI * t );
-                m.add( v[0], v[1], v[2] );
-                m.last().Col = Vec4f(t,jt,1-t,1.0);
-                //cout << v << endl; 
-            }
-        }
-        
-        //Calc Indices (FOR TRIANGLE STRIP)
-        int a,b,c,d;
-        for (int i = 0; i < num-1; ++i){
-            for (int j = 0; j < res; ++j){
-            
-                a = j * num + i;                //<-- current idx                        
-                b = a + 1;                      //<-- next circle
-                if (j>=res-1) { 
-                   // cout << "has looped around" << endl; 
-                    c = i + 1;
-                    d = i;
-                }
-                else {
-                    c = a + 1 + num ;           //<-- next on next circle
-                    d = a + num ;               //<-- next on same circle
-                }
-                int idx[2] = {a,c};
-                m.add(idx,2);
-            }
-            m.add(i).add(i+1+num);
-        }                
-        
-        //calc normals
-        for (int i = 0; i < res; ++i){
-            for (int j = 0; j < num-1; ++j){
-                a = i * num + j;        //<-- current idx
-                b = a + 1;              //<-- same on next circle
-                
-                if (i>=res-1) { 
-                    c = j + 1;
-                    d = j;
-                }
-                else {
-                    c = a + 1 + num ;           //<-- next on next circle
-                    d = a + num ;           //<-- next on same circle
-                }
-                Vec3f ta = m[b].Pos - m[a].Pos;
-                Vec3f tb = m[d].Pos - m[a].Pos;
-                Vec3f tc = -ta.cross(tb);
-                m[a].Norm = tc.unit();
-                //cout << m[a].Norm[0] << " " << m[a].Norm[1] << " " <<  m[a].Norm[2] << endl;
-            }
-        }
-        
-        return m;
-    
-    }
+    // inline Mesh Mesh::Skin (Cir * cir, int num, int res){
+    //      
+    //      Mesh m;
+    //      
+    //      for (int i = 0;  i < res; ++i){
+    //          double t= 1.0 * i/res;
+    //          
+    //          for (int j = 0; j < num; ++j){
+    //              double jt = 1.0 * j/num;
+    //              Vec v = Ro::pnt_cir( cir[j], TWOPI * t );
+    //              m.add( v[0], v[1], v[2] );
+    //              m.last().Col = Vec4f(t,jt,1-t,1.0);
+    //              //cout << v << endl; 
+    //          }
+    //      }
+    //      
+    //      //Calc Indices (FOR TRIANGLE STRIP)
+    //      int a,b,c,d;
+    //      for (int i = 0; i < num-1; ++i){
+    //          for (int j = 0; j < res; ++j){
+    //          
+    //              a = j * num + i;                //<-- current idx                        
+    //              b = a + 1;                      //<-- next circle
+    //              if (j>=res-1) { 
+    //                 // cout << "has looped around" << endl; 
+    //                  c = i + 1;
+    //                  d = i;
+    //              }
+    //              else {
+    //                  c = a + 1 + num ;           //<-- next on next circle
+    //                  d = a + num ;               //<-- next on same circle
+    //              }
+    //              int idx[2] = {a,c};
+    //              m.add(idx,2);
+    //          }
+    //          m.add(i).add(i+1+num);
+    //      }                
+    //      
+    //      //calc normals
+    //      for (int i = 0; i < res; ++i){
+    //          for (int j = 0; j < num-1; ++j){
+    //              a = i * num + j;        //<-- current idx
+    //              b = a + 1;              //<-- same on next circle
+    //              
+    //              if (i>=res-1) { 
+    //                  c = j + 1;
+    //                  d = j;
+    //              }
+    //              else {
+    //                  c = a + 1 + num ;           //<-- next on next circle
+    //                  d = a + num ;           //<-- next on same circle
+    //              }
+    //              Vec3f ta = m[b].Pos - m[a].Pos;
+    //              Vec3f tb = m[d].Pos - m[a].Pos;
+    //              Vec3f tc = -ta.cross(tb);
+    //              m[a].Norm = tc.unit();
+    //              //cout << m[a].Norm[0] << " " << m[a].Norm[1] << " " <<  m[a].Norm[2] << endl;
+    //          }
+    //      }
+    //      
+    //      return m;
+    //  
+    //  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     
     ///////////////
     ///////////////

@@ -13,7 +13,7 @@
 #ifndef CTL_glsl_h
 #define CTL_glsl_h
 
-// #include "ctl_file.h"
+#define STRINGIFY(A) #A
 
 namespace ctl{
 
@@ -185,8 +185,8 @@ namespace ctl{
         );
 
         
-    }
+    } //GLSL::
 
-}
+} //ctl::
 
 #endif

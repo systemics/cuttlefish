@@ -17,11 +17,14 @@
 #include "ctl_gl_vbo.h"
 #include "ctl_mesh.h"
 #include "ctl_gl_data.h"
+#include "ctl_gfxmatrix.h"
+#include "ctl_gl_shader.h"
 
-namespace vsr{
+namespace ctl{
 
     namespace GL{
-        namespace Draw {
+	
+        // namespace Draw {
         
                 /// BASIC AND LOOSE GL PIPELINE: SHADER -> VBO -> ATTRIB -> DRAW
                 struct Pipe {
@@ -209,8 +212,10 @@ namespace vsr{
  	               static MBO circle ( Mesh::Circle(.5) );
 	                static float mf[16];
                 
-					Mat4f mat = XMat::Identity();//Draw::Mat(cir);
-	                mat.fill(mf);
+					Mat4f mat = XMat::identity();//Draw::Mat(cir);
+	                
+					mat.fill(mf);
+	
 	                program.uniform("submodel", mf );    
 
 	                Pipe::Line( circle );                    
@@ -255,7 +260,6 @@ namespace vsr{
                 // }
                 
                 
-        } //DRAW::
     }//GL::
     
 #define DRAWES(t) vsr::GL::Draw::RenderES(t)    

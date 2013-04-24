@@ -15,7 +15,7 @@
 #define CTL_gl_data_h
 
 #include "ctl_gl_vbo.h"
-#include "ctl_mglyph.h"
+#include "ctl_mesh.h"
 
 namespace ctl{
 

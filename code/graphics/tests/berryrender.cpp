@@ -10,7 +10,6 @@
 #include "ctl_egl.h"
 #include "ctl_gl.h"
 
-
 #include <iostream>
 
 

@@ -282,6 +282,9 @@ namespace ctl {
 
          Vec4<T> row(int j) const { return Vec4<T>( col[0][j], col[1][j], col[2][j], col[3][j]); } 
          
+        void fill( T * res ) { 
+            std::copy( val(), val() + 16, res);            
+        }
          
          Mat4 operator * (const double d) const{
             Mat4 m;

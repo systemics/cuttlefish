@@ -13,7 +13,7 @@
 
 #include "ctl_mesh.h"
 
-namespace vsr {
+namespace ctl {
 //    namespace GL{
     
         //MESH GLYPHS -- consolidate with mesh::rect, etc.
@@ -78,6 +78,7 @@ namespace vsr {
                 @param number of Circles in array
                 @param resolution (default 100)
             */
+/
             static Mesh Skin (Cir * cir, int num, int res = 100){
                 
                 Mesh m;
