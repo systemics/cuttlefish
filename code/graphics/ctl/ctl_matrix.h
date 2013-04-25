@@ -12,8 +12,8 @@
 	FOR PASSING AROUND WITH MEMBERWISE SHALLOW COPYS
  */
 
-#ifndef CTL_MATRIX_H_INCLUDED
-#define CTL_MATRIX_H_INCLUDED
+#ifndef MATRIX_H_INCLUDED
+#define MATRIX_H_INCLUDED
 
 #include "ctl_constants.h"
 
@@ -35,6 +35,16 @@ namespace ctl {
 	template < typename T > class Mat5;
 //	template < typename T > class Col3;
 //	template < typename T > class Col4;
+
+    //Predeclare Template Friends
+    template< class T >
+    std::ostream& operator << ( std::ostream& os, const Vec2<T>& a );
+    template< class T >
+    std::ostream& operator << ( std::ostream& os, const Vec3<T>& a );
+    template< class T >
+    std::ostream& operator << ( std::ostream& os, const Vec4<T>& a );
+    template< class T >
+    std::ostream& operator << ( std::ostream& os, const Mat4<T>& a );
 
 	//2D VECTOR
 	template <typename T = double>
@@ -61,7 +71,7 @@ namespace ctl {
 			double len() const { return sqrt (x * x + y * y); }
 			double dot(Vec2 v) const { return x * v.x + y * v.y; }
 			
-
+            friend ostream& operator << (ostream&, const Vec2<>&);
 	};
 
 
@@ -117,10 +127,7 @@ namespace ctl {
 
 	};
 
-	inline ostream& operator << (ostream& os, const Vec3<>& v) {
-		os << "X: " << v.x << "\t\tY: " << v.y << "\t\tZ: " << v.z << "\t\t\n" ;
-		return os;
-	}
+
 	
 	//4D VECTOR (HOMOGENOUS COORDINATES)
 	template <typename T = double>	
@@ -160,11 +167,21 @@ namespace ctl {
 
 	};
 	
-	inline ostream& operator << (ostream& os, const Vec4<>& v) {
-		os << "X: " << v.x << "\t\tY: " << v.y << "\t\tZ: " << v.z << "\t\tW: " << v.w << "\t\t\n" ;
+    template <typename T>
+	inline ostream& operator << (ostream& os, const Vec2<T>& v) {
+		os << "v2 X: " << v.x << "\t\tY: " << v.y << "\t\t\n" ;
 		return os;
 	}
-	
+    template <typename T>
+    inline ostream& operator << (ostream& os, const Vec4<T>& v) {
+		os << "v4 X: " << v.x << "\t\tY: " << v.y << "\t\tZ: " << v.z << "\t\tW: " << v.w << "\t\t\n" ;
+		return os;
+	}
+    template <typename T>
+	inline ostream& operator << (ostream& os, const Vec3<T>& v) {
+		os << "v3 X: " << v.x << "\t\tY: " << v.y << "\t\tZ: " << v.z << "\t\t\n" ;
+		return os;
+	}	
 
 	
 	//5D VECTOR (CONFORMAL)
@@ -275,16 +292,18 @@ namespace ctl {
                            );
         }
         
-         const T * val() const { return col[0].val(); }
+
+        void fill( T * res ) { 
+            std::copy( val(), val() + 16, res);            
+        }
+        
+          const T * val() const { return col[0].val(); }
          T * val() { return &col[0][0]; }
          const T operator [] ( int i ) const { return val()[i]; }
          T& operator [] ( int i ) { return val()[i]; }
 
          Vec4<T> row(int j) const { return Vec4<T>( col[0][j], col[1][j], col[2][j], col[3][j]); } 
          
-        void fill( T * res ) { 
-            std::copy( val(), val() + 16, res);            
-        }
          
          Mat4 operator * (const double d) const{
             Mat4 m;
@@ -344,7 +363,8 @@ namespace ctl {
 			
 	};
 	
-	inline ostream& operator << (ostream& os, const Mat4<>& m){
+	template<typename T>
+	inline ostream& operator << (ostream& os, const Mat4<T>& m){
 	
 		os << "MAT 4: \n" << m.col[0] << m.col[1] << m.col[2] << m.col[3] <<"\n";
 		

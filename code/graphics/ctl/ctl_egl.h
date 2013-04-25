@@ -14,6 +14,7 @@
 #include <iostream>
 #include <string.h>
 
+#include <bcm_host.h>
 #include <EGL/egl.h>
 #include <map>
 #include <vector>
@@ -98,9 +99,11 @@ namespace ctl {
                 // static EGL_DISPMANX_WINDOW_T nativeWindow;
 
                 int32_t suc = 0;
-                //suc = graphics_get_display_size(0 , &width, &height);
-				width = 1920; height = 1080;
+                suc = graphics_get_display_size(0 , &width, &height);
+				//width = 1920; height = 1080;
 				maxWidth = width; maxHeight = height;
+				
+				cout << "SCEEN DIM: " << width << " x " << height << endl;
 
                 uint32_t x = 0; 
                 uint32_t y = 0;

@@ -16,7 +16,7 @@
 #include "ctl_gl_vattrib.h"
 #include "ctl_gl_vbo.h"
 #include "ctl_mesh.h"
-#include "ctl_gl_data.h"
+#include "ctl_gl_mbo.h"
 #include "ctl_gfxmatrix.h"
 #include "ctl_gl_shader.h"
 
@@ -49,6 +49,10 @@ namespace ctl{
                         vatt.col.set( Shader :: Current(), "sourceColor", sizeof(Vertex), 4, Vertex::oc() );
                         vatt.tex.set( Shader :: Current(), "texCoord", sizeof(Vertex), 2, Vertex::ot() );
                     }
+
+					static void BindPosition(){
+						vatt.pos.set( Shader :: Current(), "position", sizeof(Vertex),3,0);						
+					}
                     
                     static void InitBufferObjects(){                      
                         

@@ -103,7 +103,9 @@ struct ShaderParam {
     
     void print(){
         
-        printf(" name: %s\n id: %d\n buf: %d\n size: %d\n length: %d\n bytes: %d\n", name, id, buf, size, len, GL::bpp(datatype));
+        // printf(" name: %s\n id: %d\n buf: %d\n size: %d\n length: %d\n bytes: %d\n", name, id, buf, size, len, GL::bpp(datatype));
+
+        printf(" name: %s\n id: %d\n bytes: %d\n cmp: %d\n", name, id, GL::bpp(datatype), GL::cmp(vectype) );
         
     }
     
@@ -280,6 +282,7 @@ class ShaderProgram {
         }
     
         const ShaderProgram& uniform(const char * name, float vo[16]) {
+			
             glUniformMatrix4fv(uniform(name), 1, GL_FALSE, vo); 
             //cout << "setting" << endl; 
             GL::error("Set Shader Program UniformMat4fv");
@@ -528,6 +531,7 @@ class ShaderProgram {
 	    mId = glCreateProgram();  
 	    vert.source(vs.c_str(), Shader::VERTEX);
 	    frag.source(fs.c_str(), Shader::FRAGMENT);
+	
 	    attach(vert);
 	    attach(frag);
 
@@ -611,10 +615,21 @@ inline 	void ShaderProgram::unload(){
 
 	        GLint numActiveUniforms = 0;
 	        GLint numActiveAttributes = 0;
+			GLint linkStatus = 0;
+			GLint validateStatus =0;
 
 	        glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &numActiveUniforms);
 	        glGetProgramiv(program, GL_ACTIVE_ATTRIBUTES, &numActiveAttributes);
 
+			cout << "num uniforms: " << numActiveUniforms << endl;
+			cout << "num attributes: " << numActiveAttributes << endl;
+			
+			glGetProgramiv(program, GL_LINK_STATUS, &linkStatus);
+			glGetProgramiv(program, GL_VALIDATE_STATUS, &validateStatus);
+			
+			cout << "Link: " << linkStatus << "  Validate: " << validateStatus << endl; 
+
+			
 	        GL::error("Shader Get Params");
 
 	        printf("ShaderProgram::get()\n");
@@ -622,6 +637,7 @@ inline 	void ShaderProgram::unload(){
 	        for(int j=0; j < numActiveUniforms; j++)
 	        {
 
+				//Get Attrib Location
 	            Uniform u( program, j );
 
 	            mUniform.push_back( u );

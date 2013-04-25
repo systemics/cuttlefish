@@ -66,8 +66,11 @@ namespace ctl {
     
     struct Mesh { //: public Frame {
         
+		typedef unsigned short INDEXTYPE;
+
     private:
         
+
         /// Draw Mode
         GL::MODE mMode;
         
@@ -78,7 +81,7 @@ namespace ctl {
         vector< Vertex > mVertex;
         
         ///Indices for ElementArray
-        vector< unsigned int > mIndex;
+        vector< INDEXTYPE > mIndex;
         
     public:
         
@@ -108,8 +111,8 @@ namespace ctl {
         Vertex& operator[] (int idx) { return mVertex[idx]; }
         Vertex operator[] (int idx) const { return mVertex[idx]; }
         
-        unsigned int& idx(int ix) { return mIndex[ix]; }
-        unsigned int idx(int ix) const { return mIndex[ix]; }
+        INDEXTYPE & idx(int ix) { return mIndex[ix]; }
+        INDEXTYPE  idx(int ix) const { return mIndex[ix]; }
         
         int num() const { return mVertex.size(); }
         int numIdx() const { return mIndex.size(); }
@@ -124,6 +127,7 @@ namespace ctl {
         
         Mesh& add(const Vertex& v) { mVertex.push_back(v); return *this;}        
         Mesh& add(const Vec3f& v) { mVertex.push_back( Vertex(v) ); return *this; }
+        Mesh& add(const Vec3f& v, const Vec3f& n) { mVertex.push_back( Vertex(v,n) ); return *this; }
         
         // Mesh& add(const Vec& p, const Vec& n) { mVertex.push_back( Vertex( Vec3f(p), Vec3f(n) ) ); return *this; }
         
@@ -157,7 +161,7 @@ namespace ctl {
         
         GL::MODE mode() { return mMode; }
         
-        vector<unsigned int>::iterator indices() { return mIndex.begin(); }        
+        vector<INDEXTYPE>::iterator indices() { return mIndex.begin(); }        
         vector<Vertex>::iterator vertices() { return mVertex.begin(); }
         
         Vertex& last() { return mVertex[ mVertex.size() - 1 ]; }
@@ -285,63 +289,70 @@ namespace ctl {
         return m;
     }
  
-    //    
-    // inline Mesh Mesh::Sphere(double rad, int slices, int stacks){
-    //     Mesh m;
-    //             
-    //     for (int i = 0; i <= stacks; ++i){
-    //     
-    //         float v = -1.0 + 2.0* i/stacks;
-    //         
-    //         for (int j = 0; j < slices; ++j){
-    //             
-    //             float u = 1.0* j/slices;
-    //             Vec tv = Vec::x.sp( Gen::rot( PI * u, PIOVERFOUR * v) ) * rad;
-    //             Vec n = tv.unit();
-    //             m.add( tv, n );
-    // 
-    //             if (i == 0 || i == stacks) {
-    //                 break;
-    //             }
-    //                             
-    //         }
-    //     }
-    //     
-    //     
-    //     //BOTTOM 
-    //     for (int j = 0; j < slices; ++j){
-    //         m.add(j+1).add(0);
-    //     }
-    //     
-    //     //m.add(1);
-    //     
-    //     for (int i = 0; i < stacks -1; ++i){
-    //         static bool color = 0;
-    //         color = !color;
-    //         for (int j = 0; j < slices; ++j){
-    //             static bool xcolor = 0;
-    //             xcolor = !xcolor;                
-    //             int a = 1 + i * slices + j;
-    //             if (a == 0) continue;
-    //             
-    //             int b =  ( i < stacks - 2) ? a + slices : m.num() - 1;  // Higher Latitue or North Pole
-    //             
-    //            // int c = ( j < slices - 1 ) ? a + 1 : 1 + i * slices;
-    //             
-    //             int idx[2] = {a,b};
-    //             m.add(idx,2);
-    //             m[a].Col.set(color,xcolor,1,1);
-    //             m[b].Col.set(color,xcolor,1,1);
-    //         }
-    //         m.add( 1 + i * slices );
-    //     }
-    //     
-    //     
-    //     m.last().Col.set(0,1,0,1);
-    //     
-    //     m.mode(GL::TS);
-    //     return m;
-    // }
+       
+      inline Mesh Mesh::Sphere(double rad, int slices, int stacks){
+          Mesh m;
+                  
+          for (int i = 0; i <= stacks; ++i){
+          
+              float v = -1.0 + 2.0* i/stacks;
+              
+              for (int j = 0; j < slices; ++j){
+                  
+                  float u = 1.0* j/slices;
+
+                  // Vec tv = Vec::x.sp( Gen::rot( PI * u, PIOVERFOUR * v) ) * rad;
+                  // Vec n = tv.unit();
+				Quat qu = Quat( PI*u, Vec3f(0,1,0));
+//				Vec3f tu = Quat::spin( Vec3f(0,0,1), qu );
+				Quat qv = Quat( PIOVERFOUR * v, Vec3f(0,0,1) ) ;
+				
+				 Vec3f tv = Quat::spin( Vec3f(1,0,0),  qu * qv ) ;
+				//cout << tv << endl;
+                  m.add( tv * rad, tv );
+      
+                  if (i == 0 || i == stacks) {
+                      break;
+                  }
+                                  
+              }
+          }
+          
+          
+          //BOTTOM 
+          for (int j = 0; j < slices; ++j){
+              m.add(j+1).add(0);
+          }
+          
+          //m.add(1);
+          
+          for (int i = 0; i < stacks -1; ++i){
+              static bool color = 0;
+              color = !color;
+              for (int j = 0; j < slices; ++j){
+                  static bool xcolor = 0;
+                  xcolor = !xcolor;                
+                  int a = 1 + i * slices + j;
+                  if (a == 0) continue;
+                  
+                  int b =  ( i < stacks - 2) ? a + slices : m.num() - 1;  // Higher Latitue or North Pole
+                  
+                 // int c = ( j < slices - 1 ) ? a + 1 : 1 + i * slices;
+                  
+                  int idx[2] = {a,b};
+                  m.add(idx,2);
+                  m[a].Col.set(color,xcolor,1,1);
+                  m[b].Col.set(color,xcolor,1,1);
+              }
+              m.add( 1 + i * slices );
+          }
+          
+          
+          m.last().Col.set(0,1,0,1);
+          
+          m.mode(GL::LS);
+          return m;
+      }
     
     inline Mesh Mesh::Line (Vec3f a, Vec3f b){
     

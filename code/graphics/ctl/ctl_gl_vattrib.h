@@ -47,7 +47,8 @@ namespace ctl {
 //            mAtt.id = glGetAttribLocation(sprog, attrib.c_str()); 
             
             mAtt.getAttrib(sprog, attrib.c_str());
-            mAtt.print();
+
+//            mAtt.print();
             
             mSize = GL::cmp(mAtt.vectype);
             cout << "components: " << mSize << endl;

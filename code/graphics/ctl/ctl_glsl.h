@@ -19,6 +19,24 @@ namespace ctl{
 
     namespace GLSL{
         
+		string SimpleVertex = STRINGIFY(
+		
+			attribute vec3 position;
+		
+			void main(void){
+				vec4 tmp = vec4(position,1.0);
+				gl_Position = tmp;
+			}
+		);
+
+		string SimpleFragment = STRINGIFY(
+		
+			void main(void){
+				gl_FragColor = vec4(1.0,1.0,1.0,1.0);
+			}
+		);
+
+
         string AVertex = STRINGIFY(
             attribute vec3 position;
             attribute vec3 normal;
@@ -28,7 +46,7 @@ namespace ctl{
         
         string UMatrix = STRINGIFY(
             uniform mat4 modelView;         // Model * View
-            uniform mat4 submodel;          // Glyph-specific Transform
+           // uniform mat4 submodel;          // Glyph-specific Transform
             uniform mat4 projection;        // Projection Matrix (ortho or frustrum)
             uniform mat4 normalMatrix;      // Normal Matrix (inverse transpose of mvm)
         );
@@ -77,13 +95,13 @@ namespace ctl{
             }
         );
         
-        string VPass = STRINGIFY(
-            vec4 doVertex (vec4 v) { return gl_ModelViewProjectionMatrix * v; }
-        );
+        // string VPass = STRINGIFY(
+        //     vec4 doVertex (vec4 v) { return gl_ModelViewProjectionMatrix * v; }
+        // );
 
         string VCalc = STRINGIFY(
             vec4 doVertex (vec4 v) {
-                mat4 m = projection * modelView * submodel;
+				mat4 m = projection * modelView;// * submodel;
                 return m * v;
             }
         );
@@ -184,6 +202,38 @@ namespace ctl{
             }
         );
 
+				// static string SVert = STRINGIFY(
+				//     
+				// 			            attribute vec3 position;
+				// 			            // attribute vec3 normal;
+				// 			            // attribute vec4 sourceColor;
+				// 			            // attribute vec2 texCoord;
+				// 		            uniform mat4 modelView;         // Model * View
+				// 		           // uniform mat4 submodel;          // Glyph-specific Transform
+				// 		            uniform mat4 projection;        // Projection Matrix (ortho or frustrum)
+				// 		           // uniform mat4 normalMatrix;      // Normal Matrix (inverse transpose of mvm)
+				// 	
+				// 	vec4 doVertex (vec4 v) {
+				// 		mat4 m = projection * modelView;// * submodel;
+				// 		                return m * v;
+				// 		            }
+				// 	
+				// 	 void main(void){
+				// 						
+				// 		vec4 np = doVertex( vec4(position, 1.0) );
+				// 						
+				// 		gl_Position = np;
+				// 	}
+				// );
+				// 
+				// static string SFrag = STRINGIFY(
+				// 			    
+				// 			
+				// 	 void main(void){
+				// 		
+				// 		gl_FragColor = vec4(1.0,1.0,1.0,1.0);
+				// 	}
+				// );
         
     } //GLSL::
 

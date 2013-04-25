@@ -1,10 +1,12 @@
 PORT = 22
-HOST = pi-r
+HOST = pi-la
 NAME = main
 
 CXX = arm-linux-gnueabihf-g++
 AR = ar crs
 CXXFLAGS = -D __raspberry__ -U __linux__
+
+SYNCITEMS = /opt /usr/include /usr/lib /lib
 
 BUILD_DIR 	= build/
 BIN_DIR		= $(BUILD_DIR)bin/
@@ -36,7 +38,6 @@ title:
 	@echo "make tests for raspbi graphics"
 	@echo $(PIROOT)
 
-
 $(OBJ_DIR)%.o: $(OBJ_DIR)%.cpp %.h
 	@echo "compiling $< to $@"
 	$(CXX) $(CXXFLAGS) $(IPATH) -c $< -o $@ 
@@ -46,11 +47,14 @@ dir:
 	@mkdir -p $(OBJ_DIR)
 	@mkdir -p $(LIB_DIR)
 
-.PRECIOUS: $(EXEC)
+.PRECIOUS: $(EXEC_TARGETS)
 $(EXEC_TARGETS) : title dir FORCE
 	@echo "cross compiling executable" $@
 	$(CXX) $(CXXFLAGS) $(IPATH) $@ -o $(BIN_DIR)$(NAME) $(LDFLAGS)
-	#@cd $(BIN_DIR) && ./$(*F)
+	@make deploy
+
+sync:
+	@rsync -avzL $(addPrefix($(HOST):, $(SYNCITEMS))) $(PIROOT)
 
 deploy:
 	scp -P $(PORT) $(BIN_DIR)$(NAME) $(HOST):/tmp

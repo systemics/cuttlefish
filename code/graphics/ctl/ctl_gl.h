@@ -65,7 +65,8 @@ namespace ctl {
         
         enum TYPE {
             UBYTE       = GL_UNSIGNED_BYTE, 
-            USHORT      = GL_UNSIGNED_SHORT_5_6_5,
+			USHORT		= GL_UNSIGNED_SHORT,
+            USHORT565   = GL_UNSIGNED_SHORT_5_6_5,
             USHORT4     = GL_UNSIGNED_SHORT_4_4_4_4, 
             USHORT5     = GL_UNSIGNED_SHORT_5_5_5_1,
             FLOAT       = GL_FLOAT,
@@ -318,6 +319,7 @@ namespace ctl {
 	            case GL_FLOAT_VEC2: return 2;
 	            case GL_FLOAT_VEC3: return 3;
 	            case GL_FLOAT_VEC4: return 4;
+				case GL_FLOAT_MAT4: return 16;
 
 	            default:            return 3;
 

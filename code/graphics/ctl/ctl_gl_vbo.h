@@ -45,7 +45,7 @@ namespace ctl {
             GLuint id() const { return mId; }
         
             VBO() : mId(0) ,
-            mType(GL::FLOAT),
+            mType(GL::USHORT),
             mFormat(GL::RGB), 
             mTarget(GL::VERTEXBUFFER),
             mUsage(GL::DYNAMIC),
@@ -58,7 +58,7 @@ namespace ctl {
 //            VBO(GLvoid * udata, int num,  GLsizeiptr s, GL::BUFFER = GL::VERTEXBUFFER, GL::USAGE use = GL::STATIC);
             VBO(GLvoid * udata, int num, GLsizeiptr s, GL::BUFFER b = GL::VERTEXBUFFER, GL::USAGE use = GL::STATIC)
             : mId(0),
-            mType(GL::FLOAT),
+            mType(GL::USHORT),
             mFormat(GL::RGB), 
             mTarget(b),
             mUsage(use),
@@ -147,7 +147,7 @@ namespace ctl {
             }
             
             void drawElements(GLenum mode = GL_TRIANGLES, int num = -1, int off = 0){
-                glDrawElements ( mode, (num==-1) ? mNum - off : num, GL::UINT, (GLvoid *) ( sizeof( GLuint ) * off ) );	
+                glDrawElements ( mode, (num==-1) ? mNum - off : num, mType, (GLvoid *) ( sizeof( mType ) * off ) );	
                 GL::error("vbo draw elements");
             }
             void enable();
