@@ -1,6 +1,21 @@
 gotta do some software install and pairing bullshit
 
-http://www.raspberrypi.org/phpBB3/viewtopic.php?f=29&t=21807
+
+sudo -i
+
+apt-get install bluetooth bluez-tools
+/etc/init.d/bluetooth status
+/etc/init.d/bluetooth start
+/etc/init.d/bluetooth restart
+
+hciconfig -a
+hciconfig hci0 up
+hcitool scan
+bluez-simple agent hci0 <bt address>
+bluez-test-device trusted <bt address> yes
+bluez-test-input connect <bt address>
+
+
 Input driver version is 1.0.1
 Input device ID: bus 0x5 vendor 0x5ac product 0x30e version 0x160
 Input device name: "ky’s trackpad"

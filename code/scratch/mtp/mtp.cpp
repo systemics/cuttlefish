@@ -18,10 +18,10 @@ using namespace std;
 struct Touch {
   int id;
   float x, y;
-  float major, minor, angle;
+  float major, minor, orientation;
   inline void make() {
     id = -1;
-    x = y = major = minor = angle = 0;
+    x = y = major = minor = orientation = 0;
   }
 };
 
@@ -64,9 +64,8 @@ int main (int argc, char **argv) {
   memset(bit, 0, sizeof(bit));
   ioctl(fd, EVIOCGBIT(0, EV_MAX), bit[0]);
 
-  map<int, int> indexOf;
-  Touch touch[10];
-  for (int i = 0; i < 10; ++i)
+  Touch touch[16];
+  for (int i = 0; i < 16; ++i)
     touch[i].make();
   int active = -1, count = 0;
 
@@ -86,55 +85,69 @@ int main (int argc, char **argv) {
 
       switch (ev[i].code) {
 
-        case 53: // _ABS_MT_POSITION_X:
-        case 0: // _ABS_X:
-          if (active == -1)
-            return -1;
+        // x position
+        //
+        case 53:
+        case 0:
           touch[active].x = MAP((float)ev[i].value, -2909, 3167);
           break;
 
-        case 54: // _ABS_MT_POSITION_Y:
-        case 1: // _ABS_Y:
+        // y position
+        //
+        case 54:
+        case 1:
           if (active == -1)
             return -1;
           touch[active].y = MAP((float)ev[i].value, -2456, 2565);
           break;
 
-        case 48: // _ABS_MT_TOUCH_MAJOR:
+        // touch ellipse size on the major axis
+        //
+        case 48:
           if (active == -1)
             return -1;
           touch[active].major = MAP((float)ev[i].value, 0, 1020);
           break;
 
-        case 49: // _ABS_MT_TOUCH_MINOR:
+        // touch ellipse size on the major axis
+        //
+        case 49:
           if (active == -1)
             return -1;
           touch[active].minor = MAP((float)ev[i].value, 0, 1020);
           break;
 
-        case 52: // _ABS_MT_ORIENTATION:
+        // touch ellipse orientation
+        //
+        case 52:
           if (active == -1)
             return -1;
-          touch[active].angle = MAP((float)ev[i].value, -31, 32);
+          touch[active].orientation = MAP((float)ev[i].value, -31, 32);
           break;
 
-        //case 47: // _ABS_MT_SLOT:
-        case 57: // _ABS_MT_TRACKING_ID:
-          if (ev[i].value == -1) {
+        // slot
+        //
+        case 47:
+          active = ev[i].value;
+          break;
+
+        // unique tracking id
+        //
+        case 57:
+          if (ev[i].value == -1)
             count--;
-            //indexOf.erase(active);
-          }
-          else {
+          else
             count++;
-            active = ev[i].value;
-            //indexOf.erase(active);
-          }
+
+          touch[active].id = ev[i].value;
           break;
       }
 
-      if (active != -1) {
-        printf("%d: (%f, %f) [%d]\n", active, touch[active].x, touch[active].y, count);
-      }
     }
+
+    for (int k = 0; k < 16; ++k)
+      if (touch[k].id != -1)
+        printf("(%f, %f) ", touch[k].x, touch[k].y);
+    printf("\n");
   }
 }
