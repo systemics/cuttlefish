@@ -1,13 +1,33 @@
-.SUFFIXES:
+PORT = 22
+HOST = zappa
+NAME = mtp
+ROOT = $(HOME)/code/pi/root
 
-%.o : %.cpp
-	g++ -c $< -o $@
+CXX = arm-linux-gnueabihf-g++
+OPT += -Wall
+OPT += -O3
+INC += -I./
+INC += -I$(ROOT)/usr/include/
+INC += -I$(ROOT)/opt/vc/include/interface/vcos/pthreads/
+INC += -I$(ROOT)/opt/vc/include/
+LIB += -L$(ROOT)/opt/vc/lib/
+LIB += -lEGL
+LIB += -lGLESv2
+LIB += -lbcm_host
+LIB += -lvcos
+LIB += -lvchiq_arm
 
-mtp: mtp.o
-	g++ mtp.o -o mtp
+$(NAME): $(NAME).o
+	$(CXX) -o $@ $^ $(OPT) $(LIB)
 
-run: mtp
-	./mtp /dev/input/event0
+%.o :: %.cpp
+	$(CXX) -o $@ -c $< $(OPT) $(INC)
+
+kill:
+	ssh $(HOST) "pkill $(NAME) && rm /tmp/$(NAME)"
+
+deploy:
+	ssh -o 'LocalCommand=scp $(NAME) $(HOST):/tmp/' $(HOST) /tmp/$(NAME)
 
 clean:
-	rm *.o mtp
+	rm -f *.o *.gch $(NAME)

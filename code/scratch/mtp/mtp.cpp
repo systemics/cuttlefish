@@ -17,8 +17,8 @@ using namespace std;
 
 struct Touch {
   int id;
-  float x, y;
-  float major, minor, orientation;
+  float x, y, major, minor, orientation;
+
   inline void make() {
     id = -1;
     x = y = major = minor = orientation = 0;
@@ -28,13 +28,11 @@ struct Touch {
 #define MAP(v, low, high) ((v - low) / (high - low))
 
 int main (int argc, char **argv) {
-  int fd, rd, i, j, k;
+  int fd, rd;
   struct input_event ev[64];
   int version;
   unsigned short id[4];
   unsigned long bit[EV_MAX][NBITS(KEY_MAX)];
-  char name[256] = "Unknown";
-  int abs[5];
 
   if (argc < 2) {
     printf("Usage: evtest /dev/input/eventX\n");
@@ -58,6 +56,7 @@ int main (int argc, char **argv) {
   ioctl(fd, EVIOCGID, id);
   printf("Input device ID: bus 0x%x vendor 0x%x product 0x%x version 0x%x\n", id[ID_BUS], id[ID_VENDOR], id[ID_PRODUCT], id[ID_VERSION]);
 
+  char name[256] = "Unknown";
   ioctl(fd, EVIOCGNAME(sizeof(name)), name);
   printf("Input device name: \"%s\"\n", name);
 
@@ -69,7 +68,7 @@ int main (int argc, char **argv) {
     touch[i].make();
   int active = -1, count = 0;
 
-  while (1) {
+  while (true) {
     rd = read(fd, ev, sizeof(struct input_event) * 64);
 
     if (rd < (int) sizeof(struct input_event)) {
@@ -78,7 +77,7 @@ int main (int argc, char **argv) {
       return 1;
     }
 
-    for (i = 0; i < rd / sizeof(struct input_event); i++) {
+    for (unsigned i = 0; i < rd / sizeof(struct input_event); i++) {
       if (ev[i].type != 3)
         continue;
       //printf("%ld.%06ld (%d, %d)\n", ev[i].time.tv_sec, ev[i].time.tv_usec, ev[i].code, ev[i].value);
@@ -142,7 +141,6 @@ int main (int argc, char **argv) {
           touch[active].id = ev[i].value;
           break;
       }
-
     }
 
     for (int k = 0; k < 16; ++k)
