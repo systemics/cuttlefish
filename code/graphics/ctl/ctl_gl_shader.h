@@ -6,8 +6,8 @@
  *
  */
 
-#ifndef VSR_GL_SHADER_H_INCLUDED
-#define VSR_GL_SHADER_H_INCLUDED
+#ifndef CTL_GL_SHADER_H_INCLUDED
+#define CTL_GL_SHADER_H_INCLUDED
 
 #include "ctl_gl.h"
 // #include "vsr_file.h"
@@ -156,7 +156,7 @@ public:
     void load(string file, Shader::Type);                           ///< Load Shader File(.frag and .vert)
 
     void compile();                                                 ///< compile code
-    void unload() { glDeleteShader( mId ); mId = NULL; }
+    void unload() { glDeleteShader( mId ); mId = -1; }
 
     string name() const { return mName; }
     
@@ -561,7 +561,7 @@ inline 	void ShaderProgram::unload(){
 
 		if (mId){
 			glDeleteShader(mId);
-			mId = NULL;
+			mId = -1;
 		}
 		 GL::error("Shader Unload");
 	}

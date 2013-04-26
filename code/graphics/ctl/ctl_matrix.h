@@ -12,8 +12,8 @@
 	FOR PASSING AROUND WITH MEMBERWISE SHALLOW COPYS
  */
 
-#ifndef MATRIX_H_INCLUDED
-#define MATRIX_H_INCLUDED
+#ifndef CTL_MATRIX_H_INCLUDED
+#define CTL_MATRIX_H_INCLUDED
 
 #include "ctl_constants.h"
 
@@ -293,9 +293,27 @@ namespace ctl {
         }
         
 
-        void fill( T * res ) { 
+        void fill( T * res ) const { 
             std::copy( val(), val() + 16, res);            
         }
+		
+		template<class B>
+		Mat4& copy( const B& b){
+			// printf("copy");
+			for (int i = 0; i < 16; ++i){
+                (*this)[i] = b[i];
+            }	
+			return *this;
+		}
+		
+		template<class B>
+		static Mat4 Copy( const B& b ){
+			Mat4<T> m;
+			for (int i = 0; i < 16; ++i){
+                m[i] = b[i];
+            }
+			return m;
+		}
         
           const T * val() const { return col[0].val(); }
          T * val() { return &col[0][0]; }

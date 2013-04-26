@@ -7,8 +7,8 @@
  *
  */
  
- #ifndef CAMERA_H_INCLUDED
- #define CAMERA_H_INCLUDED
+ #ifndef CTL_CAMERA_H_INCLUDED
+ #define CTL_CAMERA_H_INCLUDED
 
 #include "ctl_gl.h"
 #include "ctl_gfxmatrix.h"

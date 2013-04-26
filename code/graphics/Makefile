@@ -6,13 +6,14 @@ CXX = arm-linux-gnueabihf-g++
 AR = ar crs
 CXXFLAGS = -D __raspberry__ -U __linux__
 
-SYNCITEMS = /opt /usr/include /usr/lib /lib
+SYNCITEMS = opt usr/include usr/lib lib code
 
 BUILD_DIR 	= build/
 BIN_DIR		= $(BUILD_DIR)bin/
 OBJ_DIR		= $(BUILD_DIR)obj/
 LIB_DIR		= $(BUILD_DIR)lib/
 PCH_DIR 	= $(BUILD_DIR)pch/
+EXT_DIR		= ../../ext/
 
 EXEC_TARGETS = tests/%.cpp tests/%.c
 
@@ -21,7 +22,8 @@ PIROOT = $(HOME)/code/pi/root/
 INC_DIR = ctl/
 SRC_DIR = src/
 
-VPATH = $(INC_DIR):\
+VPATH = $(EXT_DIR)/vsr/build/pch/:\
+		$(INC_DIR):\
 		$(SRC_DIR):\
 		$(PIROOT):\
 		$(PIROOT)opt
@@ -30,7 +32,9 @@ IPATH = -Ictl -I$(PIROOT)usr/include -I$(PIROOT)opt/vc/include -I$(PIROOT)opt/vc
 LDFLAGS =  -L$(PIROOT)usr/lib -lstdc++ -lm
 LDFLAGS += -L$(PIROOT)/opt/vc/lib/ -lGLESv2 -lEGL -lstdc++ -lm -lbcm_host -lvcos -lvchiq_arm -llo
 
-#OBJS = 
+USEVSR = 0
+VSRFLAGS = -L$(EXT_DIR)/vsr/build/lib/ -lvsr -I$(EXT_DIR)/vsr/build/pch/ -I$(EXT_DIR)/vsr/ -I$(EXT_DIR)/vsr/VSR/Elements/ -I$(EXT_DIR)/vsr/VSR/
+
 
 FORCE:
 
@@ -42,6 +46,9 @@ $(OBJ_DIR)%.o: $(OBJ_DIR)%.cpp %.h
 	@echo "compiling $< to $@"
 	$(CXX) $(CXXFLAGS) $(IPATH) -c $< -o $@ 
 
+# vsr:
+# 	@make --no-print-directory -C $@ #install DESTDIR=BUILDDIR = $(LIB_DIR)
+
 dir:
 	@mkdir -p $(BIN_DIR)
 	@mkdir -p $(OBJ_DIR)
@@ -50,11 +57,11 @@ dir:
 .PRECIOUS: $(EXEC_TARGETS)
 $(EXEC_TARGETS) : title dir FORCE
 	@echo "cross compiling executable" $@
-	$(CXX) $(CXXFLAGS) $(IPATH) $@ -o $(BIN_DIR)$(NAME) $(LDFLAGS)
+	$(CXX) $(CXXFLAGS) $(IPATH) -H $@ -o $(BIN_DIR)$(NAME) $(LDFLAGS) $(VSRFLAGS)
 	@make deploy
 
 sync:
-	@rsync -avzL $(addPrefix($(HOST):, $(SYNCITEMS))) $(PIROOT)
+	@rsync -avzL $(addPrefix($(HOST):~/, $(SYNCITEMS))) $(PIROOT)
 
 deploy:
 	scp -P $(PORT) $(BIN_DIR)$(NAME) $(HOST):/tmp

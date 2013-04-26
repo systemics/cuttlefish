@@ -18,9 +18,6 @@
 #include "ctl_mesh.h"
 
 namespace ctl{
-
-
-    namespace GL{
     
         //a Mesh Buffer Object, for lack of a better term
         struct MBO {
@@ -31,16 +28,18 @@ namespace ctl{
             
             VBO vertex;     //vertex buffer container
             VBO index;      //element buffer container
+
+			Mesh mesh;
             
             GL::MODE mode;
             
             MBO(){}
             
-            MBO( Mesh mesh, int id = -1 ){
+            MBO( Mesh m, GL::USAGE usage = GL::STATIC, int id = -1 ) : mesh(m){
                 mCount +=1;
                 idx = id == -1 ? mCount : id;
-                vertex = VBO( &mesh.vertices()[0].Pos[0], mesh.num(), mesh.num() * sizeof(Vertex), GL::VERTEXBUFFER );
-                index = VBO( &mesh.indices()[0], mesh.numIdx(), mesh.numIdx() * sizeof(Mesh::INDEXTYPE), GL::ELEMENTBUFFER );
+                vertex = VBO( &mesh.vertices()[0].Pos[0], mesh.num(), mesh.num() * sizeof(Vertex), GL::VERTEXBUFFER, usage );
+                index = VBO( &mesh.indices()[0], mesh.numIdx(), mesh.numIdx() * sizeof(Mesh::INDEXTYPE), GL::ELEMENTBUFFER, GL::STATIC );
                 mode = mesh.mode();
             }
                        
@@ -69,6 +68,16 @@ namespace ctl{
                 vertex.update(val);
             }
             
+			void update(){
+				vertex.update();
+			}
+			
+			///Update Specific Vertex
+			template< class T >
+			void update(int idx, int num, const T& val){
+				vertex.update(idx, num, &val);
+			}
+
 //            //static methods to grab quick int
 //            static int Buffer( Mesh& mesh, int id = -1){
 //                mCount +=1;
@@ -81,8 +90,7 @@ namespace ctl{
         };
         
         int MBO::mCount;
-    
-    }
+ 
 
 }
 

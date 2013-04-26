@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 WOLFTYPE. All rights reserved.
 //
 
-#ifndef Versor_ctl_gl_h
-#define Versor_ctl_gl_h
+#ifndef CTL_gl_h
+#define CTL_gl_h
 
 using namespace std;
 

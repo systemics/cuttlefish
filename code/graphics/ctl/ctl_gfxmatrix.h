@@ -4,10 +4,11 @@
 //
 //  Created by Pablo Colapinto on 10/28/11.
 //  Copyright 2011 x. All rights reserved.
+// Consider using songha's instead . . .
 //
 
-#ifndef opengles_00_GraphicsMatrix_h
-#define opengles_00_GraphicsMatrix_h
+#ifndef CTL_opengles_00_GraphicsMatrix_h
+#define CTL_opengles_00_GraphicsMatrix_h
 
 //#include "vsr/vsr_frame.h"
 
@@ -40,6 +41,12 @@ namespace ctl{
         Mat4f modelViewMatrixf()const { return modelView; }
         Mat4f projMatrixf()const { return proj; }
         Mat4f normalMatrixf() const { return normal; }
+
+        // Mat4f& modelMatrixf()  { return model; }
+        // Mat4f& viewMatrixf() { return view; }
+        // Mat4f& modelViewMatrixf() { return modelView; }
+        // Mat4f& projMatrixf() { return proj; }
+        // Mat4f& normalMatrixf()  { return normal; }
 
         void toDoubles() {
             for (int i = 0; i < 16; ++i){
@@ -110,8 +117,17 @@ namespace ctl{
         static Mat4f ortho (float X, float Y0); 
         // static Mat4f rot( Rot );
         static Mat4f rotXY(float rad) ;
+
         template< typename T> static Mat4f trans(T v);
         template<typename T> static Mat4f trans(T x, T y, T z);
+
+
+		// template< typename T> inline static Mat4f& trans( Mat4f& m, T v){
+		// 	
+		// 	m[12] *= v[0]; m[13] *= v[1]; m[14] *= v[2];
+		// 	return 
+		// }
+
     //    static Mat4f lookAt(const Vec3f eye, const Vec3f target, const Vec3f up );
     
         
@@ -135,12 +151,7 @@ namespace ctl{
                          // -(ux.dot(eye)), -(uy.dot(eye)), (uz.dot(eye)), 1
                          );
         }
-
-        //transposed version
-
-        // static const Mat4f lookAt(const Frame& f) {
-        //     return lookAt(f.x(), f.y(), f.z(), f.pos() );
-        // }        
+     
 
         static const Mat4f lookAt(const Vec3f eye, const Vec3f target, const Vec3f up ){
             Vec3f z = (target - eye).unit();	
@@ -260,32 +271,7 @@ namespace ctl{
         );        
     }
     
-    // inline Mat4f XMat::rot( Rot r ){
-    //     Vec x = Op::sp(Vec(1,0,0),r);
-    //     Vec y = Op::sp(Vec(0,1,0),r);
-    //     Vec z = Op::sp(Vec(0,0,1),r);
-    //     
-    //     return Mat4f(
-    //         x[0], x[1], x[2], 0,
-    //         y[0], y[1], y[2], 0,
-    //         z[0], z[1], z[2], 0,
-    //         0, 0, 0, 1
-    //     );        
-    // }
-    
-    // //4x4 Matrix from Axis Angle
-    // inline Mat4f XMat::aa( const Rot& r ){
-    //     float c = cos( r[0] );
-    //     float s = sin( r[0] );
-    //     float xx = r[1] * r[1]; float yy =  r[2] * r[2]; float zz =  r[3] * r[3];
-    //     float oc = 1-c;
-    // 
-    //     return Mat4f( xx * oc + c, r[1] * r[2] * oc - r[3] * s, r[1] * r[3] * oc + r[2] * s, 0,
-    //         r[1] * r[2] * oc + r[3] * s,    yy * oc + c, r[2] * r[3] * oc - r[1] * s, 0,
-    //         r[1] * r[3] * oc - r[2] * s,    r[2] * r[3] * oc + r[1] * s,    zz * oc +c,                 0,
-    //         0,                              0,                            0,                             1
-    //     );
-    // }
+
 
 
     inline Mat4f XMat::rotXY(float rad){
@@ -326,7 +312,32 @@ namespace ctl{
 //    
 //    }
 
-
+    // inline Mat4f XMat::rot( Rot r ){
+    //     Vec x = Op::sp(Vec(1,0,0),r);
+    //     Vec y = Op::sp(Vec(0,1,0),r);
+    //     Vec z = Op::sp(Vec(0,0,1),r);
+    //     
+    //     return Mat4f(
+    //         x[0], x[1], x[2], 0,
+    //         y[0], y[1], y[2], 0,
+    //         z[0], z[1], z[2], 0,
+    //         0, 0, 0, 1
+    //     );        
+    // }
+    
+    // //4x4 Matrix from Axis Angle
+    // inline Mat4f XMat::aa( const Rot& r ){
+    //     float c = cos( r[0] );
+    //     float s = sin( r[0] );
+    //     float xx = r[1] * r[1]; float yy =  r[2] * r[2]; float zz =  r[3] * r[3];
+    //     float oc = 1-c;
+    // 
+    //     return Mat4f( xx * oc + c, r[1] * r[2] * oc - r[3] * s, r[1] * r[3] * oc + r[2] * s, 0,
+    //         r[1] * r[2] * oc + r[3] * s,    yy * oc + c, r[2] * r[3] * oc - r[1] * s, 0,
+    //         r[1] * r[3] * oc - r[2] * s,    r[2] * r[3] * oc + r[1] * s,    zz * oc +c,                 0,
+    //         0,                              0,                            0,                             1
+    //     );
+    // }
 
 
     

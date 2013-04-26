@@ -10,8 +10,8 @@
  *
  */
 
-#ifndef XCONSTANTS_H_INCLUDED
-#define XCONSTANTS_H_INCLUDED
+#ifndef CTL_XCONSTANTS_H_INCLUDED
+#define CTL_XCONSTANTS_H_INCLUDED
 
 namespace ctl{
     

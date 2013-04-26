@@ -10,8 +10,8 @@
  
  */
 
-#ifndef VSR_GRAPHICS_INCLUDED
-#define VSR_GRAPHICS_INCLUDED
+#ifndef CTL_GRAPHICS_INCLUDED
+#define CTL_GRAPHICS_INCLUDED
 #include "ctl_matrix.h"
 
 #include <iostream>

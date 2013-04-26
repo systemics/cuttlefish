@@ -143,6 +143,7 @@ namespace ctl{
                 
                 //xm = submodel;
                 
+				gl_PointSize = 3.0;
                 gl_Position = doVertex(pos);
             }
         );

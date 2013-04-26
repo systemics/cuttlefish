@@ -8,8 +8,8 @@
 	some ripped from wes smith's muro
  */
 
-#ifndef VSR_GL_VBO_H_INCLUDED
-#define VSR_GL_VBO_H_INCLUDED
+#ifndef CTL_GL_VBO_H_INCLUDED
+#define CTL_GL_VBO_H_INCLUDED
 
 #include "ctl_gxlib.h"
 #include "ctl_gl_vattrib.h"
@@ -131,6 +131,16 @@ namespace ctl {
 
                 bind();
                 glBufferSubData( mTarget, 0, mDataSize, mData );
+                unbind();
+                GL::error( "vbo update data");
+
+            }
+			
+			template<class T>
+            void update(int idx, int num, T * d) {
+
+                bind();
+                glBufferSubData( mTarget, idx * sizeof(T), num * sizeof(T), (GLvoid*)d);
                 unbind();
                 GL::error( "vbo update data");
 

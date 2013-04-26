@@ -53,7 +53,7 @@ namespace ctl {
 //        static GLvoid * ot() { return (GLvoid*)( 3 * sizeof(Vec3f) ); }
 
         //friend ostream& operator << (ostream& os, Vertex v);
-        void print() { cout <<  Tex << endl; }
+        void print() { }//cout <<  Tex << endl; }
     };
 //    
 //    inline ostream& operator << (ostream& os, Vertex v){
@@ -134,7 +134,8 @@ namespace ctl {
         Mesh& add(float x, float y, float z) { mVertex.push_back( Vertex( Vec3f(x,y,z) ) ); return *this; }
         //Mesh& add(const Vec& v) { mVertex.push_back( Vertex( Vec3f(v[0], v[1], v[2]) ) ); return *this; }
         
-        
+		//         template<class T>
+		// Mes
         
         /// ADD N VERTICES
         template<typename T>
@@ -197,6 +198,12 @@ namespace ctl {
             }
         }
         
+        void scale(float s){
+            
+            for (int i = 0; i < num(); ++i){
+				mVertex[i].Pos *= s;
+            }
+        }
         
         //LOAD FROM OBJ FILE
         void load(string s) {
@@ -238,11 +245,32 @@ namespace ctl {
             printf("# of vertices: %d\n", (int)mVertex.size() );
         }    
     
+		// template<class t> 
+		// Mesh& addLine( T a, T b){
+		// 	add(a[0],a[1],a[2]).add();
+		// 	add(b[0],b[1],b[2]).add();
+		// 	return *this;
+		// }
 
         static Mesh Point(float x, float y, float z);
+
+		template<class T>
+        static Mesh Point(const T& p);
+
+		template<class T>
+        static Mesh Points(T* p, int num);
+
         static Mesh Grid(int w = 10, int h = 10, float spacing = .2);
         static Mesh Sphere(double rad = 1.0, int slices = 20, int stacks = 20);
-        static Mesh Line( Vec3f a, Vec3f b);
+
+  //      static Mesh Line( Vec3f a, Vec3f b);
+
+		template<class T>
+        static Mesh Line( T a, T b);
+
+		// template<class T>
+		//         static Mesh Lines( T * a, int num);
+
         static Mesh Cone( double rad = 1.0 , double h = 1.0, int slices = 10, int stacks = 4);
         static Mesh Dir();
         static Mesh Circle(double scale = 1);
@@ -261,11 +289,28 @@ namespace ctl {
     
     inline Mesh Mesh::Point(float x, float y, float z){
         Mesh m;
-        m.add(x,y,z);
+        m.add(x,y,z).add();
         m.mode( GL::P );
         return m;
     }
-    
+	template<class T>
+    inline Mesh Mesh::Point(const T& p){
+        Mesh m;
+        m.add(p[0],p[1],p[2]).add();
+        m.mode( GL::P );
+        return m;
+    }
+  
+	template<class T>
+	inline Mesh Mesh::Points(T * p, int num){
+		Mesh m;
+		for (int i = 0; i < num; ++i){
+			m.add(p[i][0],p[i][1],p[i][2]).add();
+		}
+		m.mode( GL::P );
+		return m;
+	}
+
     inline Mesh Mesh::Grid(int w, int h, float spacing){
         Mesh m;
         float tw = spacing * w;
@@ -350,14 +395,15 @@ namespace ctl {
           
           m.last().Col.set(0,1,0,1);
           
-          m.mode(GL::LS);
+          m.mode(GL::P);
           return m;
       }
     
-    inline Mesh Mesh::Line (Vec3f a, Vec3f b){
+	template<class T>
+    inline Mesh Mesh::Line (T a, T b){
     
         Mesh m;
-        m.add(a).add(b);
+        m.add(a[0], a[1], a[2]).add(b[0], b[1], b[2]);
         m.add(0).add(1);
         m.mode( GL::LS );
         return m;
@@ -492,6 +538,7 @@ namespace ctl {
         return m;
     }
     
+
     
 
     // inline Mesh Mesh::Skin (Cir * cir, int num, int res){

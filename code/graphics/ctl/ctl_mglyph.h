@@ -8,8 +8,8 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-#ifndef Versor_vsr_mglyph_h
-#define Versor_vsr_mglyph_h
+#ifndef CTL_vsr_mglyph_h
+#define CTL_vsr_mglyph_h
 
 #include "ctl_mesh.h"
 

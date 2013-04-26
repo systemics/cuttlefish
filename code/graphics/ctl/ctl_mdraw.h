@@ -110,16 +110,16 @@ namespace ctl{
                         mbo[id].vertex.unbind();   
                     }
 
-                    static void Begin(GL::MBO& m) { 
+                    static void Begin( MBO& m) { 
                         m.bind(); 
                         Enable(); Pointer(); 
                     }
-                    static void End(GL::MBO& m) { 
+                    static void End( MBO& m) { 
                         Disable(); 
                         m.unbind();   
                     }
                     
-                    static void Line( GL::MBO& m ) {
+                    static void Line( MBO& m ) {
                         m.bind();
                         Enable(); 
                         Pointer();
@@ -212,19 +212,7 @@ namespace ctl{
                     
 //                }
                 
-                template<class A> void RenderES ( const A& a, ShaderProgram& program ) {
- 	               
-					static MBO circle ( Mesh::Circle(.5) );
-	                static float mf[16];
-                
-					Mat4f mat = XMat::identity();//Draw::Mat(cir);
-	                
-					mat.fill(mf);
-	
-	                program.uniform("submodel", mf );    
 
-	                Pipe::Line( circle );                    
-                }
 
 
                 // template<> void RenderES ( const Cir * fcir, int num, ShaderProgram& program ){
