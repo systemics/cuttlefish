@@ -58,10 +58,17 @@ dir:
 $(EXEC_TARGETS) : title dir FORCE
 	@echo "cross compiling executable" $@
 	$(CXX) $(CXXFLAGS) $(IPATH) -H $@ -o $(BIN_DIR)$(NAME) $(LDFLAGS) $(VSRFLAGS)
-	@make deploy
+	#@make deploy
 
 sync:
 	@rsync -avzL $(addPrefix($(HOST):~/, $(SYNCITEMS))) $(PIROOT)
+
+many:
+	parallel-scp -h hosts.txt build/bin/main /tmp
+	parallel-ssh -h hosts.txt /tmp/main
+
+kill:
+	parallel-ssh -h hosts.txt pkill main
 
 deploy:
 	scp -P $(PORT) $(BIN_DIR)$(NAME) $(HOST):/tmp
