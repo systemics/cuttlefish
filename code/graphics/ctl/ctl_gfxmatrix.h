@@ -208,6 +208,25 @@ namespace ctl{
             );
         }
         
+        static const Mat4f frustum2(float left, float right, float bottom, 
+                                             float top, float near, float far)
+        {
+            float a = 2 * near / (right - left);
+            float b = 2 * near / (top - bottom);
+            float c = (right + left) / (right - left);
+            float d = (top + bottom) / (top - bottom);
+            float e = - (far + near) / (far - near);
+            float f = -2 * far * near / (far - near);
+
+            return Mat4f (
+             a, 0, 0, 0,
+             0, b, 0, 0,
+             c, d, e, -1,
+             0, 0, f, 0
+            );            
+
+        }
+
         static const Mat4f identity();
 		static Mat4f rot( const Quat& r );
 

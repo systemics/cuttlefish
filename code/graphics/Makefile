@@ -57,7 +57,7 @@ dir:
 .PRECIOUS: $(EXEC_TARGETS)
 $(EXEC_TARGETS) : title dir FORCE
 	@echo "cross compiling executable" $@
-	$(CXX) $(CXXFLAGS) $(IPATH) -H $@ -o $(BIN_DIR)$(NAME) $(LDFLAGS) $(VSRFLAGS)
+	$(CXX) $(CXXFLAGS) $(IPATH) $@ -o $(BIN_DIR)$(NAME) $(LDFLAGS) $(VSRFLAGS)
 	#@make deploy
 
 sync:

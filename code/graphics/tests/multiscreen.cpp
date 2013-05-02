@@ -1,14 +1,14 @@
 //
-//  circle.cpp
+//  MULTISCREEN.cpp
 //  Versor on the Raspberry PI
 //
 //  Created by Pablo Colapinto on 1/24/13.
 //  Copyright (c) 2013 __MyCompanyName__. All rights reserved.
 //
 
-#include "vsr.h"
-#include "vsr_op.h"
-#include "vsr_xf.h"
+// #include "vsr.h"
+// #include "vsr_op.h"
+// #include "vsr_xf.h"
 
 #include "ctl_egl.h"
 #include "ctl_gl.h"
@@ -16,10 +16,10 @@
 #include "ctl_glsl.h"
 #include "ctl_mdraw.h"
 #include "ctl_scene.h"
+#include "ctl_screen.h"
 
-#include "ctl_render.h"
-
-#include "vsr_field.h"
+//#include "ctl_render.h"
+//#include "vsr_field.h"
 
 #include <iostream>
 
@@ -33,13 +33,12 @@ using namespace ctl::GLSL;
 
 struct MyWindow : public Window {
 
-
-	
 	 	Scene scene;
 		ShaderProgram program;
 		
-
-
+		Pose viewpose;
+		float width, height, aspect, scale; //Total Width, Height of all Screens Combined
+		
         MyWindow() : Window () {
             initGL();
         }
@@ -47,11 +46,11 @@ struct MyWindow : public Window {
         ~MyWindow(){}
         
         void initGL(){
-             glClearColor(1,1,1,1);
-             srand( time(NULL) );
+	
+            glClearColor(1,1,1,1);
+            srand( time(NULL) );
 
-
-
+			// BUILD AND BIND ATTRIBUTES OF DEFAULT SHADER
 			string Vert = AVertex + Varying + UMatrix  + NTransform + VLighting + VCalc + MVert;
 			string Frag = USampler + Varying + MFrag;
 
@@ -59,34 +58,54 @@ struct MyWindow : public Window {
 			program.bind();
 	             Pipe::BindAttributes();
 	        program.unbind();
+			
+			initView();
+		}	
+		
+		void initView(){
+	
+			//use 16 GL units x 9 GL units
+			width =  4.;
+			height = 3.;
+			
+			aspect = width / height; 
+			int numscreens = 4;
+			
+			Vec3f viewer(0,0,3);
+			
+			//GET SCREEN ID
+			int screenID = 0;//??
+	
+			Pose p;
+			
+			switch( screenID ){
+				
+				case A1:
+					p = Pose( - width * 2, - height / 2.0, 0 );
+					break;
+				case A2:
+					p = Pose( - width , - height / 2.0, 0 );
+					break;
+				case A3:
+					p = Pose( 0, - height / 2.0, 0 );
+					break;
+				case A4:
+					p = Pose( width, - height / 2.0, 0 );
+					break;
+				
+			}
+			
+//			scene.camera.view() = View( viewer, p, aspect, height );
+			// scene.camera.view() = View( viewer, Pose(-32.,-4.5, 0), aspect* 4, height );
+			scene.camera.view() = View( viewer, Pose(-width/2.0,-height/2.0, 0), aspect, height );
+			
  
        }
         
         virtual void onDraw(){
-	
-			using namespace vsr;
-			
-			static Circle c = CXY(1).trs(0,0,-3);
-			static Point p = PT(0,0,0);
-			static Field<Pnt> f(30,30,1,.1);
-			//static Field<Sca> f(30,30,1);
-			static DualSphere dls = Ro::dls(p, .3);
-			
-			Par par = Gen::bst( Ro::par( dls, Vec::y) * .1);
-        				
-
-			static double time = 0.0; time += .01;
-			
-			Circle tc = c.sp( Gen::mot( DLN(1,0,0).trs(0,0,-3) * time ) );		
-			Vector tv = Vec(1,0,0).sp( Gen::rot( Biv::xy * time ) );
-			
-			for (int i = 0; i < f.num(); ++i){
-				double dist = 1.0 / ( Ro::sqd( f[i], PAO ) +.01 );
-				f[i] =  Ro::loc( f[i] .sp( Gen::bst( par * dist) ) );//.sp(bst) );
-			}
-			
-			//Dipole changes size and moves around screen
-			dls = Ro::dls(p, .3 + sin(time) ).trs(1,0,0).sp( Gen::mot( DLN(0,0,1) * time ) );
+				
+			static MBO circle ( Mesh::Disc(.5) );
+			static MBO grid ( Mesh::Grid(width, height, 1) );
 			
 		    program.bind();
 		
@@ -96,12 +115,7 @@ struct MyWindow : public Window {
 		         program.uniform("normalMatrix", scene.xf.normal);
 				 program.uniform("modelView", scene.xf.modelView );//app.scene().xf.modelView);        
 				
-				Render( f, scene.xf.modelViewMatrixf(), program );
-				
-				
-				
-				//Pipe::Line(circle);
-
+			  	GL::Pipe::Line( grid );   
 
 		    program.unbind();
 
@@ -114,8 +128,9 @@ struct MyWindow : public Window {
             glClearColor(0,0,0,1);
             // clear screen
             glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            // to update we need to swap the buffers
+           
             onDraw();
+ 			// to update we need to swap the buffers
  			swapBuffers();
         }
 

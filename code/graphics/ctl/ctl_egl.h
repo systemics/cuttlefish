@@ -142,6 +142,8 @@ namespace ctl {
                         
         };
         
+//		struct SurfaceArray
+
         //SET UP BRIDGE BETWEEN OPENGL'S OUTPUT AND DEVICE SCREEN
         struct Config {
         

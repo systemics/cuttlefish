@@ -261,6 +261,7 @@ namespace ctl {
         static Mesh Points(T* p, int num);
 
         static Mesh Grid(int w = 10, int h = 10, float spacing = .2);
+
         static Mesh Sphere(double rad = 1.0, int slices = 20, int stacks = 20);
 
   //      static Mesh Line( Vec3f a, Vec3f b);
@@ -316,21 +317,23 @@ namespace ctl {
         float tw = spacing * w;
         float th = spacing * h;
         
-        for (int i = 0; i < w; ++i){
-            float tx = (-1.0 + 2.0 * i/w ) * tw;
+		//Vertical Lines
+        for (int i = 0; i <= w; ++i){
+            float tx = (-1.0 + 2.0 * i/w ) * tw/2.0;
             float ty = th/2.0;
             m.add(tx,-ty,0).add();
             m.add(tx,ty,0).add();
         }
         
-        for (int i = 0; i < h; ++i){
-            float ty = (-1.0 + 2.0 * i/h ) * th;
+		//Horizontal Lines
+        for (int i = 0; i <= h; ++i){
+            float ty = (-1.0 + 2.0 * i/h ) * th/2.0;
             float tx = tw/2.0;
             m.add(-tx,ty,0).add();
             m.add(tx,ty,0).add();
         }
 
-        m.mode(GL::LS);
+        m.mode(GL::L);
         return m;
     }
  
