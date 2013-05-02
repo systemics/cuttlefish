@@ -197,9 +197,9 @@ struct Camera {
             
                 // Mat4f tmod = mod();
                 // Mat4f tview = XMat::lookAt( camera.x(), camera.y(), camera.z() * -1, camera.pos());
-                Mat4f tmvm = mvm();
+				Mat4f tmvm =  XMat::identity();//mvm();
                 // Mat4f tproj = proj();
-                Mat4f tproj = frust();
+                Mat4f tproj = XMat::identity();   //frust();     // 
                 Mat4f tnorm = norm();
                 
                 // copy(tmod.val(), tmod.val() + 16, xf.model);

@@ -105,7 +105,7 @@ struct MyWindow : public Window {
         virtual void onDraw(){
 				
 			static MBO circle ( Mesh::Disc(.5) );
-			static MBO grid ( Mesh::Grid(width, height, 1) );
+			static MBO grid ( Mesh::Grid(width*2, height*2, .15) );
 			
 		    program.bind();
 		
