@@ -21,7 +21,10 @@
 //#include "ctl_render.h"
 //#include "vsr_field.h"
 
+#include <unistd.h>
+#include <string>
 #include <iostream>
+#include <map>
 
 using namespace std;
 
@@ -30,6 +33,7 @@ using namespace ctl::GL;
 using namespace ctl::EGL;
 using namespace ctl::GLSL;
 
+int identifier;
 
 struct MyWindow : public Window {
 
@@ -78,21 +82,23 @@ struct MyWindow : public Window {
 	
 			Pose p;
 			
-			switch( screenID ){
+			switch( identifier ){
 				
-				case A1:
+				case 1:
 					p = Pose( - width * 2, - height / 2.0, 0 );
 					break;
-				case A2:
+				case 2:
 					p = Pose( - width , - height / 2.0, 0 );
 					break;
-				case A3:
+				case 3:
 					p = Pose( 0, - height / 2.0, 0 );
 					break;
-				case A4:
+				case 4:
 					p = Pose( width, - height / 2.0, 0 );
 					break;
 				
+        default:
+          break;
 			}
 			
 //			scene.camera.view() = View( viewer, p, aspect, height );
@@ -109,7 +115,7 @@ struct MyWindow : public Window {
 			
 		    program.bind();
 		
-		         program.uniform("projection",  scene.xf.proj);
+		         //program.uniform("projection",  scene.xf.proj);
 		         program.uniform("lightPosition", 2.0, 2.0, 2.0);
 
 		         program.uniform("normalMatrix", scene.xf.normal);
@@ -146,6 +152,18 @@ int main() {
   signal(SIGABRT, quit);
   signal(SIGTERM, quit);
   signal(SIGINT, quit);
+
+  map<string, int> idOf;
+
+  int n = 1;
+  idOf["pi-b"] = n++;
+  idOf["pi-c"] = n++;
+  idOf["pi-l"] = n++;
+  idOf["pi-r"] = n++;
+
+  char hostname[100];
+  gethostname(hostname, 100);
+  identifier = idOf[hostname];
 
   MyWindow win;
 

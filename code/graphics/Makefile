@@ -1,5 +1,5 @@
 PORT = 22
-HOST = pi-la
+HOST = pi-l
 NAME = main
 
 CXX = arm-linux-gnueabihf-g++
