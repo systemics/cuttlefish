@@ -8,6 +8,7 @@ OPT += -Wall
 OPT += -O3
 INC += -I./
 INC += -I$(ROOT)/usr/include/
+INC += -I$(ROOT)/opt/vc/include/interface/vmcs_host/linux/
 INC += -I$(ROOT)/opt/vc/include/interface/vcos/pthreads/
 INC += -I$(ROOT)/opt/vc/include/
 LIB += -L$(ROOT)/opt/vc/lib/
