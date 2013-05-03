@@ -16,7 +16,9 @@
 #include "ctl_glsl.h"
 #include "ctl_mdraw.h"
 #include "ctl_scene.h"
-#include "ctl_screen.h"
+#include "ctl_screen.h"  
+
+#include <lo/lo.h>   
 
 //#include "ctl_render.h"
 //#include "vsr_field.h"
@@ -67,20 +69,26 @@ struct MyWindow : public Window {
 		}	
 		
 		void initView(){
-	
-			//use 16 GL units x 9 GL units
-			width =  4.;
-			height = 3.;
-			
-			aspect = width / height; 
+	         
+
+			//use 16 GL units x 9 GL units   
+			//pass in width and height in inches
+			width =  14. + 3./8.;//21.5;
+			height = 10. + 11./16.;//12.5;     
+
+  			aspect = width / height;   
+  		                      
+			//Set glUnit to half Height
+		   // float glUnit = height / 2.0;
+
 			int numscreens = 4;
 			
-			Vec3f viewer(0,0,3);
+			Vec3f viewer(0,0,1);  //Position in gl units
 			
 			//GET SCREEN ID
-			int screenID = 0;//??
+			int screenID = -1;//0;//??
 	
-			Pose p;
+			Pose p(-width/2.0,-height/2.0, 0);
 			
 			switch( identifier ){
 				
@@ -103,15 +111,28 @@ struct MyWindow : public Window {
 			
 //			scene.camera.view() = View( viewer, p, aspect, height );
 			// scene.camera.view() = View( viewer, Pose(-32.,-4.5, 0), aspect* 4, height );
-			scene.camera.view() = View( viewer, Pose(-width/2.0,-height/2.0, 0), aspect, height );
+			scene.camera.view() = View( viewer, p, aspect, height );
 			
- 
        }
         
         virtual void onDraw(){
+				             
+			// scene.camera.pos() = Vec3f(0,0,1);     
 				
-			static MBO circle ( Mesh::Disc(.5) );
-			static MBO grid ( Mesh::Grid(width, height, 1) );
+			static MBO circle ( Mesh::Disc(4).color(1,1,0), GL::DYNAMIC  );
+			static MBO grid ( Mesh::Grid(width * 4, height, 1) );
+		   //  static MBO line ( Mesh::Line( Vec3f( - width * 2, -height /2.0, 0), Vec3f( width * 2, -height /2.0, 0) ) );   
+			static MBO line ( Mesh::Rect( width *4 , 1.0 ).color(0,1,1), GL::DYNAMIC );
+			                  
+			static float time = 0; time +=.03;   
+			float x = sin(time);    
+			
+			
+			circle.mesh.moveTo( x * width * 2.0, 0, 0 );   
+			circle.update();
+			
+			line.mesh.moveTo( 0, x * height/2.0, 0 );       
+			line.update();
 			
 		    program.bind();
 		
@@ -121,8 +142,9 @@ struct MyWindow : public Window {
 		         program.uniform("normalMatrix", scene.xf.normal);
 				 program.uniform("modelView", scene.xf.modelView );//app.scene().xf.modelView);        
 				
-			  	GL::Pipe::Line( grid );   
-
+			  	GL::Pipe::Line( grid );  
+				GL::Pipe::Line( circle );
+                  GL::Pipe::Line( line ); 
 		    program.unbind();
 
         }
@@ -145,6 +167,10 @@ struct MyWindow : public Window {
 bool running = true;
 void quit(int) {
   running = false;
+}      
+
+int onMessage(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) { 
+	cout << path << endl; 
 }
 
 int main() {
@@ -165,7 +191,11 @@ int main() {
   gethostname(hostname, 100);
   identifier = idOf[hostname];
 
-  MyWindow win;
+  MyWindow win;    
+
+  lo_server_thread st = lo_server_thread_new("7770", 0);
+  lo_server_thread_add_method(st, "/rectangle", "ffffffff", onMessage, 0);
+  lo_server_thread_start(st);
 
   while (running) {
     win.onFrame();
