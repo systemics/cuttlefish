@@ -53,7 +53,9 @@ namespace ctl {
 
 
 	//Distances of Viewport from Eye Position
-struct View {
+struct View {   
+	
+	//Pose pose;
 
 	View(double _l, double _t, double _r, double _b) : l(_l), t(_t), r(_r), b(_b) {}
 

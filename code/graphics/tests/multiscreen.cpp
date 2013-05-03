@@ -136,8 +136,8 @@ struct MyWindow : public Window {
 			
 		    program.bind();
 		
-		         //program.uniform("projection",  scene.xf.proj);
-		         program.uniform("lightPosition", 2.0, 2.0, 2.0);
+		         // program.uniform("lightPosition", 2.0, 2.0, 2.0);
+		         program.uniform("projection",  scene.xf.proj);
 
 		         program.uniform("normalMatrix", scene.xf.normal);
 				 program.uniform("modelView", scene.xf.modelView );//app.scene().xf.modelView);        
@@ -167,11 +167,44 @@ struct MyWindow : public Window {
 bool running = true;
 void quit(int) {
   running = false;
-}      
+}                                                                                        
 
-int onMessage(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) { 
-	cout << path << endl; 
+int onMulti1(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) { 
+ 
+	cout << path << types << endl; 
+	float x = argv[0] -> f;
+	float y = argv[1] -> f;
+	
+	cout << x << " " << y << endl; 
+	
+	MyWindow& w = *((MyWindow*)user_data); 
+	Vec3f tv = w.scene.camera.pos();
+	tv[0] = - w.width * 2.0 + x * w.width * 4.0;  
+	w.scene.camera.pos() = tv;
 }
+
+// int onMulti2(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) { 
+//  
+// 	cout << path << types << endl; 
+// 	float x = argv[0] -> f;
+// 	float y = argv[1] -> f;
+// 	
+// 	cout << x << " " << y << endl; 
+// 	
+// 	MyWindow& w = *((MyWindow*)user_data); 
+// 	Vec3f tv = w.scene.camera.view();
+// 	tv[0] = - w.width * 2.0 + x * w.width * 4.0;  
+// 	w.scene.camera.pos() = tv;
+// }    
+
+
+// int onAccel(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) { 
+// 	cout << "G" << endl; 
+// 	for (int i = 0; i<3; ++i){
+// 		float val = argv[i] -> f;
+// 		cout << val << endl;
+// 	}  
+// } 
 
 int main() {
   bcm_host_init();
@@ -193,8 +226,9 @@ int main() {
 
   MyWindow win;    
 
-  lo_server_thread st = lo_server_thread_new("7770", 0);
-  lo_server_thread_add_method(st, "/rectangle", "ffffffff", onMessage, 0);
+  lo_server_thread st = lo_server_thread_new("7770", 0);  
+  lo_server_thread_add_method(st, "/multi/1", NULL, onMulti1, &win);  
+//  lo_server_thread_add_method(st, "/accelerometer", "fff", onAccel, 0);
   lo_server_thread_start(st);
 
   while (running) {
