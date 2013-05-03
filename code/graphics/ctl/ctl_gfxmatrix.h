@@ -160,7 +160,24 @@ namespace ctl{
             return lookAt(x, y, -z, eye);
         }
         
-        static const Mat4f frustum(float left, float right, float bottom, 
+        // static const Mat4f frustum(float left, float right, float bottom, 
+        //                                      float top, float near, float far)
+        // {
+        //     float a = 2 * near / (right - left);
+        //     float b = 2 * near / (top - bottom);
+        //     float c = (right + left) / (right - left);
+        //     float d = (top + bottom) / (top - bottom);
+        //     float e = - (far + near) / (far - near);
+        //     float f = -2 * far * near / (far - near);
+        //     
+        //     return Mat4f (
+        //      a, 0, c, 0,
+        //      0, b, d, 0,
+        //      0, 0, e, f,
+        //      0, 0, -1, 1
+        //     );
+        // }    
+        static const Mat4f frustum2(float left, float right, float bottom, 
                                              float top, float near, float far)
         {
             float a = 2 * near / (right - left);
@@ -169,15 +186,16 @@ namespace ctl{
             float d = (top + bottom) / (top - bottom);
             float e = - (far + near) / (far - near);
             float f = -2 * far * near / (far - near);
-            
+
             return Mat4f (
-             a, 0, c, 0,
-             0, b, d, 0,
-             0, 0, e, f,
-             0, 0, -1, 1
-            );
+             a, 0, 0, 0,
+             0, b, 0, 0,
+             c, d, e, -1,
+             0, 0, f, 0
+            );            
+
         }
-        
+       
         static const Mat4f fovy2 (float rad, float aspectRatio, float near, float far)
         {
             float top = near * tan(rad);
@@ -185,7 +203,7 @@ namespace ctl{
             float left = bottom * aspectRatio;
             float right = top * aspectRatio;
             
-            return frustum(left, right, bottom, top, near, far);
+            return frustum2(left, right, bottom, top, near, far);
         }
 
         /*! Calculate Field of View (Perspective)
@@ -208,24 +226,7 @@ namespace ctl{
             );
         }
         
-        static const Mat4f frustum2(float left, float right, float bottom, 
-                                             float top, float near, float far)
-        {
-            float a = 2 * near / (right - left);
-            float b = 2 * near / (top - bottom);
-            float c = (right + left) / (right - left);
-            float d = (top + bottom) / (top - bottom);
-            float e = - (far + near) / (far - near);
-            float f = -2 * far * near / (far - near);
 
-            return Mat4f (
-             a, 0, 0, 0,
-             0, b, 0, 0,
-             c, d, e, -1,
-             0, 0, f, 0
-            );            
-
-        }
 
         static const Mat4f identity();
 		static Mat4f rot( const Quat& r );

@@ -129,10 +129,10 @@ struct Camera {
 		View mView;
 		Lens mLens; // Lens Data, Aspect Ratio, Etc.
 
-		Camera() : mX(1,0,0), mY(0,1,0), mZ(0,0,1), mPos(0,0,3) {
-
-			Pose pose(-4, -3, 0);
-			mView = View( mPos, pose, mLens.aspect(), 6.0 );
+		Camera() : mX(1,0,0), mY(0,1,0), mZ(0,0,1), mPos(0,0,1) {
+            
+			//Pose pose(-4, -3, 0);
+			//mView = View( mPos, pose, mLens.aspect(), 6.0 );
 
 		}
 
@@ -140,7 +140,9 @@ struct Camera {
 		Vec3f x() { return mX; }
 		Vec3f y() { return mY; }
 		Vec3f z() { return mZ; }
-		Vec3f pos() { return mPos; }
+		Vec3f pos() const { return mPos; }    
+		
+		Vec3f& pos() { return mPos; }
 		Lens lens() const { return mLens; }
 		Lens& lens() { return mLens; }
 		View view() const { return mView; }
@@ -197,11 +199,12 @@ struct Camera {
             
                 // Mat4f tmod = mod();
                 // Mat4f tview = XMat::lookAt( camera.x(), camera.y(), camera.z() * -1, camera.pos());
-				Mat4f tmvm =  XMat::identity();//mvm();
+				Mat4f tmvm =  mvm();     //     XMat::identity();//
                 // Mat4f tproj = proj();
-                Mat4f tproj = XMat::identity();   //frust();     // 
+                Mat4f tproj = frust();     //XMat::identity();   // 
                 Mat4f tnorm = norm();
-                
+                 
+			  //  cout << tmvm << endl; 
                 // copy(tmod.val(), tmod.val() + 16, xf.model);
                 // copy(tview.val(), tview.val() + 16, xf.view);
 
