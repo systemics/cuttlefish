@@ -1,4 +1,4 @@
-HOST = nonce-pi
+HOST = pi@192.168.2.2
 NAME = test_timer
 ROOT = $(HOME)/code/pi/root
 

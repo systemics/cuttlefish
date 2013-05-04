@@ -7,6 +7,7 @@
 
 #include "ctl_egl.h"
 #include "ctl_gl.h"
+#include "ctl_timer.h"
 #include <iostream>
 
 #include <lo/lo.h>
@@ -20,7 +21,7 @@ GLfloat rectangle[8] = { 0, 0, 0, 1, 1, 1, 1, 0 };
 //GLfloat rectangle[8] = { -1, -1, -1,  1, 1,  1, 1, -1, };
 GLubyte rectangle_index[] = { 0, 1, 2, 0, 2, 3, };
 
-struct MyWindow : public Window {
+struct MyWindow : public Window, public Timer {
 
   ShaderManager shaderManager;
 
@@ -31,7 +32,7 @@ struct MyWindow : public Window {
   ~MyWindow(){}
 
   void initGL(){
-    glClearColor(1, 1, 1, 1);
+    glClearColor(1, 0, 0, 1);
     shaderManager.make("basic",
       STRINGIFY(
         attribute vec2 position;
@@ -41,7 +42,7 @@ struct MyWindow : public Window {
       ),
       STRINGIFY(
         void main(void) {
-          gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0); 
+          gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0); 
         }
       )
     );
@@ -59,6 +60,10 @@ struct MyWindow : public Window {
     onDraw();
     swapBuffers();
   }
+
+  virtual void onTimer() {
+    onFrame();
+  }
 };
 
 bool running = true;
@@ -69,6 +74,7 @@ void quit(int) {
 int update_rectangle(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) {
   for (int i = 0; i < 8; ++i)
     rectangle[i] = argv[i]->f;
+  printf("update_rectangle...\n");
   return 0;
 }
 
@@ -84,11 +90,14 @@ int main() {
 
   MyWindow win;
 
-  while (running) {
-    win.onFrame();
-    usleep(16666);
-  }
+  win.start(1 / 60.);
 
+  printf("\nrunning...\n");
+  while (running)
+    sleep(1);
+  printf("...shutting down\n");
+
+  win.stop();
   bcm_host_deinit();
   return 0;
 }
