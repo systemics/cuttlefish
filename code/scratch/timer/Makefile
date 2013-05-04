@@ -22,7 +22,7 @@ LIB += -lvchiq_arm
 $(NAME): $(NAME).o
 	$(CXX) -o $@ $^ $(OPT) $(LIB)
 
-%.o :: %.c
+%.o :: %.cpp
 	$(CXX) -o $@ -c $< $(OPT) $(INC)
 
 kill:
