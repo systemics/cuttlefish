@@ -50,7 +50,6 @@
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 765.0, 135.0, 32.5, 18.0 ],
-					"presentation_rect" : [ 815.0, 138.0, 0.0, 0.0 ],
 					"text" : "0.4"
 				}
 
@@ -65,7 +64,6 @@
 					"numoutlets" : 1,
 					"outlettype" : [ "" ],
 					"patching_rect" : [ 720.0, 135.0, 32.5, 18.0 ],
-					"presentation_rect" : [ 720.0, 134.0, 0.0, 0.0 ],
 					"text" : "0."
 				}
 
@@ -448,7 +446,6 @@
 					}
 ,
 					"patching_rect" : [ 660.0, 225.0, 176.5, 20.0 ],
-					"presentation_rect" : [ 665.0, 221.0, 0.0, 0.0 ],
 					"saved_object_attributes" : 					{
 						"default_fontface" : 0,
 						"default_fontname" : "Arial",
@@ -474,9 +471,8 @@
 					"maxclass" : "newobj",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 660.0, 285.0, 127.0, 20.0 ],
-					"presentation_rect" : [ 665.0, 281.0, 0.0, 0.0 ],
-					"text" : "udpsend pi-l.zzz 7770"
+					"patching_rect" : [ 660.0, 285.0, 153.0, 20.0 ],
+					"text" : "udpsend 192.168.2.2 7770"
 				}
 
 			}
@@ -1310,8 +1306,8 @@
 					"maxclass" : "newobj",
 					"numinlets" : 1,
 					"numoutlets" : 0,
-					"patching_rect" : [ 330.0, 285.0, 127.0, 20.0 ],
-					"text" : "udpsend pi-l.zzz 7770"
+					"patching_rect" : [ 330.0, 285.0, 153.0, 20.0 ],
+					"text" : "udpsend 192.168.2.2 7770"
 				}
 
 			}
