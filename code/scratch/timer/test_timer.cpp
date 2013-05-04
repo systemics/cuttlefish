@@ -1,10 +1,17 @@
 #include "Timer.hpp"
 #include <unistd.h>
+#include <stdio.h>
+
+struct Foo : Timer {
+  void onTimer() {
+    printf("got here\n");
+  }
+};
 
 int main() {
-  Timer timer;
-  timer.start(1 / 60.);
+  Foo foo;
+  foo.start(1 / 60.);
   sleep(1);
-  timer.stop();
+  foo.stop();
   sleep(1);
 }

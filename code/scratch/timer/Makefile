@@ -1,9 +1,8 @@
-PORT = 22
-HOST = pi@192.168.2.2
+HOST = nonce-pi
 NAME = test_timer
 ROOT = $(HOME)/code/pi/root
 
-CXX = arm-linux-gnueabihf-gcc
+CXX = arm-linux-gnueabihf-g++
 OPT += -Wall
 OPT += -O3
 INC += -I./
@@ -23,13 +22,14 @@ $(NAME): $(NAME).o Timer.o
 	$(CXX) -o $@ $^ $(OPT) $(LIB)
 
 %.o :: %.cpp
-	$(CXX) -o $@ -c $< $(OPT) $(INC)
+	$(CXX) -o $@ -c $< $(OPT) $(INC) $(LIB)
 
 kill:
-	ssh $(HOST) "pkill $(NAME) && rm /tmp/$(NAME)"
+	ssh $(HOST) "pkill $(NAME) ; rm /tmp/$(NAME)"
 
 deploy:
-	ssh -o 'LocalCommand=scp $(NAME) $(HOST):/tmp/' $(HOST) /tmp/$(NAME)
+	scp $(NAME) $(HOST):/tmp/
+	ssh $(HOST) /tmp/$(NAME)
 
 clean:
 	rm -f *.o *.gch $(NAME)
