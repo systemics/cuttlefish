@@ -1,9 +1,18 @@
+/*
+ *  ctl_shader_manager.h
+ *  Cuttlefish
+ *  Created by Karl Yerkes on Sat May  4 13:33:23 PDT 2013
+ *  Copyright 2013 Karl Yerkes. All rights reserved.
+ *
+*/
 #ifndef __SHADER_MANAGER__
 #define __SHADER_MANAGER__
 
 #include <cassert>
 #include <string>
 #include <map>
+
+namespace ctl {
 
 template <typename t> class HashTable : public std::map<std::string, t> {};
 
@@ -125,4 +134,5 @@ public:
   }
 };
 
+} // ctl::
 #endif

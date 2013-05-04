@@ -1,3 +1,10 @@
+/*
+ *  ctl_timer.h
+ *  Cuttlefish
+ *  Created by Karl Yerkes on Sat May  4 13:33:23 PDT 2013
+ *  Copyright 2013 Karl Yerkes. All rights reserved.
+ *
+*/
 #ifndef CTL_TIMER_H_INCLUDED
 #define CTL_TIMER_H_INCLUDED
 #include <time.h>

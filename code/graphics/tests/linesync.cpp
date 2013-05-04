@@ -10,10 +10,10 @@
 #include "ctl_timer.h"
 #include "ctl_egl.h"
 #include "ctl_gl.h"
+#include "ctl_shader_manager.h"
 #include <iostream>
 
 #include <lo/lo.h>
-#include "ShaderManager.h"
 
 using namespace std;
 using namespace ctl::EGL;
