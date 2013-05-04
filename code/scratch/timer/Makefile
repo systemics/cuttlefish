@@ -1,5 +1,5 @@
 PORT = 22
-HOST = 192.168.2.2
+HOST = pi@192.168.2.2
 NAME = create_timer_man_example
 ROOT = $(HOME)/code/pi/root
 
