@@ -7,31 +7,26 @@
 
 namespace ctl {
 
-void timer_function(sigval_t s);
+class Timer;
+Timer* that = 0;
+void timer_function(int);
 
 class Timer {
   timer_t timerid;
-  pthread_attr_t attr;
   struct itimerspec timer_settings;
   struct sigevent sevp;
 public:
   Timer() {
-
-    //assert(thread_attr_init(attr) == 0);
-    pthread_getattr_np(pthread_self(), &attr);
-
-    // create a POSIX high-precision timer
-    //
-    sevp.sigev_notify = SIGEV_THREAD;
+    that = this;
+    sevp.sigev_notify = SIGEV_SIGNAL;
+    sevp.sigev_signo = SIGUSR1;
     sevp.sigev_value.sival_ptr = (void*)this;
-    sevp.sigev_notify_function = timer_function;
-    sevp.sigev_notify_attributes = &attr;
-    //sevp.sigev_notify_attributes = 0; // important
+    sevp.sigev_notify_attributes = 0; // important
+    signal(SIGUSR1, timer_function);
     assert(timer_create(CLOCK_REALTIME, &sevp, &timerid) == 0);
   }
 
   virtual ~Timer() {
-    //assert(thread_attr_destroy(attr) == 0);
   }
 
   void start(float period);
@@ -39,32 +34,20 @@ public:
   virtual void onTimer() = 0;
 };
 
-void timer_function(sigval_t s) {
-  ((Timer*)(s.sival_ptr))->onTimer();
+void timer_function(int) {
+  that->onTimer();
 }
 
-
 inline void Timer::start(float period) {
-
-  // set the period of the timer
-  //
   int t = (int)period;
   timer_settings.it_interval.tv_sec = t;
   timer_settings.it_interval.tv_nsec = (period - t) * 1000000000;
-
-  // start timer (almost) immediately
-  //
   timer_settings.it_value.tv_sec = 0;
   timer_settings.it_value.tv_nsec = 1;
-
-  // "arm" (start) the timer
-  //
   assert(timer_settime(timerid, 0, &timer_settings, 0) == 0);
 }
 
 inline void Timer::stop() {
-  // all zeros disarms the timer
-  //
   timer_settings.it_interval.tv_sec = 0;
   timer_settings.it_interval.tv_nsec = 0;
   timer_settings.it_value.tv_sec = 0;
