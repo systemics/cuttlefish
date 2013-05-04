@@ -1,6 +1,6 @@
 PORT = 22
 HOST = pi@192.168.2.2
-NAME = create_timer_man_example
+NAME = test_timer
 ROOT = $(HOME)/code/pi/root
 
 CXX = arm-linux-gnueabihf-gcc
@@ -19,7 +19,7 @@ LIB += -lbcm_host
 LIB += -lvcos
 LIB += -lvchiq_arm
 
-$(NAME): $(NAME).o
+$(NAME): $(NAME).o Timer.o
 	$(CXX) -o $@ $^ $(OPT) $(LIB)
 
 %.o :: %.cpp
