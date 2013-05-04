@@ -5,9 +5,11 @@
 //  Copyright (c) 2013. All rights reserved.
 //
 
+#include "ctl_bcm.h"
+#include "ctl_wait.h"
+#include "ctl_timer.h"
 #include "ctl_egl.h"
 #include "ctl_gl.h"
-#include "ctl_timer.h"
 #include <iostream>
 
 #include <lo/lo.h>
@@ -17,19 +19,18 @@ using namespace std;
 using namespace ctl::EGL;
 using namespace ctl;
 
-GLfloat rectangle[8] = { 0, 0, 0, 1, 1, 1, 1, 0 };
-//GLfloat rectangle[8] = { -1, -1, -1,  1, 1,  1, 1, -1, };
+GLfloat rectangle[8] = { 0, 0, 0, .1, .1, .1, .1, 0 };
 GLubyte rectangle_index[] = { 0, 1, 2, 0, 2, 3, };
 
-struct MyWindow : public Window, public Timer {
+struct App : BCM /* 1 */, Wait /* 2 */, Timer /* 3 */, Window /* 4 */ { // order matters
 
   ShaderManager shaderManager;
 
-  MyWindow() : Window () {
+  App() { // : Window() {
     initGL();
   }
 
-  ~MyWindow(){}
+  ~App(){}
 
   void initGL(){
     glClearColor(1, 0, 0, 1);
@@ -42,7 +43,7 @@ struct MyWindow : public Window, public Timer {
       ),
       STRINGIFY(
         void main(void) {
-          gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0); 
+          gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0); 
         }
       )
     );
@@ -66,38 +67,23 @@ struct MyWindow : public Window, public Timer {
   }
 };
 
-bool running = true;
-void quit(int) {
-  running = false;
-}
-
 int update_rectangle(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) {
   for (int i = 0; i < 8; ++i)
     rectangle[i] = argv[i]->f;
-  printf("update_rectangle...\n");
   return 0;
 }
 
 int main() {
-  bcm_host_init();
-  signal(SIGABRT, quit);
-  signal(SIGTERM, quit);
-  signal(SIGINT, quit);
 
   lo_server_thread st = lo_server_thread_new("7770", 0);
   lo_server_thread_add_method(st, "/rectangle", "ffffffff", update_rectangle, 0);
   lo_server_thread_start(st);
 
-  MyWindow win;
+  App app;
 
-  win.start(1 / 60.);
+  app.start(1 / 60.);
+  app.wait();
+  app.stop();
 
-  printf("\nrunning...\n");
-  while (running)
-    sleep(1);
-  printf("...shutting down\n");
-
-  win.stop();
-  bcm_host_deinit();
   return 0;
 }
