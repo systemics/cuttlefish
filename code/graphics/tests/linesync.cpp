@@ -80,7 +80,6 @@ int main() {
   lo_server_thread_start(st);
 
   App app;
-
   app.start(1 / 60.);
   app.wait();
   app.stop();
