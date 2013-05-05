@@ -18,10 +18,9 @@ void output(T t, R ...theRest) {
   output(theRest...);
 }
 
-// note that i can assign to name *outside* the constructor... WHAT!?
-//
 struct Chaos {
-  string name = "this is crazy!";
+  string name;
+  Chaos() : name("this is crazy!") {}
   friend ostream& operator<<(ostream& out, Chaos& chaos);
 };
 
