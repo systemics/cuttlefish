@@ -10,11 +10,11 @@
 
 #include <cassert>
 #include <string>
-#include <map>
+#include <unordered_map>
 
 namespace ctl {
 
-template <typename t> class HashTable : public std::map<std::string, t> {};
+template <typename t> class HashTable : public std::unordered_map<std::string, t> {};
 
 class ShaderManager {
   struct Shader {
