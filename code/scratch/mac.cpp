@@ -1,4 +1,5 @@
 #include <fstream>
+#include <iostream>
 using namespace std;
 int main() {
   ifstream foo("/sys/class/net/eth0/address");
