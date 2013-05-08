@@ -22,7 +22,8 @@ using namespace ctl;
 GLfloat rectangle[8] = { 0, 0, 0, .1, .1, .1, .1, 0 };
 GLubyte rectangle_index[] = { 0, 1, 2, 0, 2, 3, };
 
-struct App : BCM, Wait, Timer, Window {
+struct Rpi : BCM, Wait, Timer {};
+struct App : Rpi, Window {
 
   ShaderManager shaderManager;
 
