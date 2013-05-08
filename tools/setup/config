@@ -1,3 +1,7 @@
+Host 192.168.1.*
+  StrictHostKeyChecking no
+  UserKnownHostsFile=/dev/null
+
 Host pi-r
   HostName pi-r.mat.ucsb.edu
   User pi
