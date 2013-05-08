@@ -64,9 +64,10 @@ sync:
 	@rsync -avzL $(addPrefix($(HOST):~/, $(SYNCITEMS))) $(PIROOT)
 
 many:
-	parallel-ssh -h hosts.txt pkill main
 	parallel-scp -h hosts.txt build/bin/main /tmp
 	parallel-ssh -h hosts.txt /tmp/main
+
+#parallel-ssh -h hosts.txt pkill main
 
 kill:
 	ssh -p $(PORT) $(HOST) "rm -f /tmp/$(NAME)"

@@ -18,6 +18,10 @@
 #include "ctl_scene.h"
 #include "ctl_screen.h"  
 
+#include "ctl_bcm.h"  
+#include "ctl_timer.h"  
+#include "ctl_wait.h"  
+
 #include <lo/lo.h>   
 
 //#include "ctl_render.h"
@@ -26,6 +30,7 @@
 #include <unistd.h>
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <map>
 
 using namespace std;
@@ -37,7 +42,7 @@ using namespace ctl::GLSL;
 
 int identifier;
 
-struct MyWindow : public Window {
+struct MyWindow : BCM, Wait, Timer, Window {
 
 	 	Scene scene;
 		ShaderProgram program;
@@ -115,6 +120,10 @@ struct MyWindow : public Window {
 			
        }
         
+    virtual void onTimer() {
+      onFrame();
+    }
+
         virtual void onDraw(){
 				             
 			// scene.camera.pos() = Vec3f(0,0,1);     
@@ -164,11 +173,6 @@ struct MyWindow : public Window {
 
 };
 
-bool running = true;
-void quit(int) {
-  running = false;
-}                                                                                        
-
 int onMulti1(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) { 
  
 	cout << path << types << endl; 
@@ -207,35 +211,30 @@ int onMulti1(const char *path, const char *types, lo_arg **argv, int argc, void 
 // } 
 
 int main() {
-  bcm_host_init();
-  signal(SIGABRT, quit);
-  signal(SIGTERM, quit);
-  signal(SIGINT, quit);
-
   map<string, int> idOf;
 
   int n = 1;
-  idOf["pi-b"] = n++;
-  idOf["pi-c"] = n++;
-  idOf["pi-l"] = n++;
-  idOf["pi-r"] = n++;
+  idOf["b8:27:eb:84:b7:37"] = n++;
+  idOf["b8:27:eb:a8:87:0b"] = n++;
+  idOf["b8:27:eb:7d:63:d7"] = n++;
+  idOf["b8:27:eb:a6:9f:1a"] = n++;
 
-  char hostname[100];
-  gethostname(hostname, 100);
-  identifier = idOf[hostname];
+  ifstream foo("/sys/class/net/eth0/address");
+  char mac[256];
+  foo.getline(mac, 256);
+  identifier = idOf[mac];
 
   MyWindow win;    
 
-  lo_server_thread st = lo_server_thread_new("7770", 0);  
-  lo_server_thread_add_method(st, "/multi/1", NULL, onMulti1, &win);  
-//  lo_server_thread_add_method(st, "/accelerometer", "fff", onAccel, 0);
-  lo_server_thread_start(st);
+  //lo_server_thread st = lo_server_thread_new("7770", 0);  
+  //lo_server_thread_add_method(st, "/multi/1", NULL, onMulti1, &win);  
+////  lo_server_thread_add_method(st, "/accelerometer", "fff", onAccel, 0);
+  //lo_server_thread_start(st);
 
-  while (running) {
-    win.onFrame();
-    usleep(16666);
-  }
+  win.start(1 / 60.);
 
-  bcm_host_deinit();
+  win.wait();
+  win.stop();
+
   return 0;
 }

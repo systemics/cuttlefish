@@ -22,7 +22,7 @@ using namespace ctl;
 GLfloat rectangle[8] = { 0, 0, 0, .1, .1, .1, .1, 0 };
 GLubyte rectangle_index[] = { 0, 1, 2, 0, 2, 3, };
 
-struct App : BCM /* 1 */, Wait /* 2 */, Timer /* 3 */, Window /* 4 */ { // order matters
+struct App : BCM, Wait, Timer, Window {
 
   ShaderManager shaderManager;
 
