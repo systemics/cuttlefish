@@ -44,6 +44,10 @@ struct MyWindow : public Window {
 		
 		Pose viewpose;
 		float width, height, aspect, scale; //Total Width, Height of all Screens Combined
+		 
+		MBO circle; 
+		MBO grid;
+		MBO line;
 		
         MyWindow() : Window () {
             initGL();
@@ -65,8 +69,15 @@ struct MyWindow : public Window {
 	             Pipe::BindAttributes();
 	        program.unbind();
 			
-			initView();
+			initView();  
+			initBufferObjects();
 		}	
+		
+		void initBufferObjects(){
+			circle 	= MBO ( Mesh::Disc(4).color(1,1,0), GL::DYNAMIC  );
+			line 	= MBO ( Mesh::Rect( width *4 , 1.0 ).color(0,1,1), GL::DYNAMIC );
+			grid 	= MBO ( Mesh::Grid( width * 4, height, 1 ) );    
+		}
 		
 		void initView(){
 	         
@@ -119,10 +130,10 @@ struct MyWindow : public Window {
 				             
 			// scene.camera.pos() = Vec3f(0,0,1);     
 				
-			static MBO circle ( Mesh::Disc(4).color(1,1,0), GL::DYNAMIC  );
-			static MBO grid ( Mesh::Grid(width * 4, height, 1) );
+		   // static MBO circle ( Mesh::Disc(4).color(1,1,0), GL::DYNAMIC  );
+		   // static MBO grid ( Mesh::Grid(width * 4, height, 1) );
 		   //  static MBO line ( Mesh::Line( Vec3f( - width * 2, -height /2.0, 0), Vec3f( width * 2, -height /2.0, 0) ) );   
-			static MBO line ( Mesh::Rect( width *4 , 1.0 ).color(0,1,1), GL::DYNAMIC );
+		   // static MBO line ( Mesh::Rect( width *4 , 1.0 ).color(0,1,1), GL::DYNAMIC );
 			                  
 			static float time = 0; time +=.03;   
 			float x = sin(time);    

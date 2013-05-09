@@ -115,6 +115,21 @@ namespace ctl {
                 mIndex.push_back(m.mIndex[i]);
             }    
 			store();
+        }  
+
+		Mesh operator = (const Mesh& m){
+            
+            mMode = m.mMode;
+            
+            for (int i = 0; i < m.num(); ++i){
+                mVertex.push_back( m[i] ); 
+				
+            }
+            
+            for (int i = 0; i < m.mIndex.size(); ++i){
+                mIndex.push_back(m.mIndex[i]);
+            }    
+			store();
         }
         
         /// Create Mesh from an OBJ file

@@ -33,8 +33,24 @@ namespace ctl{
             
             GL::MODE mode;
             
-            MBO(){}
-            
+            MBO(){} 
+
+			MBO(const MBO& mbo){
+				idx = mbo.idx;
+				vertex = mbo.vertex;
+				index = mbo.index; 
+				mesh = mbo.mesh;
+				mode = mbo.mode;  			
+			}
+               
+			MBO operator = (const MBO& mbo){
+				idx = mbo.idx;
+				vertex = mbo.vertex;
+				index = mbo.index; 
+				mesh = mbo.mesh;
+				mode = mbo.mode;  			
+			}           
+			
             MBO( Mesh m, GL::USAGE usage = GL::STATIC, int id = -1 ) : mesh(m){
                 mCount +=1;
                 idx = id == -1 ? mCount : id;
