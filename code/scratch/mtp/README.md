@@ -21,6 +21,8 @@
 
 # information on the ASUS bluetooth dongle on the pi #
 
+note: tested in linux/macbookair. same hanging behaviour as on the pi.
+
 hci0: Type: BR/EDR  Bus: USB
   BD Address: 00:02:72:C0:66:02  ACL MTU: 1022:8  SCO MTU: 121:3
   UP RUNNING PSCAN ISCAN
@@ -56,6 +58,25 @@ hci0: Type: BR/EDR  Bus: USB
   HCI Version: 1.2 (0x2)  Revision: 0x1fe
   LMP Version: 1.2 (0x2)  Subversion: 0x1fe
   Manufacturer: Integrated System Solution Corp. (57)
+
+# bluetooth on my macbook air #
+
+hci0:	Type: BR/EDR  Bus: USB
+	BD Address: 10:9A:DD:AA:E3:EB  ACL MTU: 1021:8  SCO MTU: 64:1
+	UP RUNNING PSCAN 
+	RX bytes:828 acl:0 sco:0 events:35 errors:0
+	TX bytes:2079 acl:0 sco:0 commands:35 errors:0
+	Features: 0xff 0xff 0x8f 0xfe 0x9b 0xff 0x79 0x83
+	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
+	Link policy: RSWITCH HOLD SNIFF PARK 
+	Link mode: SLAVE ACCEPT 
+	Name: 'ubuntu-0'
+	Class: 0x6e0100
+	Service Classes: Networking, Rendering, Capturing, Audio, Telephony
+	Device Class: Computer, Uncategorized
+	HCI Version: 2.1 (0x4)  Revision: 0x2ad
+	LMP Version: 2.1 (0x4)  Subversion: 0x4222
+	Manufacturer: Broadcom Corporation (15)
 
 # hid descriptor report from evtest #
 
