@@ -63,11 +63,14 @@ $(EXEC_TARGETS) : title dir FORCE
 sync:
 	@rsync -avzL $(addPrefix($(HOST):~/, $(SYNCITEMS))) $(PIROOT)
 
-many:
+copy:
 	parallel-scp -h hosts.txt build/bin/main /tmp
+
+many: copy
 	parallel-ssh -h hosts.txt /tmp/main
 
-#parallel-ssh -h hosts.txt pkill main
+many-kill:
+	parallel-ssh -h hosts.txt "pkill main"
 
 kill:
 	ssh -p $(PORT) $(HOST) "rm -f /tmp/$(NAME)"
