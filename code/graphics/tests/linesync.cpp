@@ -11,6 +11,7 @@
 #include "ctl_egl.h"
 #include "ctl_gl.h"
 #include "ctl_shader_manager.h"
+#include "ctl_stopwatch.h"
 #include <iostream>
 
 #include <lo/lo.h>
@@ -24,6 +25,7 @@ GLubyte rectangle_index[] = { 0, 1, 2, 0, 2, 3, };
 
 struct Rpi : BCM, Wait, Timer {};
 struct App : Rpi, Window {
+  Stopwatch stopwatch;
 
   ShaderManager shaderManager;
 

@@ -18,6 +18,9 @@
 #include "ctl_scene.h"
 #include "ctl_screen.h"  
 
+#include "ctl_bcm.h"
+#include "ctl_timer.h"  
+
 #include <lo/lo.h>   
 
 //#include "ctl_render.h"
@@ -37,7 +40,7 @@ using namespace ctl::GLSL;
 
 int identifier;
 
-struct MyWindow : public Window {
+struct MyWindow : BCM, Timer, public Window {
 
 	 	Scene scene;
 		ShaderProgram program;
@@ -160,6 +163,9 @@ struct MyWindow : public Window {
 
         }
         
+    virtual void onTimer(){
+      onFrame();
+    }
         virtual void onFrame(){
 			
 			scene.onFrame();
@@ -243,9 +249,11 @@ int main() {
 //  lo_server_thread_add_method(st, "/accelerometer", "fff", onAccel, 0);
   lo_server_thread_start(st);
 
+  win.start(1 / 3.0);
   while (running) {
-    win.onFrame();
-    usleep(16666);
+    //win.onFrame();
+    sleep(1);
+    //usleep(16666);
   }
 
   bcm_host_deinit();

@@ -1,27 +1,29 @@
 #ifndef __STOPWATCH__
 #define __STOPWATCH__
 
-using namespace std;
-using namespace std::chrono;
+#include <chrono>
 
-template <typename CLOCK = high_resolution_clock, typename UNIT = double>
+namespace ctl {
+
 struct Stopwatch {
-  typename CLOCK::time_point start;
-  typename CLOCK::time_point stop;
-  duration<UNIT> elapsed_time;
+  std::chrono::high_resolution_clock::time_point start;
+  std::chrono::high_resolution_clock::time_point stop;
+  std::chrono::duration<double> elapsed_time;
 
   void tic() {
-    start = CLOCK::now();
+    start = std::chrono::high_resolution_clock::now();
   }
 
   void toc() {
-    stop = CLOCK::now();
-    elapsed_time = duration_cast<duration<UNIT>>(stop - start);
+    stop = std::chrono::high_resolution_clock::now();
+    elapsed_time = std::chrono::duration_cast<std::chrono::duration<double>>(stop - start);
   }
 
   void report() {
-    cout << elapsed_time.count() << endl;
+    std::cout << elapsed_time.count() << std::endl;
   }
 };
+
+}
 
 #endif
