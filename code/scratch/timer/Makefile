@@ -1,6 +1,5 @@
-PORT = 22
-HOST = pi-r
-NAME = main
+HOST = pi@192.168.2.2
+NAME = test_timer
 ROOT = $(HOME)/code/pi/root
 
 CXX = arm-linux-gnueabihf-g++
@@ -12,23 +11,25 @@ INC += -I$(ROOT)/opt/vc/include/interface/vmcs_host/linux/
 INC += -I$(ROOT)/opt/vc/include/interface/vcos/pthreads/
 INC += -I$(ROOT)/opt/vc/include/
 LIB += -L$(ROOT)/opt/vc/lib/
+LIB += -lrt
 LIB += -lEGL
 LIB += -lGLESv2
 LIB += -lbcm_host
 LIB += -lvcos
 LIB += -lvchiq_arm
 
-$(NAME): $(NAME).o EGLConfig.o EGLWindow.o
+$(NAME): $(NAME).o Timer.o
 	$(CXX) -o $@ $^ $(OPT) $(LIB)
 
 %.o :: %.cpp
-	$(CXX) -o $@ -c $< $(OPT) $(INC)
+	$(CXX) -o $@ -c $< $(OPT) $(INC) $(LIB)
 
 kill:
-	ssh $(HOST) "pkill $(NAME) && rm /tmp/$(NAME)"
+	ssh $(HOST) "pkill $(NAME) ; rm /tmp/$(NAME)"
 
 deploy:
-	ssh -o 'LocalCommand=scp $(NAME) $(HOST):/tmp/' $(HOST) /tmp/$(NAME)
+	scp $(NAME) $(HOST):/tmp/
+	ssh $(HOST) /tmp/$(NAME)
 
 clean:
 	rm -f *.o *.gch $(NAME)

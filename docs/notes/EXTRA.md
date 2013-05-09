@@ -18,3 +18,6 @@ sync
   http://www.raspberrypi.org/phpBB3/viewtopic.php?t=6270&p=82347
   http://www.raspberrypi.org/phpBB3/viewtopic.php?t=6913&p=89406
   http://www.raspberrypi.org/phpBB3/viewtopic.php?t=19073&p=186935
+
+had to do this to use the official raspberry pi cross-compiler on x86_64
+  sudo apt-get install libstdc++6:i386

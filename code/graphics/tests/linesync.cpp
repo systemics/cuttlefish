@@ -5,33 +5,38 @@
 //  Copyright (c) 2013. All rights reserved.
 //
 
+#include "ctl_bcm.h"
+#include "ctl_wait.h"
+#include "ctl_timer.h"
 #include "ctl_egl.h"
 #include "ctl_gl.h"
+#include "ctl_shader_manager.h"
+#include "ctl_stopwatch.h"
 #include <iostream>
 
 #include <lo/lo.h>
-#include "ShaderManager.h"
 
 using namespace std;
 using namespace ctl::EGL;
 using namespace ctl;
 
-GLfloat rectangle[8] = { 0, 0, 0, 1, 1, 1, 1, 0 };
-//GLfloat rectangle[8] = { -1, -1, -1,  1, 1,  1, 1, -1, };
+GLfloat rectangle[8] = { 0, 0, 0, .1, .1, .1, .1, 0 };
 GLubyte rectangle_index[] = { 0, 1, 2, 0, 2, 3, };
 
-struct MyWindow : public Window {
+struct Rpi : BCM, Wait, Timer {};
+struct App : Rpi, Window {
+  Stopwatch<> stopwatch;
 
   ShaderManager shaderManager;
 
-  MyWindow() : Window () {
+  App() { // : Window() {
     initGL();
   }
 
-  ~MyWindow(){}
+  ~App(){}
 
   void initGL(){
-    glClearColor(1, 1, 1, 1);
+    glClearColor(1, 0, 0, 1);
     shaderManager.make("basic",
       STRINGIFY(
         attribute vec2 position;
@@ -59,12 +64,16 @@ struct MyWindow : public Window {
     onDraw();
     swapBuffers();
   }
-};
 
-bool running = true;
-void quit(int) {
-  running = false;
-}
+  virtual void onTimer() {
+    stopwatch.tic();
+    onFrame();
+    stopwatch.toc();
+    static int n = 0;
+    if ((n++ % 60) == 0)
+      stopwatch.report();
+  }
+};
 
 int update_rectangle(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) {
   for (int i = 0; i < 8; ++i)
@@ -73,22 +82,15 @@ int update_rectangle(const char *path, const char *types, lo_arg **argv, int arg
 }
 
 int main() {
-  bcm_host_init();
-  signal(SIGABRT, quit);
-  signal(SIGTERM, quit);
-  signal(SIGINT, quit);
 
   lo_server_thread st = lo_server_thread_new("7770", 0);
   lo_server_thread_add_method(st, "/rectangle", "ffffffff", update_rectangle, 0);
   lo_server_thread_start(st);
 
-  MyWindow win;
+  App app;
+  app.start(1 / 60.);
+  app.wait();
+  app.stop();
 
-  while (running) {
-    win.onFrame();
-    usleep(16666);
-  }
-
-  bcm_host_deinit();
   return 0;
 }

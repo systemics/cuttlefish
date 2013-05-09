@@ -79,14 +79,25 @@ namespace ctl {
         
         /// Vertices for VertexArray
         vector< Vertex > mVertex;
-        
+        vector< Vertex > mStore; 		//Original Stored copy
+   
         ///Indices for ElementArray
         vector< INDEXTYPE > mIndex;
         
     public:
         
         /// Set Draw Mode
-        void mode( GL::MODE m) { mMode = m; }
+        void mode( GL::MODE m) { mMode = m; }  
+		void store() {
+			mStore = mVertex;
+		}
+		void moveTo( double x, double y, double z ){
+			
+			for (int i = 0; i < mVertex.size(); ++i ){
+				
+				mVertex[i].Pos = mStore[i].Pos + Vec3f(x,y,z);
+			}
+		}
         
         /// Default Line Loop Mode
         Mesh(GL::MODE m = GL::LL) : mMode(m) {}
@@ -96,12 +107,32 @@ namespace ctl {
             mMode = m.mMode;
             
             for (int i = 0; i < m.num(); ++i){
-                mVertex.push_back( m[i] );
+                mVertex.push_back( m[i] ); 
+				
             }
             
             for (int i = 0; i < m.mIndex.size(); ++i){
                 mIndex.push_back(m.mIndex[i]);
+            }    
+			store();
+        }  
+
+		Mesh operator = (const Mesh& m){
+            
+			if (this != &m ){
+            mMode = m.mMode;
+            
+            for (int i = 0; i < m.num(); ++i){
+                mVertex.push_back( m[i] ); 
+				
             }
+            
+            for (int i = 0; i < m.mIndex.size(); ++i){
+                mIndex.push_back(m.mIndex[i]);
+            }    
+			store();
+			}     
+			return *this;
         }
         
         /// Create Mesh from an OBJ file
@@ -117,7 +148,13 @@ namespace ctl {
         int num() const { return mVertex.size(); }
         int numIdx() const { return mIndex.size(); }
         
-        void color(float r, float g, float b, float a) { mColor.set(r,g,b,a); }
+        Mesh& color(float r, float g, float b, float a = 1.0) { 
+			   mColor.set(r,g,b,a);   
+			for (int i = 0; i < mVertex.size(); ++i ){
+				mVertex[i].Col = mColor;
+			}   
+			return *this;
+		}
         
         //Add  vertices from another Mesh
         Mesh& add(const Mesh& m){
@@ -189,20 +226,22 @@ namespace ctl {
         
         #endif
                 
-        void translate(float x, float y, float z){
+        Mesh& translate(float x, float y, float z){
             
             for (int i = 0; i < num(); ++i){
-                mVertex[i].Pos[0] -= x;
-                mVertex[i].Pos[1] -= y;
-                mVertex[i].Pos[2] -= z;
-            }
+                mVertex[i].Pos[0] += x;
+                mVertex[i].Pos[1] += y;
+                mVertex[i].Pos[2] += z;
+            }    
+			return *this;
         }
         
-        void scale(float s){
+        Mesh&  scale(float s){
             
             for (int i = 0; i < num(); ++i){
 				mVertex[i].Pos *= s;
-            }
+            }  
+ 			   return *this;
         }
         
         //LOAD FROM OBJ FILE
@@ -242,7 +281,8 @@ namespace ctl {
                 myfile.close();            
             }
             
-            printf("# of vertices: %d\n", (int)mVertex.size() );
+            printf("# of vertices: %d\n", (int)mVertex.size() );  
+			store();
         }    
     
 		// template<class t> 
@@ -261,6 +301,7 @@ namespace ctl {
         static Mesh Points(T* p, int num);
 
         static Mesh Grid(int w = 10, int h = 10, float spacing = .2);
+
         static Mesh Sphere(double rad = 1.0, int slices = 20, int stacks = 20);
 
   //      static Mesh Line( Vec3f a, Vec3f b);
@@ -291,6 +332,7 @@ namespace ctl {
         Mesh m;
         m.add(x,y,z).add();
         m.mode( GL::P );
+		m.store();
         return m;
     }
 	template<class T>
@@ -298,6 +340,7 @@ namespace ctl {
         Mesh m;
         m.add(p[0],p[1],p[2]).add();
         m.mode( GL::P );
+		m.store();
         return m;
     }
   
@@ -307,7 +350,8 @@ namespace ctl {
 		for (int i = 0; i < num; ++i){
 			m.add(p[i][0],p[i][1],p[i][2]).add();
 		}
-		m.mode( GL::P );
+		m.mode( GL::P );    
+		m.store();		
 		return m;
 	}
 
@@ -316,22 +360,25 @@ namespace ctl {
         float tw = spacing * w;
         float th = spacing * h;
         
-        for (int i = 0; i < w; ++i){
-            float tx = (-1.0 + 2.0 * i/w ) * tw;
+		//Vertical Lines
+        for (int i = 0; i <= w; ++i){
+            float tx = (-1.0 + 2.0 * i/w ) * tw/2.0;
             float ty = th/2.0;
             m.add(tx,-ty,0).add();
             m.add(tx,ty,0).add();
         }
         
-        for (int i = 0; i < h; ++i){
-            float ty = (-1.0 + 2.0 * i/h ) * th;
+		//Horizontal Lines
+        for (int i = 0; i <= h; ++i){
+            float ty = (-1.0 + 2.0 * i/h ) * th/2.0;
             float tx = tw/2.0;
             m.add(-tx,ty,0).add();
             m.add(tx,ty,0).add();
         }
 
-        m.mode(GL::LS);
-        return m;
+        m.mode(GL::L);
+ 		m.store();
+       return m;
     }
  
        
@@ -396,7 +443,8 @@ namespace ctl {
           m.last().Col.set(0,1,0,1);
           
           m.mode(GL::P);
-          return m;
+		 m.store(); 
+         return m;
       }
     
 	template<class T>
@@ -406,6 +454,7 @@ namespace ctl {
         m.add(a[0], a[1], a[2]).add(b[0], b[1], b[2]);
         m.add(0).add(1);
         m.mode( GL::LS );
+		m.store();
         return m;
     }
     
@@ -425,6 +474,7 @@ namespace ctl {
         }
         
         m.mode(GL::LL);
+		m.store();
         return m;
     }
     
@@ -445,7 +495,8 @@ namespace ctl {
             m.add(i*slices);
         }
         
-        m.mode(GL::LL);
+        m.mode(GL::LL); 
+		m.store(); 
         return m;
     
     }
@@ -457,7 +508,8 @@ namespace ctl {
         m.add( Vec3f(0,0,-1) );
         m.add( n );
         m.translate(0,0,1);
-        m.mode(GL::LS);
+        m.mode(GL::LS); 
+		m.store(); 
         return m;
     
     }
@@ -471,8 +523,8 @@ namespace ctl {
         for (int i = 0; i < res; ++i){
         
             float rad = 2.0 * PI * i / res;
-            float x = cos(rad);
-            float y = sin(rad);
+            float x = cos(rad) * scale;
+            float y = sin(rad) * scale;
             
             m.add( Vec3f(x,y,0) );
             
@@ -486,7 +538,7 @@ namespace ctl {
 
         m.add(1);
         m.mode(GL::TS);
-        
+        m.store(); 
         return m;
     }
     
@@ -500,17 +552,18 @@ namespace ctl {
         Vec3f lt = rt - Vec3f(w,0,0);
         
         Vec3f normal(0,0,1);
-        Vertex va( lt, normal, Vec4f(lt,1), Vec2f(0,0));
-        Vertex vb( rt, normal,  Vec4f(lt,1), Vec2f(1,0));
-        Vertex vc( rb, normal, Vec4f(lt,1), Vec2f(1,1));
-        Vertex vd( lb,  normal, Vec4f(lt,1), Vec2f(0,1));
+        Vertex va( lt, normal, Vec4f(1,1,1,1), Vec2f(0,0));
+        Vertex vb( rt, normal,  Vec4f(1,1,1,1), Vec2f(1,0));
+        Vertex vc( rb, normal, Vec4f(1,1,1,1), Vec2f(1,1));
+        Vertex vd( lb,  normal, Vec4f(1,1,1,1), Vec2f(0,1));
         
         m.add(va).add(vb).add(vc).add(vd);
         
         int idx[4] = {0,1,3,2};
         m.add(idx,4);
                 
-        m.mode(GL::TS);
+        m.mode(GL::TS);  
+		m.store(); 
         return m;
     }
     
@@ -535,6 +588,8 @@ namespace ctl {
                 
             }
         }
+		m.mode(GL::TS);
+		m.store(); 
         return m;
     }
     

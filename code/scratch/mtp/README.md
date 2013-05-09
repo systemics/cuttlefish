@@ -1,20 +1,63 @@
-gotta do some software install and pairing bullshit
+# notes #
 
 
-sudo -i
+# install dependencies #
 
-apt-get install bluetooth bluez-tools
-/etc/init.d/bluetooth status
-/etc/init.d/bluetooth start
-/etc/init.d/bluetooth restart
+    sudo -s
+    apt-get install bluetooth bluez-tools
+    /etc/init.d/bluetooth status
+    /etc/init.d/bluetooth start
+    /etc/init.d/bluetooth restart
 
-hciconfig -a
-hciconfig hci0 up
-hcitool scan
-bluez-simple agent hci0 <bt address>
-bluez-test-device trusted <bt address> yes
-bluez-test-input connect <bt address>
+# connect and pair #
 
+    sudo -s
+    hciconfig -a
+    hciconfig hci0 up
+    hcitool scan
+    bluez-simple-agent hci0 F4:1B:A1:31:30:A3
+    bluez-test-device trusted F4:1B:A1:31:30:A3 yes
+    bluez-test-input connect F4:1B:A1:31:30:A3
+
+# information on the ASUS bluetooth dongle on the pi #
+
+hci0: Type: BR/EDR  Bus: USB
+  BD Address: 00:02:72:C0:66:02  ACL MTU: 1022:8  SCO MTU: 121:3
+  UP RUNNING PSCAN ISCAN
+  RX bytes:45964 acl:1714 sco:0 events:184 errors:0
+  TX bytes:1918 acl:34 sco:0 commands:79 errors:0
+  Features: 0xff 0xfe 0x0d 0xfe 0x98 0x7f 0x79 0x87
+  Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+  Link policy: RSWITCH HOLD SNIFF
+  Link mode: SLAVE ACCEPT
+  Name: 'raspberrypi-0'
+  Class: 0x420100
+  Service Classes: Networking, Telephony
+  Device Class: Computer, Uncategorized
+  HCI Version: 3.0 (0x5)  Revision: 0x9999
+  LMP Version: 3.0 (0x5)  Subversion: 0x9999
+  Manufacturer: Atheros Communications, Inc. (69)
+
+# my other blue bluetooth dongle #
+
+hci0: Type: BR/EDR  Bus: USB
+  BD Address: 11:11:11:11:11:11  ACL MTU: 678:8  SCO MTU: 48:10
+  UP RUNNING PSCAN
+  RX bytes:1189 acl:0 sco:0 events:40 errors:0
+  TX bytes:434 acl:0 sco:0 commands:40 errors:0
+  Features: 0xbf 0xfe 0x8d 0x78 0x08 0x18 0x00 0x00
+  Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+  Link policy: RSWITCH SNIFF
+  Link mode: SLAVE ACCEPT
+  Name: 'raspberrypi-0'
+  Class: 0x420100
+  Service Classes: Networking, Telephony
+  Device Class: Computer, Uncategorized
+  HCI Version: 1.2 (0x2)  Revision: 0x1fe
+  LMP Version: 1.2 (0x2)  Subversion: 0x1fe
+  Manufacturer: Integrated System Solution Corp. (57)
+
+# hid descriptor report from evtest #
 
 Input driver version is 1.0.1
 Input device ID: bus 0x5 vendor 0x5ac product 0x30e version 0x160

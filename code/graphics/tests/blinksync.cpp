@@ -5,22 +5,26 @@
 //  Copyright (c) 2013. All rights reserved.
 //
 
+#include "ctl_bcm.h"
+#include "ctl_wait.h"
+#include "ctl_timer.h"
 #include "ctl_egl.h"
 #include "ctl_gl.h"
 #include <iostream>
 
 using namespace std;
 using namespace ctl::EGL;
+using namespace ctl;
 
-struct MyWindow : public Window {
+struct App : BCM /* 1 */, Wait /* 2 */, Timer /* 3 */, Window /* 4 */ { // order matters
 
   int n;
-  MyWindow() : Window () {
+  App() {
     n = 0;
     initGL();
   }
 
-  ~MyWindow(){}
+  ~App(){}
 
   void initGL(){
     glClearColor(1, 1, 1, 1);
@@ -28,6 +32,10 @@ struct MyWindow : public Window {
   }
 
   virtual void onDraw() {
+  }
+
+  virtual void onTimer() {
+    onFrame();
   }
 
   virtual void onFrame() {
@@ -44,25 +52,10 @@ struct MyWindow : public Window {
   }
 };
 
-bool running = true;
-void quit(int) {
-  running = false;
-}
-
 int main() {
-  bcm_host_init();
-  signal(SIGABRT, quit);
-  signal(SIGTERM, quit);
-  signal(SIGINT, quit);
-
-    cout << "GOTHERE" << endl;
-  MyWindow win;
-
-  while (running) {
-    win.onFrame();
-    usleep(16666);
-  }
-
-  bcm_host_deinit();
+  App app;
+  app.start(1 / 60.);
+  app.wait();
+  app.stop();
   return 0;
 }

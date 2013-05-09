@@ -32,14 +32,10 @@ using namespace ctl::GLSL;
 
 
 struct MyWindow : public Window {
-
-
 	
 	 	Scene scene;
 		ShaderProgram program;
 		
-
-
         MyWindow() : Window () {
             initGL();
         }
@@ -49,8 +45,6 @@ struct MyWindow : public Window {
         void initGL(){
              glClearColor(1,1,1,1);
              srand( time(NULL) );
-
-
 
 			string Vert = AVertex + Varying + UMatrix  + NTransform + VLighting + VCalc + MVert;
 			string Frag = USampler + Varying + MFrag;
@@ -65,43 +59,24 @@ struct MyWindow : public Window {
         virtual void onDraw(){
 	
 			using namespace vsr;
+			static double time = 0.0; time += .01;
 			
 			static Circle c = CXY(1).trs(0,0,-3);
 			static Point p = PT(0,0,0);
 			static Field<Pnt> f(30,30,1,.1);
-			//static Field<Sca> f(30,30,1);
 			static DualSphere dls = Ro::dls(p, .3);
-			
-			Par par = Gen::bst( Ro::par( dls, Vec::y) * .1);
-        				
-
-			static double time = 0.0; time += .01;
-			
+						
 			Circle tc = c.sp( Gen::mot( DLN(1,0,0).trs(0,0,-3) * time ) );		
 			Vector tv = Vec(1,0,0).sp( Gen::rot( Biv::xy * time ) );
-			
-			for (int i = 0; i < f.num(); ++i){
-				double dist = 1.0 / ( Ro::sqd( f[i], PAO ) +.01 );
-				f[i] =  Ro::loc( f[i] .sp( Gen::bst( par * dist) ) );//.sp(bst) );
-			}
-			
-			//Dipole changes size and moves around screen
-			dls = Ro::dls(p, .3 + sin(time) ).trs(1,0,0).sp( Gen::mot( DLN(0,0,1) * time ) );
-			
+									
 		    program.bind();
 		
-		         program.uniform("projection",  scene.xf.proj);
-		         program.uniform("lightPosition", 2.0, 2.0, 2.0);
-
+		         program.uniform("projection",  scene.xf.proj );
 		         program.uniform("normalMatrix", scene.xf.normal);
-				 program.uniform("modelView", scene.xf.modelView );//app.scene().xf.modelView);        
+				 program.uniform("modelView", scene.xf.modelView );    
+	 			 program.uniform("lightPosition", 2.0, 2.0, 2.0 );
 				
-				Render( f, scene.xf.modelViewMatrixf(), program );
-				
-				
-				
-				//Pipe::Line(circle);
-
+				 Render( f, scene.xf.modelViewMatrixf(), program );
 
 		    program.unbind();
 

@@ -134,7 +134,8 @@ namespace ctl{
             
             void main(void){
             
-                colorDst = doColor();
+				colorDst = doColor();  
+				colorDst = sourceColor;
                 
                 texco = texCoord;
                                 

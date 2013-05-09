@@ -29,7 +29,7 @@ namespace ctl {
     
         inline void Error(string s){
             if (State == EGL_FALSE){
-                cout << "ERROR: " << s << endl; 
+                // cout << "ERROR: " << s << endl; 
             }
         }
         
@@ -69,7 +69,7 @@ namespace ctl {
 
                 State = eglInitialize( display, &majorVersion, &minorVersion); Error("egl initialize");
                 
-                cout << "EGL VERSION: " << majorVersion << "." << minorVersion <<  endl; 
+                // cout << "EGL VERSION: " << majorVersion << "." << minorVersion <<  endl; 
 
             }
         };
@@ -103,7 +103,7 @@ namespace ctl {
 				//width = 1920; height = 1080;
 				maxWidth = width; maxHeight = height;
 				
-				cout << "SCEEN DIM: " << width << " x " << height << endl;
+				// cout << "SCEEN DIM: " << width << " x " << height << endl;
 
                 uint32_t x = 0; 
                 uint32_t y = 0;
@@ -142,6 +142,8 @@ namespace ctl {
                         
         };
         
+//		struct SurfaceArray
+
         //SET UP BRIDGE BETWEEN OPENGL'S OUTPUT AND DEVICE SCREEN
         struct Config {
         
@@ -185,7 +187,7 @@ namespace ctl {
                     State = eglGetConfigs( *display, NULL, 0, &numConfig );
                     Error("egl get configs");
                     
-                    cout << "NUM CONFIGS: " << numConfig << endl; 
+                    // cout << "NUM CONFIGS: " << numConfig << endl; 
                     
                     config = new EGLConfig[ numConfig ];
                     State = eglGetConfigs( *display, config, numConfig, &numConfig );
@@ -196,32 +198,36 @@ namespace ctl {
                     for(int i=0; i<numConfig; ++i){
                     
                         
-                        cout<<"Config #"<<i<<"\n";
-                        cout << "Buffer: " << get(i, Buffer) << "\n";
-                        cout << "Red: " << get(i, Red) << "\n";
-                        cout << "Green: " << get(i, Green) << "\n";
-                        cout << "Blue: " << get(i, Blue) << "\n";
-                        cout << "Alpha: " << get(i, Alpha) << "\n";
+                        // cout<<"Config #"<<i<<"\n";
+                        // cout << "Buffer: " << get(i, Buffer) << "\n";
+                        // cout << "Red: " << get(i, Red) << "\n";
+                        // cout << "Green: " << get(i, Green) << "\n";
+                        // cout << "Blue: " << get(i, Blue) << "\n";
+                        // cout << "Alpha: " << get(i, Alpha) << "\n";
                         
                         EGLint var = get(i, ConfigCav);
                         
                         switch(var){
-                            case  None : cout<<"ConfigCav EGL_NONE\n"; break;
-                            case  Slow : cout<<"ConfigCav EGL_SLOW_CONFIG\n"; break;
+                            case  None :
+                              // cout<<"ConfigCav EGL_NONE\n";
+                              break;
+                            case  Slow :
+                              // cout<<"ConfigCav EGL_SLOW_CONFIG\n";
+                              break;
                         }
 
-                        cout << "ConfigId: " << get(i, ConfigId) << "\n";
-                        cout << "Depth: " <<get(i, Depth) << "\n";
-                        cout << "PBufferW: " <<get(i, PBufferW) << "\n";
-                        cout << "PBufferH: " <<get(i, PBufferH) << "\n";
-                        cout << "PBufferP: " <<get(i, PBufferP) << "\n";
-                        cout << "Renderable: " <<get(i, Renderable) << "\n"; 
-                        cout << "VisualId: " <<get(i, VisualId) << "\n"; 
-                        cout << "VisualType: " <<get(i, VisualType) << "\n"; 
-                        cout << "SampleBuf: " <<get(i, SampleBuf) << "\n"; 
-                        cout << "Samples: " <<get(i, Samples) << "\n"; 
-                        cout << "Surface: " <<get(i, SurfaceType) << "\n"; 
-                        cout << "Transparent: " <<get(i, Transparent) << "\n"; 
+                        // cout << "ConfigId: " << get(i, ConfigId) << "\n";
+                        // cout << "Depth: " <<get(i, Depth) << "\n";
+                        // cout << "PBufferW: " <<get(i, PBufferW) << "\n";
+                        // cout << "PBufferH: " <<get(i, PBufferH) << "\n";
+                        // cout << "PBufferP: " <<get(i, PBufferP) << "\n";
+                        // cout << "Renderable: " <<get(i, Renderable) << "\n"; 
+                        // cout << "VisualId: " <<get(i, VisualId) << "\n"; 
+                        // cout << "VisualType: " <<get(i, VisualType) << "\n"; 
+                        // cout << "SampleBuf: " <<get(i, SampleBuf) << "\n"; 
+                        // cout << "Samples: " <<get(i, Samples) << "\n"; 
+                        // cout << "Surface: " <<get(i, SurfaceType) << "\n"; 
+                        // cout << "Transparent: " <<get(i, Transparent) << "\n"; 
                     }
                     
                     set();
