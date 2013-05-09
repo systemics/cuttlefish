@@ -7,3 +7,6 @@
 [submodule "ext/vsr"]
 	path = ext/vsr
 	url = git://github.com/wolftype/vsr.git
+[submodule "ext/Gamma"]
+	path = ext/Gamma
+	url = git://github.com/LancePutnam/Gamma.git
