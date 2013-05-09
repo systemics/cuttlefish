@@ -25,7 +25,7 @@ GLubyte rectangle_index[] = { 0, 1, 2, 0, 2, 3, };
 
 struct Rpi : BCM, Wait, Timer {};
 struct App : Rpi, Window {
-  Stopwatch stopwatch;
+  Stopwatch<> stopwatch;
 
   ShaderManager shaderManager;
 
@@ -66,7 +66,12 @@ struct App : Rpi, Window {
   }
 
   virtual void onTimer() {
+    stopwatch.tic();
     onFrame();
+    stopwatch.toc();
+    static int n = 0;
+    if ((n++ % 60) == 0)
+      stopwatch.report();
   }
 };
 
