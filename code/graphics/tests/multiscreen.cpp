@@ -18,10 +18,6 @@
 #include "ctl_scene.h"
 #include "ctl_screen.h"  
 
-#include "ctl_bcm.h"  
-#include "ctl_timer.h"  
-#include "ctl_wait.h"  
-
 #include <lo/lo.h>   
 
 //#include "ctl_render.h"
@@ -30,7 +26,6 @@
 #include <unistd.h>
 #include <string>
 #include <iostream>
-#include <fstream>
 #include <map>
 
 using namespace std;
@@ -42,7 +37,7 @@ using namespace ctl::GLSL;
 
 int identifier;
 
-struct MyWindow : BCM, Wait, Timer, Window {
+struct MyWindow : public Window {
 
 	 	Scene scene;
 		ShaderProgram program;
@@ -120,10 +115,6 @@ struct MyWindow : BCM, Wait, Timer, Window {
 			
        }
         
-    virtual void onTimer() {
-      onFrame();
-    }
-
         virtual void onDraw(){
 				             
 			// scene.camera.pos() = Vec3f(0,0,1);     
@@ -173,6 +164,11 @@ struct MyWindow : BCM, Wait, Timer, Window {
 
 };
 
+bool running = true;
+void quit(int) {
+  running = false;
+}                                                                                        
+
 int onMulti1(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) { 
  
 	cout << path << types << endl; 
@@ -211,6 +207,11 @@ int onMulti1(const char *path, const char *types, lo_arg **argv, int argc, void 
 // } 
 
 int main() {
+  bcm_host_init();
+  signal(SIGABRT, quit);
+  signal(SIGTERM, quit);
+  signal(SIGINT, quit);
+
   map<string, int> idOf;
 
   int n = 1;
@@ -226,15 +227,16 @@ int main() {
 
   MyWindow win;    
 
-  //lo_server_thread st = lo_server_thread_new("7770", 0);  
-  //lo_server_thread_add_method(st, "/multi/1", NULL, onMulti1, &win);  
-////  lo_server_thread_add_method(st, "/accelerometer", "fff", onAccel, 0);
-  //lo_server_thread_start(st);
+  lo_server_thread st = lo_server_thread_new("7770", 0);  
+  lo_server_thread_add_method(st, "/multi/1", NULL, onMulti1, &win);  
+//  lo_server_thread_add_method(st, "/accelerometer", "fff", onAccel, 0);
+  lo_server_thread_start(st);
 
-  win.start(1 / 60.);
+  while (running) {
+    win.onFrame();
+    usleep(16666);
+  }
 
-  win.wait();
-  win.stop();
-
+  bcm_host_deinit();
   return 0;
 }
