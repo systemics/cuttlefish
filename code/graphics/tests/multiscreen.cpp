@@ -45,9 +45,9 @@ struct MyWindow : public Window {
 		Pose viewpose;
 		float width, height, aspect, scale; //Total Width, Height of all Screens Combined
 		 
-		MBO circle; 
-		MBO grid;
-		MBO line;
+		MBO * circle; 
+		MBO * grid;
+		MBO * line;
 		
         MyWindow() : Window () {
             initGL();
@@ -74,9 +74,9 @@ struct MyWindow : public Window {
 		}	
 		
 		void initBufferObjects(){
-			circle 	= MBO ( Mesh::Disc(4).color(1,1,0), GL::DYNAMIC  );
-			line 	= MBO ( Mesh::Rect( width *4 , 1.0 ).color(0,1,1), GL::DYNAMIC );
-			grid 	= MBO ( Mesh::Grid( width * 4, height, 1 ) );    
+			circle 	= new MBO ( Mesh::Disc(4).color(1,1,0), GL::DYNAMIC  );
+			line 	= new MBO ( Mesh::Rect( width *4 , 1.0 ).color(0,1,1), GL::DYNAMIC );
+			grid 	= new MBO ( Mesh::Grid( width * 4, height, 1 ) );    
 		}
 		
 		void initView(){
@@ -139,11 +139,11 @@ struct MyWindow : public Window {
 			float x = sin(time);    
 			
 			
-			circle.mesh.moveTo( x * width * 2.0, 0, 0 );   
-			circle.update();
+			circle -> mesh.moveTo( x * width * 2.0, 0, 0 );   
+			circle  -> update();
 			
-			line.mesh.moveTo( 0, x * height/2.0, 0 );       
-			line.update();
+			line  -> mesh.moveTo( 0, x * height/2.0, 0 );       
+			line  -> update();
 			
 		    program.bind();
 		
@@ -153,9 +153,9 @@ struct MyWindow : public Window {
 		         program.uniform("normalMatrix", scene.xf.normal);
 				 program.uniform("modelView", scene.xf.modelView );//app.scene().xf.modelView);        
 				
-			  	GL::Pipe::Line( grid );  
-				GL::Pipe::Line( circle );
-                  GL::Pipe::Line( line ); 
+			  	 GL::Pipe::Line( *grid );  
+				 GL::Pipe::Line( *circle );
+                 GL::Pipe::Line( *line ); 
 		    program.unbind();
 
         }

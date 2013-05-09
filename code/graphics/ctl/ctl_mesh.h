@@ -119,6 +119,7 @@ namespace ctl {
 
 		Mesh operator = (const Mesh& m){
             
+			if (this != &m ){
             mMode = m.mMode;
             
             for (int i = 0; i < m.num(); ++i){
@@ -130,6 +131,8 @@ namespace ctl {
                 mIndex.push_back(m.mIndex[i]);
             }    
 			store();
+			}     
+			return *this;
         }
         
         /// Create Mesh from an OBJ file
