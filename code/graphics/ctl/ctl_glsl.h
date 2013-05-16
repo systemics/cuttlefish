@@ -72,7 +72,7 @@ namespace ctl{
         //Pass from Vertex to Fragment Shader
         string Varying = STRINGIFY(
             varying vec4 colorDst;
-            varying vec2 texco;
+            varying lowp vec2 texco;
         );
         
 
@@ -158,10 +158,11 @@ namespace ctl{
                 
                 vec4 texColor = texture2D(sampleTexture, texco);
                 
-                gl_FragColor = litColor ;
+				gl_FragColor = litColor;//mix(litColor, texColor, .5);
             }
-        );       
-        
+        );    
+
+      
         
         //cubemapping function [in progress]
         string VMakeCubemap = STRINGIFY(

@@ -19,19 +19,24 @@
 #include "vsr_xf.h"
 #include "vsr_field.h"
 
-#include "ctl_matrix.h"
+//#include "ctl_matrix.h"
 #include "ctl_mdraw.h"
-#include "ctl_scene.h"
-#include "ctl_gl_mbo.h"
-#include "ctl_gl_shader.h"
-
-namespace ctl {
-
-	template<class A> void Render ( const A& a, const Mat4f& mvm, ShaderProgram& program ){ cout << "nothing to render this element\n" << endl;  }
-	template<class A> void Render (  vsr::Field<A>& a, const Mat4f& mvm, ShaderProgram& program ){ cout << "nothing to render this field\n" << endl; }
+// #include "ctl_scene.h"
+// #include "ctl_gl_mbo.h"
+// #include "ctl_gl_shader.h"  
+ 
+using namespace vsr;
 	
-	template<> void Render(const vsr::Cir& cir, const Mat4f& mvm, ShaderProgram& program )	{
+namespace ctl {
+     
 
+	using GL::Pipe;
+	
+	template<class A> void Render ( const A& a, const Mat4f& mvm, Pipe& pipe ){ cout << "nothing to render this element\n" << endl;  }
+	template<class A> void Render (  vsr::Field<A>& a, const Mat4f& mvm, Pipe& pipe ){ cout << "nothing to render this field\n" << endl; }
+	
+	template<> void Render(const vsr::Cir& cir, const Mat4f& mvm, Pipe& pipe )	{
+        
 		static MBO circle ( Mesh::Disc(.5) );
 		static float mv[16];
 		static Mat4f mat;
@@ -39,12 +44,11 @@ namespace ctl {
 		
 		mat = mvm * tmp.copy( vsr::Xf::mat(cir) );
 		mat.fill(mv);
-		program.uniform("modelView", mv );    
-
-		GL::Pipe::Line( circle );                    
+		pipe.program -> uniform("modelView", mv );    
+		pipe.line( circle );                    
 	}	
 	
-	template<> void Render(const vsr::Vec& vec, const Mat4f& mvm, ShaderProgram& program){
+	template<> void Render(const vsr::Vec& vec, const Mat4f& mvm, Pipe& pipe){
 		static MBO cone ( Mesh::Cone(.1,.3) );
 		static MBO line ( Mesh::Line( vsr::Vec(0,0,0),  vec), GL::DYNAMIC );
 	
@@ -57,17 +61,17 @@ namespace ctl {
 		line.update(1, 1, &vertex);
 		
 		mvm.fill(mv);
-		program.uniform("modelView", mv );  
-		GL::Pipe::Line( line );
+		pipe.program -> uniform("modelView", mv );  
+	   	pipe.line( line );
 		
 		mat = mvm * tmp.copy( vsr::Xf::mat(vec) );
 		mat.fill(mv);
-		program.uniform("modelView", mv );  
-		GL::Pipe::Line( cone );
+		pipe.program -> uniform("modelView", mv );    
+		pipe.line( cone );
 	
 	}
 	
-	template<> void Render(const vsr::Pnt& pnt, const Mat4f& mvm, ShaderProgram& program){
+	template<> void Render(const vsr::Pnt& pnt, const Mat4f& mvm, Pipe& pipe){
 		
 		static float mv[16];
 		static Mat4f mat;
@@ -77,18 +81,19 @@ namespace ctl {
 		
 	    double ta = vsr::Ro::size( pnt, true );
 
-	    //Draw as dual Sphere (if |radius| > 0.000001);
+	    //Draw as dual Sphere (if |radius| > 0.000001);   
+	
 	    if ( fabs(ta) >  FPERROR ) {
 						
 	        bool real = ta > 0 ? 1 : 0;	
-			tmp.copy( vsr::Xf::mat( pnt, sqrt( fabs(ta) ) ) ); 
-
-			mat = mvm * tmp;
-			
+		  //  tmp.copy( vsr::Xf::mat( pnt, sqrt( fabs(ta) ) ) ); 
+			tmp = vsr::Xf::mat( pnt, sqrt( fabs(ta) ) );
+			//cout << tmp << endl; 
+			mat = mvm * tmp;//tmp;
+		   
 			mat.fill(mv);
-			program.uniform("modelView", mv);
-			
-			GL::Pipe::Line(sphere);
+			pipe.program -> uniform("modelView", mv );    
+			pipe.line( sphere );
 
 	        // (real) ? Glyph::SolidSphere(t, 5+ floor(t*30), 5+floor(t*30)) : Glyph::Sphere(t);	
 
@@ -98,7 +103,8 @@ namespace ctl {
 			Vertex v(pnt[0], pnt[1], pnt[2]);
 
 			//point.update(0,1, &v);
-			GL::Pipe::Line (point);
+			pipe.line( point );
+
 	    }
 		
 	}
@@ -115,7 +121,7 @@ namespace ctl {
 	// }	
 	
 	
-	template<> void Render(vsr::Field<vsr::Pnt>& f, const Mat4f& mvm, ShaderProgram& program ){
+	template<> void Render(vsr::Field<vsr::Pnt>& f, const Mat4f& mvm, Pipe& pipe ){
 		static float mv[16];
 		static Mat4f mat;
 		static Mat4f tmp;
@@ -126,7 +132,7 @@ namespace ctl {
 			points.mesh[i].Pos = Vec3f( f[i] );
 		}
 		points.update();
-		GL::Pipe::Line( points );
+		pipe.line(points);
 		
 	}
 }

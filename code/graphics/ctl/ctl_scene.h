@@ -13,7 +13,8 @@ namespace ctl {
 		Pose(Vec3f p, Quat q = Quat(1,0,0,0)) : mPos(p), mQuat(q) { orient(); }
 		Pose(float x, float y, float z) : mPos(x,y,z), mQuat(1,0,0,0) { orient(); }
 		Pose() : mX(1,0,0), mY(0,1,0), mZ(0,0,1), mPos(0,0,0), mQuat(1,0,0,0) {}
-		Vec3f mX, mY, mZ, mPos;
+	   
+	 	Vec3f mX, mY, mZ, mPos;
 		Quat mQuat;
 		
 		Quat quat() const { return mQuat; }
@@ -27,7 +28,7 @@ namespace ctl {
 		    mZ = Quat::spin( Vec3f(0,0,1), mQuat);			
 			return *this;
 		}
-
+        
 		Vec3f px()  const{ return mPos + mX; }
 		Vec3f py()  const{ return mPos + mY; }
 		Vec3f pz()  const{ return mPos + mZ; }
@@ -36,15 +37,10 @@ namespace ctl {
 		Vec3f y()  const{ return mY; }
 		Vec3f z()  const{ return mZ; }
 		
+
  		Vec3f& x() { return mX; }
 		Vec3f& y() { return mY; }
 		Vec3f& z() { return mZ; }
-		// Vec3f x()  const{ mX = Quat::spin( Vec3f(1,0,0), mQuat); return mX; }
-		// Vec3f y()  const{ mY = Quat::spin( Vec3f(0,1,0), mQuat); return mY; }
-		// Vec3f z()  const{ mZ = Quat::spin( Vec3f(0,0,1), mQuat); return mZ; }
- 
-		
-
 
 		Vec3f pos()  const{ return mPos; }
 		Vec3f& pos() { return mPos; }
@@ -124,27 +120,28 @@ struct Lens {
 //	View mView;
 };
 
-struct Camera {
+struct Camera : Pose {
 		
-		Vec3f mX, mY, mZ, mPos;
+ //   	Vec3f mX, mY, mZ, mPos;
 		
 		View mView;
 		Lens mLens; // Lens Data, Aspect Ratio, Etc.
 
-		Camera() : mX(1,0,0), mY(0,1,0), mZ(0,0,1), mPos(0,0,1) {
-            
+		Camera() : Pose() {
+             //mX(1,0,0), mY(0,1,0), mZ(0,0,1), mPos(0,0,1)
+			mPos = Vec3f(0,0,1);
 			//Pose pose(-4, -3, 0);
 			//mView = View( mPos, pose, mLens.aspect(), 6.0 );
 
 		}
 
 
-		Vec3f x() { return mX; }
-		Vec3f y() { return mY; }
-		Vec3f z() { return mZ; }
-		Vec3f pos() const { return mPos; }    
+		// Vec3f x() { return mX; }
+		// Vec3f y() { return mY; }
+		// Vec3f z() { return mZ; }
+		// Vec3f pos() const { return mPos; }    		
+		// Vec3f& pos() { return mPos; }         
 		
-		Vec3f& pos() { return mPos; }
 		Lens lens() const { return mLens; }
 		Lens& lens() { return mLens; }
 		View view() const { return mView; }
@@ -157,7 +154,7 @@ struct Camera {
             
             Scene() {}
             
-            XformMat xf;  
+            ctl::XformMat xf;  
 			Pose model;
 			
 
@@ -205,7 +202,7 @@ struct Camera {
                 // Mat4f tproj = proj();
                 Mat4f tproj = frust();     //XMat::identity();   // 
                 Mat4f tnorm = norm();
-                 
+			   // cout << tmvm << endl; 
 			  //  cout << tmvm << endl; 
                 // copy(tmod.val(), tmod.val() + 16, xf.model);
                 // copy(tview.val(), tview.val() + 16, xf.view);
@@ -218,7 +215,8 @@ struct Camera {
             }
 
 			void onFrame(){
-				updateMatrices();
+				updateMatrices();  
+				
 			}	
     
 };

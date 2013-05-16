@@ -12,15 +12,16 @@
 
 //#include "vsr/vsr_frame.h"
 
-#include "ctl_matrix.h"
+// #include "ctl_matrix.h" 
+#include "vsr_matrix.h" 
 #include <math.h>
 
 using namespace std;
 
 namespace ctl{
     
-    typedef Mat4<float> Mat4f;
-    typedef Mat4<double> Mat4d;
+    typedef vsr::Mat4<float> Mat4f;
+    typedef vsr::Mat4<double> Mat4d; 
     
     /*! Transformation Matrices Container */
     struct XformMat {
@@ -147,8 +148,8 @@ namespace ctl{
                          ux[0], uy[0], uz[0], 0,
                          ux[1], uy[1], uz[1], 0,
                          ux[2], uy[2], uz[2], 0,
-						-eye[0], -eye[1], -eye[2], 1
-                         // -(ux.dot(eye)), -(uy.dot(eye)), (uz.dot(eye)), 1
+						//-eye[0], -eye[1], -eye[2], 1
+                          -(ux.dot(eye)), -(uy.dot(eye)), -(uz.dot(eye)), 1
                          );
         }
      

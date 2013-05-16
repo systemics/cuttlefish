@@ -13,7 +13,7 @@
 #include "ctl_gl.h"
 #include "ctl_gfxmatrix.h"
 
-#include "vsr/vsr_frame.h"
+//#include "vsr/vsr_frame.h"
  
 namespace ctl {
 

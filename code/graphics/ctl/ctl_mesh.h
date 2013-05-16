@@ -15,11 +15,15 @@
 
 //#include "vsr/vsr_frame.h"
 
-#include "ctl_matrix.h"
+//#include "ctl_matrix.h" 
+
+#include "vsr_matrix.h"  
 #include "ctl_gl.h"
+
 // #include "ctl_mglyph.h"
 
-using namespace std;
+using namespace std;  
+using namespace vsr;  
 
 namespace ctl {
     
@@ -42,8 +46,8 @@ namespace ctl {
         Vertex(float x, float y, float z) : Pos(x,y,z), Norm(0,0,1), Col(1,1,1,1), Tex(0.0,0.0) {}
         
         float * pos() { return &Pos[0]; }
-        float * col() { return &Col[0]; }
-        float * norm() { return &Norm[0]; }
+        float * norm() { return &Norm[0]; } 
+        float * col() { return &Col[0]; }   
         float * tex() { return &Tex[0]; }
         
         static GLvoid * on() { return (GLvoid*)sizeof(Vec3f); }
@@ -552,10 +556,10 @@ namespace ctl {
         Vec3f lt = rt - Vec3f(w,0,0);
         
         Vec3f normal(0,0,1);
-        Vertex va( lt, normal, Vec4f(1,1,1,1), Vec2f(0,0));
-        Vertex vb( rt, normal,  Vec4f(1,1,1,1), Vec2f(1,0));
-        Vertex vc( rb, normal, Vec4f(1,1,1,1), Vec2f(1,1));
-        Vertex vd( lb,  normal, Vec4f(1,1,1,1), Vec2f(0,1));
+        Vertex va( lt, normal, Vec4f(1,1,1,1), Vec2f(0.,0.));
+        Vertex vb( rt, normal,  Vec4f(1,1,1,1), Vec2f(1.,0.));
+        Vertex vc( rb, normal, Vec4f(1,1,1,1), Vec2f(1.,1.));
+        Vertex vd( lb,  normal, Vec4f(1,1,1,1), Vec2f(0.,1.));
         
         m.add(va).add(vb).add(vc).add(vd);
         

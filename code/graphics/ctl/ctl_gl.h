@@ -15,9 +15,12 @@ using namespace std;
 #include <vector>
 
 #include "ctl_gxlib.h"
-#include "ctl_matrix.h"
+//#include "ctl_matrix.h"
+#include "vsr_matrix.h" 
 
-#include <stdio.h>
+#include <stdio.h>   
+
+using namespace vsr;
 
 namespace ctl {
 
@@ -113,7 +116,8 @@ namespace ctl {
             
             DEPTHCOMP   = GL_DEPTH_COMPONENT16, //GL_DEPTH_COMPONENT24 ?
             RGB5        = GL_RGB5_A1,
-            STENCILIDX  = GL_STENCIL_INDEX8,
+            STENCILIDX  = GL_STENCIL_INDEX8,  
+			RGBA4 		= GL_RGBA4,
             #ifdef __raspberry__            
             RGB8       = GL_RGB8_OES,
             RGBA8       = GL_RGBA8_OES

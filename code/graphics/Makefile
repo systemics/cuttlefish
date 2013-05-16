@@ -1,5 +1,6 @@
 PORT = 22
-HOST = pi@192.168.2.2
+HOST = pi-la
+#@192.168.2.2
 NAME = main
 
 CXX = arm-linux-gnueabihf-g++ -std=c++0x
