@@ -162,7 +162,17 @@ namespace ctl{
             }
         );    
 
-      
+         string TFrag = STRINGIFY(
+            
+            void main(void){
+                
+                vec4 litColor = colorDst;
+                
+                vec4 texColor = texture2D(sampleTexture, texco);
+                
+				gl_FragColor = mix(litColor, texColor, .5);
+            }
+        );     
         
         //cubemapping function [in progress]
         string VMakeCubemap = STRINGIFY(

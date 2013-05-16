@@ -100,18 +100,18 @@ struct MyWindow : BCM, Timer, public Window {
 
 			// BUILD AND BIND ATTRIBUTES OF DEFAULT SHADER
 			string Vert = AVertex + Varying + UMatrix  + NTransform + VLighting + VCalc + MVert;
-			string Frag = USampler + Varying + MFrag;
+			string Frag = USampler + Varying + TFrag;
 
 	        programA.source(Vert,Frag);
 			programA.bind();
 	             A.bindAttributes();
 	        programA.unbind();  
 	
-		    programB.source(TexVert,TexFrag);
-			programB.bind();
-				 B.bindPosition(); 
-			     B.bindTexture(); 
-			programB.unbind();   
+			// 		    programB.source(Vert, USampler + Varying + TFrag);
+			// programB.bind();
+			// 	 B.bindAttributes(); 
+			//      // B.bindTexture();   
+			// programB.unbind();   
 			
 			initView();  
 			initBufferObjects(); 
@@ -131,7 +131,7 @@ struct MyWindow : BCM, Timer, public Window {
 		    texture = new Texture( w, h);  
 		   
 		 	//attach Texture to Framebuffer's color attachment
-	      // fbo.attach(*texture, GL::COLOR);
+	       fbo.attach(*texture, GL::COLOR);
 	       //fbo.attach( RBO(w,h, GL::DEPTHCOMP), GL::DEPTH);  
 		}
 		
@@ -195,40 +195,40 @@ struct MyWindow : BCM, Timer, public Window {
 		    updateMeshes(); 
 
 
-				// 			   fbo.bind();   
-				// 		                  
-				// glViewport(0,0,texture->width(),texture->height() );
-				// 	                                                                   
-				// 	            glClearColor(0,1,0,1);
-				// 	           	// clear screen
-				// 	           	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);      
-				//    					
-				//  
-				//   			 	programA.bind();  
-				// 
-				// 	 	         	programA.uniform("projection",  scene.xf.proj);
-				// 		         	programA.uniform("normalMatrix", scene.xf.normal);
-				//  	programA.uniform("modelView", scene.xf.modelView );//app.scene().xf.modelView);    
-				// 			
-				//    			 			A.line( *grid );  
-				//  		A.line( *circle );
-				//     	A.line( *line );      
-				//    	    		
-				// 			   programA.unbind();   
-				//    
-				// 			   		   fbo.unbind();    
-			// // 
-			//   glViewport(0,0,scene.camera.lens().mWidth,scene.camera.lens().mHeight); 
-			// // 
-			// //     
-			programB.bind();  
+			fbo.bind();   
+			 // 						                  
+			 glViewport(0,0,texture->width(),texture->height() );      
+					                                                                   
+	            glClearColor(0,0,0,1);
+	           	// clear screen
+	           	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);      
+				   					
+				 
+				programA.bind();  
+				
+	 	         	programA.uniform("projection",  scene.xf.proj);
+		         	programA.uniform("normalMatrix", scene.xf.normal);      
+				 	programA.uniform("modelView", scene.xf.modelView );//app.scene().xf.modelView);    
+							
+				   	    A.line( *grid );  
+				 		A.line( *circle );
+				    	A.line( *line );      
+				   	    		
+			    programA.unbind();   
+   
+		   fbo.unbind();     
 			// 
-	 	     texture -> bind();  
-		  			B.pos_tex( *rect );   
-		     texture -> unbind();    
+			// // // 
+	        glViewport(0,0,scene.camera.lens().mWidth,scene.camera.lens().mHeight); 
+			//    
+			programA.bind();  
 			// 
-		    programB.unbind();      
-
+				 	     texture -> bind();  
+					  			A.line( *rect );   
+					     texture -> unbind();    
+			// 
+		    programA.unbind();      
+			//                                     
 
         }     
 

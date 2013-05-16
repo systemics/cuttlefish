@@ -44,6 +44,7 @@ struct MyWindow : BCM, Timer, public Window {
 
 	 	Scene scene;
 		ShaderProgram program;
+		Pipe pipe;
 		
 		Pose viewpose;
 		float width, height, aspect, scale; //Total Width, Height of all Screens Combined
@@ -69,7 +70,7 @@ struct MyWindow : BCM, Timer, public Window {
 
 	        program.source(Vert,Frag);
 			program.bind();
-	             Pipe::BindAttributes();
+	             pipe.bindAttributes();
 	        program.unbind();
 			
 			initView();  
@@ -147,9 +148,9 @@ struct MyWindow : BCM, Timer, public Window {
 		         program.uniform("normalMatrix", scene.xf.normal);
 				 program.uniform("modelView", scene.xf.modelView );//app.scene().xf.modelView);        
 				
-			  	 GL::Pipe::Line( *grid );  
-				 GL::Pipe::Line( *circle );
-                 GL::Pipe::Line( *line ); 
+			  	 pipe.line( *grid );  
+				 pipe.line( *circle );
+                 pipe.line( *line ); 
 		   program.unbind();
 
         }
