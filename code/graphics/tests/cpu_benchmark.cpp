@@ -1,5 +1,5 @@
                                    //
-//  circle.cpp
+//  cpu_benchmark.cpp
 //  Versor on the Raspberry PI
 //
 //  Created by Pablo Colapinto on 1/24/13.

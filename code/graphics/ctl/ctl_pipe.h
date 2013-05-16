@@ -1,9 +1,9 @@
 //
-//  ctl_mdraw.h
+//  ctl_pipe.h
 //  ctl
 //  
 /*
-    QUICK AND DIRTY HELPER CLASS
+    GL ES 2.0 HELPER CLASS
 */
 //  Created by Pablo Colapinto on 10/25/12.
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
@@ -15,19 +15,30 @@
 #include "ctl_gl_vattrib.h"
 #include "ctl_gl_vbo.h"
 #include "ctl_gl_mbo.h"
-#include "ctl_gl_shader.h"
+#include "ctl_gl_shader.h" 
+
+#include "ctl_gfxmatrix.h"
 
 namespace ctl{
 
-    namespace GL{
         
                 /// BASIC GL ES PIPELINE: SHADER -> VBO -> ATTRIB -> DRAW
                 struct Pipe {
-                
+                    
+					enum {
+					    POS = 1,
+					   	NORM = 1 << 1,
+						COL = 1 << 2,
+						TEX = 1 << 3
+					};     
+					
+					int attributeFlag;
+
                     static int mIdx; ///< MBO counter
                     static std::map<int, MBO> mbo;
-                    
-					Pipe() {}
+                   
+					Pipe(){}
+
 					Pipe(std::string v, std::string f) {
 						program = new ShaderProgram(v,f, 0); /// <-- pass in vertex and fragment source code
 					}
@@ -63,7 +74,7 @@ namespace ctl{
                       
 				    void bindAll(){
 						program -> bind();
-						bindAttributes();
+						bindAttributes();  
 						program -> unbind();
 					}
                    
@@ -142,8 +153,19 @@ namespace ctl{
                         disable();
                         m.unbind();
                     }
- 
+                        
+					void bind( XformMat& xf ){
+						program -> bind();
+			  			 program -> uniform("lightPosition", 2.0, 2.0, 2.0);  
+				         program  -> uniform("projection",  xf.proj);
+				         program  -> uniform("normalMatrix", xf.normal);  
+						 program  -> uniform("modelView",  xf.modelView );     
+					}
 
+					void unbind(){
+						program -> unbind();
+					}                       
+					
                     void pos_tex( MBO& m ) {
                         m.bind();
                         vatt.pos.enable(); 
@@ -170,8 +192,6 @@ namespace ctl{
                 //ShaderProgram * Pipe::shaderprogram;
                 //Uniform Pipe::LightPosition;
 
-                
-    }//GL::
     
 //#define DRAWES(t) vsr::GL::Draw::RenderES(t)    
 // #define DRAWV(t) vsr::GL::Draw::VRender(t)    

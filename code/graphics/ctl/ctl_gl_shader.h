@@ -208,9 +208,9 @@ class ShaderProgram {
 
         ShaderProgram() : bLoaded(0), mId(0) {}
 
-        ShaderProgram( string vs, string fs) : bLoaded(0), mId(0) {
-            load(vs,fs);
-            get();
+        ShaderProgram( string vs, string fs, bool bFile) : bLoaded(0), mId(0) {
+            if (bFile) load(vs,fs);
+			else source(vs, fs);
         }
     
         //single name
@@ -521,7 +521,9 @@ class ShaderProgram {
 	    printf("Shader Program: %d: %s %s\n", mId, vs.c_str(), fs.c_str() );
 
 	    bLoaded = true;
-	    bActive = true;
+	    bActive = true;      
+	
+	   get(); 
 
 	}
 

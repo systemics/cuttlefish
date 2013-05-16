@@ -119,8 +119,9 @@ struct MyWindow : BCM, Timer, public Window {
 					p = Pose( width, - height / 2.0, 0 );
 					break;
 				
-        default:
-          break;
+        			default: 
+					cout << "DEFAULT POSE" << endl;
+          			reak;
 			}
 			
 			scene.camera.view() = View( viewer, p, aspect, height );
