@@ -10,7 +10,7 @@
 #include "ctl_gl.h"
 
 #include "ctl_glsl.h"
-#include "ctl_mdraw.h"
+#include "ctl_pipe.h"
 #include "ctl_scene.h"
 #include "ctl_screen.h" 
 
@@ -36,17 +36,33 @@ using namespace ctl::GLSL;
 
 int identifier;    
 
-
-
 string TexVert = STRINGIFY( 
 
-    attribute vec3 position;
+    attribute vec3 position; 
     attribute vec2 texCoord;
-  
-    varying lowp vec2 texco;  
+    
+    varying lowp vec2 texco; 
 
 	void main(void){  
-		texco = texCoord;
+		texco = texCoord; 
+		gl_Position = vec4(position,1.0);
+    }
+);
+
+string TexVertAll = STRINGIFY( 
+
+    attribute vec3 position; 
+	attribute vec3 normal;
+	attribute vec4 sourceColor;
+    attribute vec2 texCoord;
+    
+    varying lowp vec2 texco; 
+   // varying vec4 colorDst;
+
+	void main(void){  
+		texco = texCoord; 
+		//colorDst = sourceColor;
+		vec3 tn = normal + position + sourceColor.rgb;   //FORCE COMPILATION OF THESE TERMS!!
 		gl_Position = vec4(position,1.0);
     }
 ); 
@@ -55,10 +71,11 @@ string TexFrag = STRINGIFY(
 
 	uniform sampler2D tex; 
 	
-	varying lowp vec2 texco;    
+	varying lowp vec2 texco;
+	//varying vec4 colorDst;     
 	
 	void main(void){
-        
+      //  vec4 nc = colorDst
         vec4 texColor = texture2D(tex, texco);   
 		gl_FragColor = texColor;
     }
@@ -100,19 +117,19 @@ struct MyWindow : BCM, Timer, public Window {
 
 			// BUILD AND BIND ATTRIBUTES OF DEFAULT SHADER
 			string Vert = AVertex + Varying + UMatrix  + NTransform + VLighting + VCalc + MVert;
-			string Frag = USampler + Varying + TFrag;
+			string Frag = USampler + Varying + TFragMix;
 
 	        programA.source(Vert,Frag);
 			programA.bind();
 	             A.bindAttributes();
 	        programA.unbind();  
 	
-			// 		    programB.source(Vert, USampler + Varying + TFrag);
-			// programB.bind();
-			// 	 B.bindAttributes(); 
-			//      // B.bindTexture();   
-			// programB.unbind();   
+			programB.source(TexVertAll, TexFrag);
+			programB.bind();
+				 B.bindAttributes();    
+			programB.unbind();   
 			
+			glLineWidth(10.0);
 			initView();  
 			initBufferObjects(); 
 			//program.bind();
@@ -121,14 +138,14 @@ struct MyWindow : BCM, Timer, public Window {
 		void initBufferObjects(){
 			circle 	= new MBO ( Mesh::Disc(4).color(1,1,0), GL::DYNAMIC  );
 			line 	= new MBO ( Mesh::Rect( width *4 , 1.0 ).color(0,1,1), GL::DYNAMIC );
-			grid 	= new MBO ( Mesh::Grid( width * 4, height, 1 ) );  
+			grid 	= new MBO ( Mesh::Grid( width * 4, height, 1 ).color(1,0,0) );  
 			
 			rect = new MBO ( Mesh::Rect(2.0,2.0) ); 
 			
-			int w = scene.camera.lens().mWidth;
-			int h = scene.camera.lens().mHeight;
+			int w = surface.width;
+			int h = surface.height;
 			
-		    texture = new Texture( w, h);  
+			texture = new Texture( w, h);  
 		   
 		 	//attach Texture to Framebuffer's color attachment
 	       fbo.attach(*texture, GL::COLOR);
@@ -219,15 +236,15 @@ struct MyWindow : BCM, Timer, public Window {
 		   fbo.unbind();     
 			// 
 			// // // 
-	        glViewport(0,0,scene.camera.lens().mWidth,scene.camera.lens().mHeight); 
+	        glViewport(0,0,surface.width,surface.height); 
 			//    
-			programA.bind();  
+			programB.bind();  
 			// 
-				 	     texture -> bind();  
-					  			A.line( *rect );   
-					     texture -> unbind();    
+ 				 	     texture -> bind();  
+					  			B.line( *rect );   
+					  	 texture -> unbind();    
 			// 
-		    programA.unbind();      
+		    programB.unbind();      
 			//                                     
 
         }     

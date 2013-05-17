@@ -10,7 +10,7 @@
 #ifndef VSR_GL_FBO_H_INCLUDED
 #define VSR_GL_FBO_H_INCLUDED
 
-#include "vsr_gl_texture.h"
+
 
 /*
 Basic render-to-texture setup and use
@@ -47,6 +47,7 @@ of the default EAGL_fbo to the screen
 */
 
 #include "ctl_gl.h"
+#include "ctl_gl_texture.h"   
 
 namespace ctl {
 
@@ -110,7 +111,8 @@ namespace ctl {
 			float mClearColor[4];		///< clear color for bind()
 			float mClearDepth;          ///< clear depth for unbind()
 			
-			bool mAutoClear;
+			bool mAutoClear;  
+			
 		
 		public:
 		
@@ -338,7 +340,8 @@ namespace ctl {
 
 	    //Bind in this and attach to render buffer
 	    glBindFramebuffer(GL_FRAMEBUFFER, mId);    
-	    glFramebufferTexture2D(GL_FRAMEBUFFER, tAttach, GL_TEXTURE_2D, texid, 0);
+	    glFramebufferTexture2D(GL_FRAMEBUFFER, tAttach, GL_TEXTURE_2D, texid, 0); 
+	 	GL::error("FBO ATTACH"); 
 	    mNumAttachments += 1;
 	    return texid;
 

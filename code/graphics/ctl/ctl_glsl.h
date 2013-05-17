@@ -151,7 +151,11 @@ namespace ctl{
         
         
          string MFrag = STRINGIFY(
-            
+
+            uniform sampler2D sampleTexture;  
+            varying vec4 colorDst;
+            varying lowp vec2 texco;
+           
             void main(void){
                 
                 vec4 litColor = colorDst;
@@ -162,7 +166,11 @@ namespace ctl{
             }
         );    
 
-         string TFrag = STRINGIFY(
+         string TFragMix = STRINGIFY(
+
+            uniform sampler2D sampleTexture;  
+            varying vec4 colorDst;
+            varying lowp vec2 texco;
             
             void main(void){
                 
@@ -170,9 +178,73 @@ namespace ctl{
                 
                 vec4 texColor = texture2D(sampleTexture, texco);
                 
-				gl_FragColor = mix(litColor, texColor, .5);
+				gl_FragColor = mix(litColor, texColor, 0.5);     			
             }
-        );     
+        ); 
+
+         string TFragAlpha = STRINGIFY(
+
+            uniform sampler2D sampleTexture;  
+            varying vec4 colorDst;
+            varying lowp vec2 texco;
+           
+            void main(void){
+                
+                vec4 litColor = colorDst;
+                
+                vec4 texColor = texture2D(sampleTexture, texco);
+                
+				gl_FragColor = vec4(texColor.rgb, texColor.a * litColor.a);     			
+            }
+        );
+
+         string TFrag = STRINGIFY(   
+
+            uniform sampler2D sampleTexture;  
+            varying vec4 colorDst;
+            varying lowp vec2 texco;
+ 
+            void main(void){
+                
+                 
+                
+                vec4 texColor = texture2D(sampleTexture, texco); 
+				vec4 litColor = texColor + colorDst;    //force use of variables! 
+                
+				gl_FragColor = texColor;//mix(litColor, texColor, 0.0);
+            }
+        );   
+
+
+		string ClipSpaceVert = STRINGIFY( 
+
+		    attribute vec3 position; 
+			attribute vec3 normal;
+			attribute vec4 sourceColor;
+		    attribute vec2 texCoord;
+
+		    varying lowp vec2 texco;
+		    varying vec4 colorDst;   
+
+			void main(void){  
+				texco = texCoord;
+				colorDst = sourceColor; 
+				vec3 tn = normal + position;   //FORCE COMPILATION OF THESE TERMS!!
+				gl_Position = vec4(position,1.0);
+		    }
+		);
+		
+		// string TFragBasic = STRINGIFY(     
+		// 
+		// 	uniform sampler2D tex; 
+		// 	varying lowp vec2 texco; 
+		// 
+		// 	void main(void){
+		//       //  vec4 nc = colorDst
+		//         vec4 texColor = texture2D(tex, texco);   
+		// 		gl_FragColor = texColor;
+		//     }
+		// ); 
         
         //cubemapping function [in progress]
         string VMakeCubemap = STRINGIFY(

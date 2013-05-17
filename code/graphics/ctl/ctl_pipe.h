@@ -160,6 +160,10 @@ namespace ctl{
 				         program  -> uniform("projection",  xf.proj);
 				         program  -> uniform("normalMatrix", xf.normal);  
 						 program  -> uniform("modelView",  xf.modelView );     
+					}   
+					
+					void bind(){
+						program -> bind();
 					}
 
 					void unbind(){

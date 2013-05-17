@@ -232,8 +232,9 @@ namespace ctl {
 
 		for (int i = 0; i < numTexels(); ++i){
 			int r = floor (255.0 * i/numTexels());
-			Color c(r, 20, 10,255);
-			ptr[i] = c.pack();    
+			Color c(r, 20, 10,255);  
+			Color c2(0,0,0,0);
+			ptr[i] = c2.pack();    
 	   // 	cout << c << endl; 
 		}
 

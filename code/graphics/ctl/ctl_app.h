@@ -45,7 +45,7 @@ namespace ctl {
 	        srand( time(NULL) );  
 
 		    string Vert = AVertex + Varying + UMatrix  + NTransform + VLighting + VCalc + MVert;
-			string Frag = USampler + Varying + MFrag;
+			string Frag = MFrag;//TFragMix; //mFrag
             
 			pipe.program = new ShaderProgram(Vert,Frag,0);
 			pipe.bindAll();		

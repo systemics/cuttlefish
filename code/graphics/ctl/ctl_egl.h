@@ -103,7 +103,7 @@ namespace ctl {
 				//width = 1920; height = 1080;
 				maxWidth = width; maxHeight = height;
 				
-				// cout << "SCEEN DIM: " << width << " x " << height << endl;
+				cout << "SCEEN DIM: " << width << " x " << height << endl;
 
                 uint32_t x = 0; 
                 uint32_t y = 0;
