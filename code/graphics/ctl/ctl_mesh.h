@@ -94,47 +94,74 @@ namespace ctl {
         void mode( GL::MODE m) { mMode = m; }  
 		void store() {
 			mStore = mVertex;
-		}
-		void moveTo( double x, double y, double z ){
+		}     
+		
+		Mesh& moveTo( double x, double y, double z ){
 			
 			for (int i = 0; i < mVertex.size(); ++i ){
 				
 				mVertex[i].Pos = mStore[i].Pos + Vec3f(x,y,z);
-			}
-		}
+			}   
+			
+			return *this;
+		}  
+
+		Mesh& moveTo( const Vec3f& v ){
+			
+			for (int i = 0; i < mVertex.size(); ++i ){
+				
+				mVertex[i].Pos = mStore[i].Pos + v;
+			}   
+			
+			return *this;
+		}		
         
         /// Default Line Loop Mode
         Mesh(GL::MODE m = GL::LL) : mMode(m) {}
         
         Mesh(const Mesh& m){
             
-            mMode = m.mMode;
-            
-            for (int i = 0; i < m.num(); ++i){
-                mVertex.push_back( m[i] ); 
-				
-            }
-            
-            for (int i = 0; i < m.mIndex.size(); ++i){
-                mIndex.push_back(m.mIndex[i]);
-            }    
-			store();
+		 //  cout << "mesh copy constructor " << endl;       
+
+			            mMode = m.mMode;
+			            
+			// mVertex = m.mVertex;
+			// 		   // mStore = m.mStore;
+			// mIndex = m.mIndex;
+			//             mStore = m.mVertex;    
+			// 
+			            for (int i = 0; i < m.num(); ++i){
+			                mVertex.push_back( m[i] ); 
+							mStore.push_back( m[i] );
+			            }
+			            
+			            for (int i = 0; i < m.mIndex.size(); ++i){
+			                mIndex.push_back(m.mIndex[i]);
+			            } 
+			   
+			// store();   
         }  
 
 		Mesh operator = (const Mesh& m){
             
+
+		 //   cout << "mesh assignment operator " << endl;
 			if (this != &m ){
-            mMode = m.mMode;
+            mMode = m.mMode;   
+
+			// mVertex = m.mVertex;
+			// 		   // mStore = m.mStore;
+			// mIndex = m.mIndex;
+			//             mStore = m.mStore;  
+	            for (int i = 0; i < m.num(); ++i){
+	                mVertex.push_back( m[i] ); 
+					mStore.push_back( m[i] );			
+	            }
             
-            for (int i = 0; i < m.num(); ++i){
-                mVertex.push_back( m[i] ); 
-				
-            }
-            
-            for (int i = 0; i < m.mIndex.size(); ++i){
-                mIndex.push_back(m.mIndex[i]);
-            }    
-			store();
+	            for (int i = 0; i < m.mIndex.size(); ++i){
+	                mIndex.push_back(m.mIndex[i]);
+	            }      
+			// store();  
 			}     
 			return *this;
         }

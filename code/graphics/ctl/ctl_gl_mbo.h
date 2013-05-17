@@ -40,7 +40,10 @@ namespace ctl{
 				vertex = mbo.vertex;
 				index = mbo.index; 
 				mesh = mbo.mesh;
-				mode = mbo.mode;  			
+				mode = mbo.mode;  
+				
+				vertex.data( &mesh.vertices()[0].Pos[0] );
+				index.data( &mesh.indices()[0] );  		
 			}
                
 			MBO operator = (const MBO& mbo){    
@@ -49,7 +52,10 @@ namespace ctl{
 					vertex = mbo.vertex;
 					index = mbo.index; 
 					mesh = mbo.mesh;
-					mode = mbo.mode;   
+					mode = mbo.mode;    
+					
+					vertex.data( &mesh.vertices()[0].Pos[0] );
+					index.data( &mesh.indices()[0] );
 				}  
 				return *this;			
 			}           

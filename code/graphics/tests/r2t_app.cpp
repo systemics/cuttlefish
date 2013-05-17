@@ -9,12 +9,13 @@ using namespace ctl;
 
 struct MyApp : App {
         
-
-	MBO * circle; 
+    //THIS IS THE APP SPECIFIC STUFF, 
+	MBO * circle;   
+	
+	//ALL THIS IS THE PIPELINE STUFF.  MANDATORY
 	MBO * rect;
-	MBO * rectTrans;  
 	   
-	FBO fboA;//, fboB;
+	FBO fboA;
 	Texture * textureA;    
 	Texture * textureB;     
 	
@@ -28,38 +29,39 @@ struct MyApp : App {
 	
 	void swapTextures(){
 		Texture * tmp = textureA; textureA = textureB; textureB = tmp;
-	}
-
-	virtual void init(){ 
-		
-		cout << "init buffer objects" << endl;
-		
-		circle = new MBO( Mesh::Circle().color(1,0,0,1) ); 
+	}  
+	
+	void initObjects(){
+		cout << "init buffer objects" << endl;   	
+		circle = new MBO( Mesh::Circle().color(1,0,0,1) );     	
 		rect = new MBO( Mesh::Rect( 2.0, 2.0 ).color(0,0,0,.9) );
-	   // rectTrans = new MBO( Mesh::Rect(  2.0, 2.0  ).color(0,0,0,.9) ); 
-		  		
-		//Make a Texture the size of the screen
+	}   
+	
+	void initPipeline(){    
+		
+		//Make Two Textures the size of the screen (as big as possible anyway: there are memeory limitations )
 		textureA = new Texture( surface.width/2.0, surface.height/2.0 );   
-		textureB = new Texture( surface.width/2.0, surface.height/2.0 );   
-		//Attach it to Framebuffer  ColorAttachment
-		fboA.attach(*textureA, GL::COLOR);  
-		//fboB.attach(*textureB, GL::COLOR); 
-				
-		//create new shader on secondary pipeline  
-		string Vert = ClipSpaceVert;//AVertex + Varying + UMatrix  + NTransform + VLighting + VCalc + MVert;
+		textureB = new Texture( surface.width/2.0, surface.height/2.0 );  		                    
+		
+		//This is the shader used to draw the Rendered Texture to screen 
+		//It doesn't use any transformation matrices, just clip space and the texture values
+		string Vert = ClipSpaceVert;
 		string Frag = TFrag;
 		texpipe.program = new ShaderProgram( Vert, Frag, 0 );
 		texpipe.bindAll();  
 		
-		//create new shader on tertiary pipeline  
-//		string VertB = AVertex + Varying + UMatrix  + NTransform + VLighting + VCalc + MVert;
+		//This Shader Will Be the "Feedback Shader" that adds a bit of the previously drawn Frame on top
 		string FragB = TFragAlpha;
 		texalpha.program = new ShaderProgram( Vert, FragB, 0 );
 		texalpha.bindAll();		
+	}
+
+	virtual void init(){ 
 		
-		//glLineWidth(10);
-		
-	}                  
+		initPipeline();  //<-- Initialize the Graphics Pipeline Shaders, Textures, etc.
+		initObjects();   //<-- Create and bind all the VBO's
+	
+	}
 	
 	void updateMeshes(){
 		
@@ -69,13 +71,20 @@ struct MyApp : App {
 		circle -> mesh.moveTo( x * width /2.0, 0, 0 );   
 		circle  -> update();
 		
-	}
+	}    
+	   
 	
+	//This is where the actual objects get rendered
+	void drawScene(){
+ 		updateMeshes();   			//<-- CPU Calculations happen in updateMeshes()
+        pipe.line( *circle );  		//<-- Then we Render all our Shit
+	}   
+	     
+	
+   //This is the texture feedback loop 
 	virtual void onDraw(){     
         
-		updateMeshes();
-        
-		swapTextures();
+ 		swapTextures();
 		//Write into textureA using textureB 
 		fboA.attach(*textureA, GL::COLOR);  
 		fboA.bind();               
@@ -84,32 +93,31 @@ struct MyApp : App {
 			glClearColor(0,0,0,1);
            	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
+			//We add a bit of the previously drawn frame
 			texalpha.bind();
 			
 			    textureB -> bind();      
 					texalpha.line( *rect );
 				textureB -> unbind();  
 				    
-			 texalpha.unbind();   
+			texalpha.unbind(); 
+			 
+			//And add a new frame on top
+			 pipe.bind( scene.xf );
+				
+				drawScene();  
+		
+			pipe.unbind( );  
 			
-			pipe.bind( scene.xf ); 
-
-				pipe.line( *circle );  
-
-		    pipe.unbind( );
- 	
 		fboA.unbind();  
-   	    
 
-	   //Switch to full Viewport and Bind Texture to Rect 
+		//Switch to full Viewport and Bind Texture to Rect 
 	   glViewport(0,0,surface.width,surface.height);		
 		texpipe.bind ();    
 			textureA -> bind();
 				texpipe.line( *rect );
 			textureA -> unbind();
-	    texpipe.unbind();   
-	
-	
+	    texpipe.unbind();
 
 	}
 	

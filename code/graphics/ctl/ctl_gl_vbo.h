@@ -69,8 +69,11 @@ namespace ctl {
 
             {
                 generate();        
-            }
-            
+            }   
+
+			//Copy and Assignment
+			
+			void data( GLvoid * d ) { mData = d; }
         
             void target(GL::BUFFER t) { mTarget = t; }
         
