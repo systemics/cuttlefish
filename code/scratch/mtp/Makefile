@@ -1,5 +1,5 @@
 PORT = 22
-HOST = zappa
+HOST = pi@192.168.1.148
 NAME = mtp
 ROOT = $(HOME)/code/pi/root
 

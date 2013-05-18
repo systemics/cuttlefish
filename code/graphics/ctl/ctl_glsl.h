@@ -13,7 +13,9 @@
 #ifndef CTL_glsl_h
 #define CTL_glsl_h
 
+#ifndef STRINGIFY
 #define STRINGIFY(A) #A
+#endif
 
 namespace ctl{
 

@@ -1,5 +1,5 @@
 PORT = 22
-HOST = pi-la
+HOST = pi@192.168.2.4
 #@192.168.2.2
 NAME = main
 
@@ -72,6 +72,12 @@ many: copy
 
 many-kill:
 	parallel-ssh -h hosts.txt "pkill main"
+
+mpssh:
+	mpssh -s -r build/bin/main
+
+mpssh-kill:
+	mpssh -s "pkill main"
 
 kill:
 	ssh -p $(PORT) $(HOST) "rm -f /tmp/$(NAME)"

@@ -1,0 +1,14 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+my $host = $ARGV[0] or die $!;
+
+print "$host>";
+while(<STDIN>) {
+  chomp;
+  /quit/ and die "done";
+  /^$/ and print "$host>" and next;
+  print qx(ssh $host "$_"\n);
+  print "$host>";
+}
