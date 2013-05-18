@@ -8,6 +8,7 @@
 #ifndef CTL_TOUCH_H_INCLUDED
 #define CTL_TOUCH_H_INCLUDED
 
+#include <assert.h>
 #include <stdint.h>
 #include <linux/input.h>
 #include <string.h>
@@ -54,7 +55,7 @@ struct Touch {
   }
 
   int make(const char* deviceName) {
-    assert((fd = open(deviceName, O_RDONLY)) >= 0);
+    assert((fd = open(deviceName, O_RDONLY | O_NONBLOCK)) >= 0);
     memset(bit, 0, sizeof(bit));
     ioctl(fd, EVIOCGBIT(0, EV_MAX), bit[0]);
 
@@ -67,7 +68,8 @@ struct Touch {
     rd = read(fd, ev, sizeof(struct input_event) * 64);
 
     if (rd < (int) sizeof(struct input_event)) {
-      perror("error reading\n");
+      //perror("error reading\n");
+      return -1;
     }
 
     for (unsigned i = 0; i < rd / sizeof(struct input_event); i++) {
@@ -121,12 +123,10 @@ struct Touch {
       }
     }
 
-    /*
     for (int k = 0; k < 16; ++k)
       if (touchPoint[k].id != -1)
-        printf("(%f, %f) ", touchPoint[k].x, touchPoint[k].y);
+        printf("(%i, %i) ", touchPoint[k].x, touchPoint[k].y);
     printf("\n");
-    */
   }
 };
 
