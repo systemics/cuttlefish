@@ -318,7 +318,8 @@ namespace ctl {
 	    }
 	   inline  int cmp( GLenum type) {
 	        switch (type){
-
+                
+				case GL_FLOAT:		return 1;
 	            case GL_FLOAT_MAT2: 
 	            case GL_FLOAT_VEC2: return 2;
 	            case GL_FLOAT_VEC3: return 3;
