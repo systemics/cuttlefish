@@ -348,6 +348,7 @@ namespace ctl {
         static Mesh Circle(double scale = 1);
         static Mesh Disc(double scale = 1);        
         static Mesh Rect(float w, float h);
+        static Mesh IRect(float w, float h);  
         static Mesh Cylinder(float r, float h, int slices = 20, int stacks = 2);
         
         /*! A Mesh of Skinned Circles 
@@ -573,7 +574,7 @@ namespace ctl {
         return m;
     }
     
-    inline Mesh Mesh::Rect (float w, float h) {
+    inline Mesh Mesh::IRect (float w, float h) {
         
         Mesh m;
         
@@ -587,6 +588,31 @@ namespace ctl {
         Vertex vb( rt, normal,  Vec4f(1,1,1,1), Vec2f(1.,0.));
         Vertex vc( rb, normal, Vec4f(1,1,1,1), Vec2f(1.,1.));
         Vertex vd( lb,  normal, Vec4f(1,1,1,1), Vec2f(0.,1.));
+        
+        m.add(va).add(vb).add(vc).add(vd);
+        
+        int idx[4] = {0,1,3,2};
+        m.add(idx,4);
+                
+        m.mode(GL::TS);  
+		m.store(); 
+        return m;
+    }   
+
+    inline Mesh Mesh::Rect (float w, float h) {
+        
+        Mesh m;
+        
+        Vec3f lb (-w/2.0, -h/2.0, 0 );
+        Vec3f rb = lb + Vec3f(w,0,0);
+        Vec3f rt = rb + Vec3f(0,h,0);
+        Vec3f lt = rt - Vec3f(w,0,0);
+        
+        Vec3f normal(0,0,1);
+        Vertex va( lt, normal, Vec4f(1,1,1,1), Vec2f(0.,1.));
+        Vertex vb( rt, normal,  Vec4f(1,1,1,1), Vec2f(1.,1.));
+        Vertex vc( rb, normal, Vec4f(1,1,1,1), Vec2f(1.,0.));
+        Vertex vd( lb,  normal, Vec4f(1,1,1,1), Vec2f(0.,0.));
         
         m.add(va).add(vb).add(vc).add(vd);
         

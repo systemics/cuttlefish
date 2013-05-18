@@ -186,7 +186,8 @@ namespace ctl{
 
          string TFragAlpha = STRINGIFY(
 
-            uniform sampler2D sampleTexture;  
+            uniform sampler2D sampleTexture;
+			uniform float alpha;
             varying vec4 colorDst;
             varying lowp vec2 texco;
            
@@ -196,7 +197,61 @@ namespace ctl{
                 
                 vec4 texColor = texture2D(sampleTexture, texco);
                 
-				gl_FragColor = vec4(texColor.rgb, texColor.a * litColor.a);     			
+				// gl_FragColor = vec4(texColor.rgb, texColor.a * litColor.a);     			
+				gl_FragColor = vec4(texColor.rgb, texColor.a * ( alpha * litColor.a) );     			
+
+            }
+        );
+ 
+         string TFragBlur = STRINGIFY(
+
+            uniform sampler2D sampleTexture;  
+   			uniform float ux;
+			uniform float uy;
+			uniform float bluramt;
+			 
+            varying vec4 colorDst;
+            varying lowp vec2 texco;
+
+             
+
+
+			vec4 neighbors( vec2 t, float xoff, float yoff, float amt ){
+				vec2 top = vec2(t.x, t.y + yoff ); 
+				vec2 bottom = vec2(t.x, t.y - yoff); 
+				vec2 left = vec2(t.x - xoff, t.y ); 
+				vec2 right = vec2(t.x + xoff, t.y ); 
+				
+				vec2 tr  = vec2(t.x + xoff, t.y + yoff ); 
+				vec2 tl   = vec2(t.x - xoff, t.y + yoff ); 
+				vec2 br   = vec2(t.x + xoff, t.y - yoff ); 
+				vec2 bl    =vec2(t.x -xoff, t.y - yoff ); 
+				   		
+				vec4 ts = texture2D(sampleTexture, top );
+				vec4 bs = texture2D(sampleTexture, bottom );
+				vec4 ls = texture2D(sampleTexture, left );
+				vec4 rs = texture2D(sampleTexture, right ); 
+				
+			   	vec4 tls = texture2D(sampleTexture, tl );
+				vec4 bls = texture2D(sampleTexture, bl );
+				vec4 trs = texture2D(sampleTexture, tr );
+				vec4 brs = texture2D(sampleTexture, br ); 
+				
+ //   			return vec4( ( ts + bs + ls + rs ) * amt );   
+				return vec4( ( ts + bs + ls + rs + tls + bls + trs + brs ) * amt ); 				
+			}
+           
+            void main(void){
+                
+                vec4 texColor = texture2D(sampleTexture, texco); 
+
+				vec4 average = neighbors( texco, ux , uy, bluramt/2.0);   ;
+				vec4 average2 = neighbors( texco, ux/2.0, uy/2.0, bluramt);   
+				
+				vec4 litColor = texColor + colorDst;    //force use of variables!  
+   			
+				gl_FragColor = max(texColor, average + average2);     			
+
             }
         );
 
@@ -206,9 +261,7 @@ namespace ctl{
             varying vec4 colorDst;
             varying lowp vec2 texco;
  
-            void main(void){
-                
-                 
+            void main(void){               
                 
                 vec4 texColor = texture2D(sampleTexture, texco); 
 				vec4 litColor = texColor + colorDst;    //force use of variables! 
@@ -235,6 +288,11 @@ namespace ctl{
 				gl_Position = vec4(position,1.0);
 		    }
 		);
+		     
+		
+		
+		string DefaultVert =  AVertex + Varying + UMatrix  + NTransform + VLighting + VCalc + MVert;
+		
 		
 		// string TFragBasic = STRINGIFY(     
 		// 
@@ -288,6 +346,8 @@ namespace ctl{
                 textureCube(cubeMap, vTexDir).rgb 
             }
         );
+           
+
 
 				// static string SVert = STRINGIFY(
 				//     

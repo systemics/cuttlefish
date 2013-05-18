@@ -1,0 +1,69 @@
+<html>
+<head>
+  <script src='interface.js'></script>
+</head>
+
+<body>
+  <script>  
+
+    // NOTE: The Interface.js server outputs all OSC messages to port 8082. See the README for more information
+    
+    panel = new Interface.Panel({ useRelativeSizesAndPositions: true });
+    
+    // send a message to the address '/slider'
+    b = new Interface.Slider({
+      bounds:[0,0,.5,.15],
+		label: 'trace amount', 
+      isVertical:false,
+      target:"OSC", key:'/trace',
+    })     
+
+    // send a message to the address '/slider'
+    c = new Interface.Slider({
+      bounds:[0,.15,.5,.15],
+ 		label: 'ux',
+      isVertical:false,
+      target:"OSC", key:'/ux',
+    })  
+
+    // send a message to the address '/slider'
+    d = new Interface.Slider({
+      bounds:[0,.30,.5,.10],
+      isVertical:false, 
+ 		label: 'uy', 
+      target:"OSC", key:'/uy',
+    })   
+
+    // send a message to the address '/slider'
+    e = new Interface.Slider({
+      bounds:[0,.40,.5,.10],
+      isVertical:false, 
+	  label: 'blur_amount',
+      target:"OSC", key:'/bluramt',
+    })
+
+     xy = new Interface.XY({
+	  childWidth: 25,
+	  numChildren: 1, 
+	  usePhysics: false,
+	  background:"#111",
+	  fill: "rgba(127,127,127,.2)",
+	  bounds:[.5,0,.5,.5],  
+
+	  onvaluechange: function() {
+	    Interface.OSC.send('/xy', 'ff', 
+	      [this.values[0].x, this.values[0].y] )
+	  },
+	});
+
+
+    panel.add( b, c, d, e, xy );
+    
+    Interface.OSC.receive = function(address, typetags, parameters) {
+      window.alert(address + typetags + parameters);
+    }
+        
+
+  </script>
+</body>
+</html>
