@@ -22,7 +22,7 @@ namespace ctl {
 	using namespace EGL;
     using namespace GLSL; 
 
-	struct App :  BCM, Timer, Screen, Window { 
+	struct App :  BCM, /*Timer,*/ Screen, Window { 
 	        
 		Scene scene;   		///<-- Transformation Matrices
 		

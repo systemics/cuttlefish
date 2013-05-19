@@ -14,16 +14,16 @@
 
 namespace ctl {
 
-class Timer;
-Timer* that = 0;
+class LinuxTimer;
+LinuxTimer* that = 0;
 void timer_function(int);
 
-class Timer {
+class LinuxTimer {
   timer_t timerid;
   struct itimerspec timer_settings;
   struct sigevent sevp;
 public:
-  Timer() {
+  LinuxTimer() {
     that = this;
     sevp.sigev_notify = SIGEV_SIGNAL;
     sevp.sigev_signo = SIGUSR1;
@@ -33,19 +33,19 @@ public:
     assert(timer_create(CLOCK_REALTIME, &sevp, &timerid) == 0);
   }
 
-  virtual ~Timer() {
+  virtual ~LinuxTimer() {
   }
 
   void start(float period);
   void stop();
-  virtual void onTimer() = 0;
+  virtual void onLinuxTimer() = 0;
 };
 
 void timer_function(int) {
-  that->onTimer();
+  that->onLinuxTimer();
 }
 
-inline void Timer::start(float period) {
+inline void LinuxTimer::start(float period) {
   int t = (int)period;
   timer_settings.it_interval.tv_sec = t;
   timer_settings.it_interval.tv_nsec = (period - t) * 1000000000;
@@ -54,7 +54,7 @@ inline void Timer::start(float period) {
   assert(timer_settime(timerid, 0, &timer_settings, 0) == 0);
 }
 
-inline void Timer::stop() {
+inline void LinuxTimer::stop() {
   timer_settings.it_interval.tv_sec = 0;
   timer_settings.it_interval.tv_nsec = 0;
   timer_settings.it_value.tv_sec = 0;

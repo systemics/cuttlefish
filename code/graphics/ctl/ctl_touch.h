@@ -123,10 +123,12 @@ struct Touch {
       }
     }
 
+    /*
     for (int k = 0; k < 16; ++k)
       if (touchPoint[k].id != -1)
         printf("(%i, %i) ", touchPoint[k].x, touchPoint[k].y);
     printf("\n");
+    */
   }
 };
 

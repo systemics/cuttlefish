@@ -1,13 +1,29 @@
 #include "ctl_app.h"
-#include "ctl_gl_mbo.h"
+#include "ctl_mainloop.h"
 #include "ctl_touch.h"
+#include "ctl_gl_mbo.h"
+
+#include <chrono>
+#include <thread>
 
 using namespace std;
 using namespace ctl;
 
-struct MyApp : App, Touch {
-  MBO* circles;       //<-- Circle Objects
-  Vec3f* touches;        //<-- Vec3f touch posiitons
+struct Timer {
+  float t, d;
+  Timer(float d) : t(0), d(d) {}
+  bool operator()(float dt) {
+    bool returnValue = (t > d);
+    if (returnValue)
+      t -= d;
+    t += dt;
+    return returnValue;
+  }
+};
+
+struct MyApp : MainLoop, App, Touch {
+  MBO* circles;
+  Vec3f* touches;
 
   int num;
 
@@ -15,53 +31,43 @@ struct MyApp : App, Touch {
     init();
   }
 
-  virtual void init(){
-    cout << "init buffer objects" << endl;
+  virtual void onLoop(float dt) {
+    static Timer frameTimer(1.0f / 60);
+    if (frameTimer(dt))
+      onFrame();
+    poll();
+  }
 
+  virtual void init() {
     num = 10;
     touches = new Vec3f[num];
     circles = new MBO[num];
     for (int i = 0; i < num; ++i){
-      double t = TWOPI * i/num;
-      touches[i] = Vec3f(sin(t), cos(t), 0);     //<-- Default Positions Init
-      circles[i] = MBO(Mesh::Circle());        //<-- Circle Buffers Init
+      double t = TWOPI * i / num;
+      touches[i] = Vec3f(sin(t), cos(t), 0);
+      circles[i] = MBO(Mesh::Circle());
     }
   }
 
-  //moves circles to values stored in touches.
-  void updateMeshes(){
+  void updateMeshes() {
     for (int i = 0; i < num; ++i) {
-      touches[i].x = touchPoint[i].x / 2000.0f;
-      touches[i].y = touchPoint[i].y / -2000.0f;
+      touches[i].x = touchPoint[i].x / 1000.0f;
+      touches[i].y = touchPoint[i].y / -1000.0f;
       circles[i].mesh.moveTo(touches[i]);
       circles[i].update();
     }
   }
 
-  virtual void onDraw(){
+  virtual void onDraw() {
     updateMeshes();
     pipe.bind(scene.xf);
-
     for (int i = 0; i < num; ++i)
       pipe.line(circles[i]);
-
     pipe.unbind();
   }
 };
 
-bool running = true;
-void quit(int) {
-  running = false;
-}
-
 int main() {
-  MyApp app;
-
-  while (running) {
-    app.onFrame();
-    app.poll();
-    usleep(166);
-  }
-
+  MyApp().start();
   return 0;
 }

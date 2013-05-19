@@ -11,6 +11,8 @@
 #include <signal.h>
 #include <unistd.h>
 #include <iostream>
+#include <chrono>
+#include "ctl_tictoc.h"
 using namespace std;
 
 namespace ctl {
@@ -22,7 +24,7 @@ MainLoop* mainLoop = nullptr;
 struct MainLoop {
 
   bool running;
-  virtual void onLoop() = 0;
+  virtual void onLoop(float dt) = 0;
 
   MainLoop() {
     cout << "MainLoop()\n";
@@ -41,8 +43,12 @@ struct MainLoop {
   void start() {
     cout << "MainLoop::start()\n";
     running = true;
-    while (running)
-      onLoop();
+    float df = 0;
+    while (running) {
+      tic();
+      onLoop(df);
+      df = toc();
+    }
   }
 
   void stop() {
