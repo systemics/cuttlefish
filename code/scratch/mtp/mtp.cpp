@@ -27,7 +27,6 @@ struct Touch {
 int main () {
   int fd, rd;
   struct input_event ev[64];
-  int version;
   //unsigned short id[4];
   unsigned long bit[EV_MAX][NBITS(KEY_MAX)];
 
@@ -36,21 +35,6 @@ int main () {
     return 1;
   }
 
-  if (ioctl(fd, EVIOCGVERSION, &version)) {
-    perror("evtest: can't get version");
-    return 1;
-  }
-/*
-  printf("Input driver version is %d.%d.%d\n",
-    version >> 16, (version >> 8) & 0xff, version & 0xff);
-
-  ioctl(fd, EVIOCGID, id);
-  printf("Input device ID: bus 0x%x vendor 0x%x product 0x%x version 0x%x\n", id[ID_BUS], id[ID_VENDOR], id[ID_PRODUCT], id[ID_VERSION]);
-
-  char name[256] = "Unknown";
-  ioctl(fd, EVIOCGNAME(sizeof(name)), name);
-  printf("Input device name: \"%s\"\n", name);
-*/
   memset(bit, 0, sizeof(bit));
   ioctl(fd, EVIOCGBIT(0, EV_MAX), bit[0]);
 
@@ -58,7 +42,7 @@ int main () {
   Touch sorted[N_TOUCHES];
   for (int i = 0; i < N_TOUCHES; ++i)
     touch[i].make();
-  int active = -1, count = 0;
+  int active = 0, count = 0;
 
   while (true) {
     rd = read(fd, ev, sizeof(struct input_event) * 64);
@@ -79,8 +63,6 @@ int main () {
         //
         case 53:
         case 0:
-          if (active == -1)
-            return -1;
           touch[active].x = ev[i].value;
           break;
 
@@ -88,32 +70,24 @@ int main () {
         //
         case 54:
         case 1:
-          if (active == -1)
-            return -1;
           touch[active].y = ev[i].value;
           break;
 
         // touch ellipse size on the major axis
         //
         case 48:
-          if (active == -1)
-            return -1;
           touch[active].major = ev[i].value;
           break;
 
         // touch ellipse size on the major axis
         //
         case 49:
-          if (active == -1)
-            return -1;
           touch[active].minor = ev[i].value;
           break;
 
         // touch ellipse orientation
         //
         case 52:
-          if (active == -1)
-            return -1;
           touch[active].orientation = ev[i].value;
           break;
 

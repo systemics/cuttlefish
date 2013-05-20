@@ -1,0 +1,5 @@
+rsync -avz -e "ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no" $1 pi-z:/tmp
+ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no pi-t "rsync -avz pi-z:/tmp/$1 /tmp"
+ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no pi-m "rsync -avz pi-z:/tmp/$1 /tmp"
+ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no pi-c "rsync -avz pi-z:/tmp/$1 /tmp"
+ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no pi-b "rsync -avz pi-z:/tmp/$1 /tmp"
