@@ -2,58 +2,59 @@
 #define __STOPWATCH__
 
 #include <chrono>
+#include <limits>
 
 namespace ctl {
 
 using namespace std;
 using namespace std::chrono;
 
-template <
-  typename DATA,
-  int N
->
-struct Average {
-  DATA data[N];
-  DATA sum;
+template <typename TYPE, unsigned LENGTH>
+struct MinMeanMax {
+  TYPE data[LENGTH];
+  TYPE sum, min, max;
   unsigned index;
-  Average() : sum(0), index(0) {}
-  DATA operator()() {
-    return sum / N;
-  }
-  void operator()(DATA d) {
+
+  MinMeanMax() : sum(0), index(0), min(numeric_limits<TYPE>::max()), max(numeric_limits<TYPE>::min()) {}
+
+  void operator()(TYPE d) {
+    if (d < min)
+      min = d;
+    if (d > max)
+      max = d;
     sum += d;
     sum -= data[index];
     data[index] = d;
     index++;
-    if (index == N)
+    if (index == LENGTH)
       index = 0;
-  }
-};
-
-
-
-template <
-  typename UNIT = milliseconds,
-  typename CLOCK = high_resolution_clock,
-  int N = 20
->
-struct Stopwatch {
-  typename CLOCK::time_point start;
-  typename CLOCK::time_point stop;
-  Average<float, N> average;
-
-  void tic() {
-    start = CLOCK::now();
-  }
-
-  void toc() {
-    stop = CLOCK::now();
-    UNIT elapsed_time = duration_cast<UNIT>(stop - start);
-    average(elapsed_time.count());
   }
 
   void report() {
-    cout << average() << endl;
+    cout << "(" << min << ", " << sum / LENGTH << ", " << max << ")\n";
+  }
+};
+
+template <
+  typename UNIT = milliseconds,
+  typename CLOCK = high_resolution_clock
+>
+struct StopWatch {
+  typename CLOCK::time_point before, after;
+  MinMeanMax<float, 10> minMeanMax;
+
+  void start() {
+    before = CLOCK::now();
+  }
+
+  void stop() {
+    after = CLOCK::now();
+    UNIT elapsed_time = duration_cast<UNIT>(after - before);
+    minMeanMax(elapsed_time.count());
+  }
+
+  void report() {
+    minMeanMax.report();
   }
 };
 

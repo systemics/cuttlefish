@@ -1,9 +1,9 @@
 PORT = 22
-HOST = pi@192.168.1.148
+HOST = pi@192.168.2.4
 NAME = mtp
 ROOT = $(HOME)/code/pi/root
 
-CXX = arm-linux-gnueabihf-g++
+CXX = arm-linux-gnueabihf-g++ -std=c++0x
 OPT += -Wall
 OPT += -O3
 INC += -I./
@@ -26,8 +26,13 @@ $(NAME): $(NAME).o
 kill:
 	ssh $(HOST) "pkill $(NAME) && rm /tmp/$(NAME)"
 
+mpssh:
+	mpssh -l home -s -r mtp
+
 deploy:
-	ssh -o 'LocalCommand=scp $(NAME) $(HOST):/tmp/' $(HOST) /tmp/$(NAME)
+	ssh $(HOST) "rm -f /tmp/$(NAME)"
+	scp $(NAME) $(HOST):/tmp
+	ssh -t $(HOST) /tmp/$(NAME)
 
 clean:
 	rm -f *.o *.gch $(NAME)

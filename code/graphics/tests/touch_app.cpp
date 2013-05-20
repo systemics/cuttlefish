@@ -1,5 +1,6 @@
 #include "ctl_app.h"
 #include "ctl_mainloop.h"
+#include "ctl_stopwatch.h"
 #include "ctl_touch.h"
 #include "ctl_gl_mbo.h"
 
@@ -24,6 +25,7 @@ struct Timer {
 struct MyApp : MainLoop, App, Touch {
   MBO* circles;
   Vec3f* touches;
+  StopWatch<> stopWatch;
 
   int num;
 
@@ -32,9 +34,18 @@ struct MyApp : MainLoop, App, Touch {
   }
 
   virtual void onLoop(float dt) {
-    static Timer frameTimer(1.0f / 60);
-    if (frameTimer(dt))
+
+    static Timer frameTimer(1.0f / 20);
+    if (frameTimer(dt)) {
+      stopWatch.start();
       onFrame();
+      stopWatch.stop();
+    }
+
+    static Timer reportTimer(1.0f);
+    if (reportTimer(dt))
+      stopWatch.report();
+
     poll();
   }
 
@@ -45,14 +56,14 @@ struct MyApp : MainLoop, App, Touch {
     for (int i = 0; i < num; ++i){
       double t = TWOPI * i / num;
       touches[i] = Vec3f(sin(t), cos(t), 0);
-      circles[i] = MBO(Mesh::Circle());
+      circles[i] = MBO(Mesh::Circle(0.1 + 0.1 * i));
     }
   }
 
   void updateMeshes() {
-    for (int i = 0; i < num; ++i) {
-      touches[i].x = touchPoint[i].x / 1000.0f;
-      touches[i].y = touchPoint[i].y / -1000.0f;
+    for (unsigned i = 0; i < touchCount; ++i) {
+      touches[i].x = touchPoint[i].x / 500.0f;
+      touches[i].y = touchPoint[i].y / -500.0f;
       circles[i].mesh.moveTo(touches[i]);
       circles[i].update();
     }

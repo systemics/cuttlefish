@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <map>
 #include <iostream>
+#include <algorithm>
 using namespace std;
 
 #define BITS_PER_LONG (sizeof(long) * 8)
@@ -33,6 +34,12 @@ struct TouchPoint {
   inline void make() {
     id = -1;
     x = y = major = minor = orientation = 0;
+  }
+};
+
+struct CompareTouchPoint {
+  bool operator() (const TouchPoint& a, const TouchPoint& b) {
+    return a.id < b.id;
   }
 };
 
@@ -114,14 +121,25 @@ struct Touch {
           break;
 
         case 57:
-          if (ev[i].value == -1)
+          if (ev[i].value == -1) {
             touchCount--;
-          else
+            cout << "lost touch\n";
+          }
+          else {
             touchCount++;
+            cout << "found touch\n";
+          }
           touchPoint[activeTouchIndex].id = ev[i].value;
           break;
       }
     }
+
+    //sort(touchPoint, touchPoint + (sizeof(touchPoint) / sizeof(touchPoint[0])), CompareTouchPoint());
+    sort(touchPoint, touchPoint + (sizeof(touchPoint) / sizeof(touchPoint[0])),
+      [](const TouchPoint& a, const TouchPoint& b) {
+        return a.id < b.id;
+      }
+    );
 
     /*
     for (int k = 0; k < 16; ++k)
