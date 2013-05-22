@@ -29,11 +29,11 @@ namespace ctl {
 		  // idof["b8:27:eb:7d:63:d7"] = n++;
 		  // idof["b8:27:eb:a6:9f:1a"] = n++;   
 
-		  idof["b8:27:eb:4c:d3:3d"] = n++; // pi-z
-		  idof["b8:27:eb:be:e5:83"] = n++; // pi-m
-		  idof["b8:27:eb:96:79:67"] = n++; // pi-t
-		  idof["b8:27:eb:69:2d:6c"] = n++; // pi-c
-		  idof["b8:27:eb:7f:74:ff"] = n++; // pi-b   
+		  idOf["b8:27:eb:4c:d3:3d"] = n++; // pi-z    1
+		  idOf["b8:27:eb:96:79:67"] = n++; // pi-t    2
+		  idOf["b8:27:eb:be:e5:83"] = n++; // pi-m    3
+		  idOf["b8:27:eb:69:2d:6c"] = n++; // pi-c    4
+		  idOf["b8:27:eb:7f:74:ff"] = n++; // pi-b    5
 
 		  ifstream foo("/sys/class/net/eth0/address");
 		  char mac[256];

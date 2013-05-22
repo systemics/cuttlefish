@@ -16,7 +16,7 @@ pablo colapinto and karl yerkes
 #include "ctl_glsl.h"
 #include "ctl_pipe.h"
 #include "ctl_scene.h"  
-#include "ctl_screen.h"
+#include "ctl_host.h"
  
 
 
@@ -25,7 +25,7 @@ namespace ctl {
 	using namespace EGL;
     using namespace GLSL; 
 
-	struct App :  BCM, /*Timer,*/ Screen, Window { 
+	struct App :  BCM, /*Timer,*/ Host, Window { 
 	        
 		Scene scene;   		///<-- Transformation Matrices
 		
@@ -68,23 +68,23 @@ namespace ctl {
 
 			int numscreens = 4;
 
-			vsr::Vec3f viewer(0,0,20);  //Position in inches
+			vsr::Vec3f viewer(0,0,50);  //Position in inches
 
 
 			Pose p(-width/2.0,-height/2.0, 0);
 
 			switch( identifier ){
 
-				case 1:
+				case 2:
 					p = Pose( - width * 2, - height / 2.0, 0 );
 					break;
-				case 2:
+				case 3:
 					p = Pose( - width , - height / 2.0, 0 );
 					break;
-				case 3:
+				case 4:
 					p = Pose( 0, - height / 2.0, 0 );
 					break;
-				case 4:
+				case 5:
 					p = Pose( width, - height / 2.0, 0 );
 					break;
 
@@ -94,7 +94,7 @@ namespace ctl {
 			}
 
 			scene.camera.view() = View( viewer, p, aspect, height );
-			scene.camera.pos() = Vec3f( 0, 0, 20);
+			scene.camera.pos() = Vec3f( 0, 0, 50);
        } 
 
 	

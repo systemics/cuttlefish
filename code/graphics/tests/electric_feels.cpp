@@ -35,7 +35,7 @@ struct MyApp : AppR2T {
 
 	MyApp() : 
 	AppR2T( 14. + 3./8., 10. + 11./16. ),
-    f(30,10,1,.5), vf(20,5,1,1)    
+    f(40,7,1,2), vf(20,5,1,3)    
 	{
 
 
@@ -56,10 +56,11 @@ struct MyApp : AppR2T {
 		AppR2T :: init();  		
 	    addListener(GetPositions, "/xy", "ffffffff", this);  
 		addListener(GetVelocity, "/vel", "f", this);
-	    addListener(GetReset, "/reset", "f", this); 
+	    addListener(GetReset, "/reset", "f", this);  
+		addListener(GetTouch, "/touch", "iii", this);
 		
-		 ow = - width / 2.0; 
-		 tw = width;    
+		 ow = - ( width * 2)/ 2.0; 
+		 tw = width * 4;    
 		
 		 oh = - height/ 2.0; 
 		 th = height;  
@@ -183,6 +184,18 @@ struct MyApp : AppR2T {
 		
 		app.bReset = argv[0] -> f;
 		
+	} 
+	
+	static int GetTouch( const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) { 
+	  
+		MyApp& app = *(MyApp*)user_data;
+		for (int i = 0; i < 4; ++i){ 
+			int idx = argv[0] -> i; 
+			float x =  ( argv[1] -> i ) / 3000.0; 
+			float y =  ( argv[2] -> i ) / 2500.0; 
+			
+			app.dp[idx] = Vec( (app.tw / 2.0 )*x, ( app.th /2.0) * (-y),0); 
+		} 
 	}
   
 };

@@ -48,7 +48,7 @@
       isVertical:false, 
 	  label: 'velocity',
       target:"OSC", key:'/vel',
-    })   
+    }) 
 
     g = new Interface.Button({
       bounds:[.5,.5,.1,.1],
@@ -63,7 +63,7 @@
 	  usePhysics: false,
 	  background:"#111",
 	  fill: "rgba(127,127,127,.2)",
-	  bounds:[.5,0,.5,.5],  
+	  bounds:[.5,0,.5,.5], 
 
 	  onvaluechange: function() {
 	    Interface.OSC.send('/xy', 'ffffffff', 
@@ -77,9 +77,17 @@
 		)
 	  },
 	});
+	
+	      cam = new Interface.Slider({
+	        bounds:[.6,.5,.4,.1],
+	        isVertical:false, 
+	  		label: 'cam',
+			max: 50,
+	        target:"OSC", key:'/cam',
+	      })
 
 
-    panel.add( b, c, d, e, f,g, xy );
+    panel.add( b, c, d, e, f,g, xy, cam );
     
     Interface.OSC.receive = function(address, typetags, parameters) {
       window.alert(address + typetags + parameters);
