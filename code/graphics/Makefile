@@ -30,9 +30,36 @@ VPATH = $(EXT_DIR)/vsr/build/pch/:\
 		$(PIROOT):\
 		$(PIROOT)opt
 
-IPATH = -Ictl -I$(PIROOT)usr/include -I$(PIROOT)opt/vc/include -I$(PIROOT)opt/vc/include/interface/vcos/pthreads -I$(PIROOT)opt/vc/include/interface/vmcs_host/linux
-LDFLAGS =  -L$(PIROOT)usr/lib -lstdc++ -lm
-LDFLAGS += -L$(PIROOT)/opt/vc/lib/ -lGLESv2 -lEGL -lstdc++ -lm -lbcm_host -lvcos -lvchiq_arm -llo -lrt
+IPATH += -Ictl
+IPATH += -I$(PIROOT)usr/include
+IPATH += -I$(PIROOT)usr/local/include
+IPATH += -I$(PIROOT)opt/vc/include
+IPATH += -I$(PIROOT)opt/vc/include/interface/vcos/pthreads
+IPATH += -I$(PIROOT)opt/vc/include/interface/vmcs_host/linux
+
+LDFLAGS += -L$(PIROOT)lib
+LDFLAGS += -L$(PIROOT)usr/lib
+LDFLAGS += -L$(PIROOT)usr/local/lib
+LDFLAGS += -L$(PIROOT)opt/vc/lib
+#LDFLAGS += -L$(PIROOT)lib/arm-linux-gnueabihf
+#LDFLAGS += -L$(PIROOT)usr/lib/arm-linux-gnueabihf
+LDFLAGS += -lEGL
+LDFLAGS += -lGLESv2
+LDFLAGS += -lGamma
+LDFLAGS += -lpthread
+LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libportaudio.a
+LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libjack.a
+LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libasound.so
+#LDFLAGS += -lasound
+#LDFLAGS += -ljack
+#LDFLAGS += -lportaudio
+LDFLAGS += -lbcm_host
+LDFLAGS += -llo
+LDFLAGS += -lm
+LDFLAGS += -lrt
+LDFLAGS += -lstdc++
+LDFLAGS += -lvchiq_arm
+LDFLAGS += -lvcos
 
 USEVSR = 0
 VSRFLAGS = -L$(EXT_DIR)/vsr/build/lib/ -lvsr -I$(EXT_DIR)/vsr/build/pch/ -I$(EXT_DIR)/vsr/ -I$(EXT_DIR)/vsr/VSR/Elements/ -I$(EXT_DIR)/vsr/VSR/
