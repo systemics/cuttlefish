@@ -6,7 +6,7 @@ using namespace ctl;
 
 struct OscRelay : OSCPacketHandler {  
 	
-	float traceAmt, ux, uy, bluramt, vel;
+	float traceAmt, ux, uy, bluramt, vel, cam;
      
    lo_address t, m, b, c;  
 
@@ -21,7 +21,8 @@ struct OscRelay : OSCPacketHandler {
 	 	addListener( GetUX,"/ux","f", this);  
 	 	addListener( GetUY,"/uy","f", this);  
 	   	addListener( GetBlur,"/bluramt","f", this);
-	    addListener(GetVelocity, "/vel", "f", this);  
+	    addListener(GetVelocity, "/vel", "f", this); 
+		addListener(GetCam, "/cam", "f", this);    
 	}
   
   	void resendTrace(){
@@ -57,7 +58,14 @@ struct OscRelay : OSCPacketHandler {
 	    lo_send(m, "/bluramt", "f", bluramt);  
 		lo_send(b, "/bluramt", "f", bluramt);  
 		lo_send(c, "/bluramt", "f", bluramt);  
-	}	
+	} 
+	
+	void resendCam(){
+	    lo_send(t, "/cam", "f", cam);    
+	    lo_send(m, "/cam", "f", cam);  
+		lo_send(b, "/cam", "f", cam);  
+		lo_send(c, "/cam", "f", cam);  
+	}  
 	
 	static int GetTrace(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) {
 
@@ -112,7 +120,17 @@ struct OscRelay : OSCPacketHandler {
 		app.resendVel();
 		return 0;
 	}
+
+	static int GetCam( const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) {
 	
+		OscRelay& app = *(OscRelay*)user_data;    
+		
+		app.cam = argv[0] -> f;
+		cout << app.cam << endl;
+		
+		app.resendCam();
+		return 0;
+	}	
  
 };
 
