@@ -12,6 +12,7 @@
 #include "ctl_sound.h" 
 
 #include <Gamma/Oscillator.h>
+#include <Gamma/Delay.h>
 
 using namespace std;
 using namespace ctl;
@@ -22,6 +23,7 @@ struct MyApp :  AppR2T, Sound {  //MainLoop,
 	StopWatch<> stopWatch;  
     
   gam::SineD<> sineD[5];
+  gam::Delay<> delay;
 
 	MBO * field;
     MBO * potentials;  
@@ -49,11 +51,11 @@ struct MyApp :  AppR2T, Sound {  //MainLoop,
 
 	MyApp() : 
 	AppR2T( 21.5, 14.5 ),
-    f(20,3,1,4), vf(25,5,1,2.5), orth(25,5,1,2.5)    
+    f(20,3,1,4), vf(25,5,1,2.5), orth(25,5,1,2.5),
+    delay(0.2)
 	{
-         
     for (int i = 0; i < 5; ++i)
-      sineD[i] = gam::SineD<>(440 * (i + 1), 0.9, 0.3);
+      sineD[i] = gam::SineD<>(300 * ((0.7*i) + 1), 0.9, 0.3);
 
 		//defaults
 		bReset = 0;
@@ -111,14 +113,14 @@ struct MyApp :  AppR2T, Sound {  //MainLoop,
 	~MyApp(){}   
 	
 	virtual void onSound( gam::AudioIOData& io ){
-    if (identifier != 1)
-      while (io()) {
-        float f = 0;
-        for (int i = 0; i < 5; ++i)
-          f += sineD[i]();
-        f /= 5;
-        io.out(0) = io.out(1) = f;
-      }
+    while (io()) {
+      float f = 0;
+      for (int i = 0; i < 5; ++i)
+        f += sineD[i]();
+      f /= 5;
+      f += delay(f + delay()*0.7);
+      io.out(0) = io.out(1) = f;
+    }
 	}
 	
 	// virtual void onLoop(float dt) {
@@ -286,7 +288,6 @@ bool running = true;
 void quit(int) {
   running = false;
 }
-
 
 int main(){
 	

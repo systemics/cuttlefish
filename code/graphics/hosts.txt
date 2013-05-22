@@ -1,4 +1,3 @@
-pi-z
 pi-t
 pi-m
 pi-b

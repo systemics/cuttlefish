@@ -22,7 +22,7 @@ void audioCB(gam::AudioIOData& io);
 
 struct Sound {
   gam::AudioIO io;
-  Sound() : io(1024, 22050, audioCB, this, 1) {
+  Sound() : io(1024, 22050, audioCB, this, 2) {
     gam::Sync::master().spu(io.framesPerSecond());
     io.start();
   }
