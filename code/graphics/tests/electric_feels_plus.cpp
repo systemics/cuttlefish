@@ -17,23 +17,11 @@ using namespace std;
 using namespace ctl;
 using namespace vsr;  
 
-struct Timer {
-  float t, d;
-  Timer(float d) : t(0), d(d) {}
-  bool operator()(float dt) {
-    bool returnValue = (t > d);
-    if (returnValue)
-      t -= d;
-    t += dt;
-    return returnValue;
-  }
-};
-
 struct MyApp :  AppR2T, Sound {  //MainLoop,
      
 	StopWatch<> stopWatch;  
     
-	gam::Sine<> sine;
+  gam::SineD<> sineD[5];
 
 	MBO * field;
     MBO * potentials;  
@@ -64,8 +52,8 @@ struct MyApp :  AppR2T, Sound {  //MainLoop,
     f(20,3,1,4), vf(25,5,1,2.5), orth(25,5,1,2.5)    
 	{
          
-		//SOUND
-		sine.freq( 440 );
+    for (int i = 0; i < 5; ++i)
+      sineD[i] = gam::SineD<>(440 * (i + 1), 0.9, 0.3);
 
 		//defaults
 		bReset = 0;
@@ -123,9 +111,14 @@ struct MyApp :  AppR2T, Sound {  //MainLoop,
 	~MyApp(){}   
 	
 	virtual void onSound( gam::AudioIOData& io ){
-	   while (io()){
-			io.out(0) = sine() * .3;
-		} 
+    if (identifier != 1)
+      while (io()) {
+        float f = 0;
+        for (int i = 0; i < 5; ++i)
+          f += sineD[i]();
+        f /= 5;
+        io.out(0) = io.out(1) = f;
+      }
 	}
 	
 	// virtual void onLoop(float dt) {
@@ -282,6 +275,9 @@ struct MyApp :  AppR2T, Sound {  //MainLoop,
 			
 			app.dp[idx] = vsr::Vec( (app.tw / 2.0 )*x, ( app.th /2.0) * (-y),0); 
 		} 
+
+    if (argv[0]->i < 5)
+      app.sineD[argv[0]->i].reset();
 	}
   
 };
