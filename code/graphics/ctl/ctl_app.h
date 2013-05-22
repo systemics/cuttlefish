@@ -58,7 +58,7 @@ namespace ctl {
 		virtual void init() = 0; 		
 		virtual void onDraw() = 0;
 		      
-		void initView(float w, float h, float z = 50.0){
+		void initView(float w, float h, float z = 20.0){
 
 			width =  w;
 			height = h;     

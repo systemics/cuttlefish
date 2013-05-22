@@ -48,7 +48,7 @@ struct MyApp :  AppR2T, Sound {  //MainLoop,
 	float ow, oh, tw, th;
 
 	MyApp() : 
-	AppR2T( 14. + 3./8., 10. + 11./16. ),
+	AppR2T( 21.5, 14.5 ),
     f(20,3,1,4), vf(25,5,1,2.5), orth(25,5,1,2.5)    
 	{
          
