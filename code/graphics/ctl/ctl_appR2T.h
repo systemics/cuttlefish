@@ -23,7 +23,9 @@ struct AppR2T : App, OSCPacketHandler {
 	Pipe blurpipe;
 	
 	float traceAmt;
-	float ux, uy, bluramt;
+	float ux, uy, bluramt;  
+	
+	bool bUX, bUY, bBLUR, bTRACE; //update bools
     
 	AppR2T(float w, float h) : App(w, h), OSCPacketHandler() {	
 		//init();
@@ -36,13 +38,15 @@ struct AppR2T : App, OSCPacketHandler {
 	void initPipeline(){ 
 	   
 	 	//defaults
-		ux = uy = .05;
+		ux = uy = .02;
 		traceAmt = .9;
-		bluramt = 0.17;    
+		bluramt = 0.2; 
+		
+		bUX = bUY = bBLUR = bTRACE = 0;   
 		
 		//Make Two Textures the size of the screen (as big as possible anyway: there are memeory limitations )   
-		//int tw = surface.width; int th =  surface.width; 
-		int tw = 1280; int th = 853;
+		int tw = surface.width /2.0; int th =  surface.width/2.0; 
+		//int tw = 1280; int th = 853;
 		textureA = new Texture( tw,th);//surface.width/2.0, surface.height/2.0 );   
 		textureB = new Texture( tw,th);//surface.width/2.0, surface.height/2.0 );  		                    
 		                                                                             
@@ -73,8 +77,8 @@ struct AppR2T : App, OSCPacketHandler {
 	virtual void init(){ 
 		
 		initPipeline();  //<-- Initialize the Graphics Pipeline Shaders, Textures, etc.
-		initSlab();     //<-- Create and bind all the VBO's   
-	    initOSC();    	//<-- Initialize OSC handling for shader settings
+		initSlab();      //<-- Create and bind all the VBO's   
+	    initOSC();    	 //<-- Initialize OSC handling for shader settings
 	}
 	
 	 //This is where the actual objects get updated  
@@ -97,8 +101,9 @@ struct AppR2T : App, OSCPacketHandler {
 			
 			//We add a bit of the previously drawn frame
 			texalpha.bind();
-			    texalpha.program -> uniform("alpha", traceAmt);
-			
+			float nt = traceAmt;
+			    texalpha.program -> uniform("alpha", nt); 
+							
 			    textureB -> bind();      
 					texalpha.line( *rect );
 				textureB -> unbind();  
@@ -117,9 +122,10 @@ struct AppR2T : App, OSCPacketHandler {
 		//Switch to full Viewport and Bind Texture to Rect 
 	   glViewport(0,0,surface.width,surface.height);		
 		texpipe.bind ();
-		texpipe.program -> uniform("ux" ,ux);
-		texpipe.program -> uniform("uy" ,uy); 
-		texpipe.program -> uniform("bluramt", bluramt);
+		float nux = ux; float nuy = uy; float nb = bluramt;
+		texpipe.program -> uniform("ux" ,nux);
+		texpipe.program -> uniform("uy" ,nuy); 
+		texpipe.program -> uniform("bluramt", nb);
 			textureA -> bind();
 				texpipe.line( *rect );
 			textureA -> unbind();
