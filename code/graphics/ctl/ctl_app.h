@@ -25,7 +25,7 @@ namespace ctl {
 	using namespace EGL;
     using namespace GLSL; 
 
-	struct App :  BCM, /*Timer,*/ Host, Window { 
+	struct App :  BCM, Host, Window { 
 	        
 		Scene scene;   		///<-- Transformation Matrices
 		
@@ -58,7 +58,7 @@ namespace ctl {
 		virtual void init() = 0; 		
 		virtual void onDraw() = 0;
 		      
-		void initView(float w, float h){
+		void initView(float w, float h, float z = 50.0){
 
 			width =  w;
 			height = h;     
@@ -68,7 +68,7 @@ namespace ctl {
 
 			int numscreens = 4;
 
-			vsr::Vec3f viewer(0,0,50);  //Position in inches
+			vsr::Vec3f viewer(0,0,z);  //Position in inches
 
 
 			Pose p(-width/2.0,-height/2.0, 0);
@@ -94,8 +94,43 @@ namespace ctl {
 			}
 
 			scene.camera.view() = View( viewer, p, aspect, height );
-			scene.camera.pos() = Vec3f( 0, 0, 50);
-       } 
+			scene.camera.pos() = Vec3f( 0, 0, z);
+       }  
+
+		// void viewerAt( float x, float y, float z){ 
+		// 	
+		// 	width =  w;
+		// 	height = h;     
+		// 
+		//   		    float aspect = width / height;
+		// 
+		// 	 vsr::Vec3f viewer(0,0,50);  //Position in inches
+		// 	 
+		// 	Pose p(-width/2.0,-height/2.0, 0);  
+		// 	
+		// 	switch( identifier ){
+		// 
+		// 		case 2:
+		// 			p = Pose( - width * 2, - height / 2.0, 0 );
+		// 			break;
+		// 		case 3:
+		// 			p = Pose( - width , - height / 2.0, 0 );
+		// 			break;
+		// 		case 4:
+		// 			p = Pose( 0, - height / 2.0, 0 );
+		// 			break;
+		// 		case 5:
+		// 			p = Pose( width, - height / 2.0, 0 );
+		// 			break;
+		// 
+		//         default:  
+		// 			cout << "USING DEFAULT SCREEN VIEW POSE" << endl;
+		//           break;  
+		// 	}
+		// 
+		// 	scene.camera.view() = View( viewer, p, aspect, height );
+		// 	scene.camera.pos() = Vec3f( 0, 0, 50);
+		// }    
 
 	
 		virtual void onFrame(){

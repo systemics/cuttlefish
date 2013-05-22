@@ -93,13 +93,13 @@ sync:
 	@rsync -avzL $(addPrefix($(HOST):~/, $(SYNCITEMS))) $(PIROOT)
 
 copy:
-	parallel-scp -h hosts.txt build/bin/main /tmp
+	parallel-scp -h hosts.txt build/bin/$(NAME) /tmp
 
 many: copy
-	parallel-ssh -h hosts.txt /tmp/main
+	parallel-ssh -h hosts.txt /tmp/$(NAME)
 
 many-kill:
-	parallel-ssh -h hosts.txt "pkill main"
+	parallel-ssh -h hosts.txt "pkill $(NAME)"
 
 mpssh:
 	mpssh -sqr build/bin/main

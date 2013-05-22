@@ -7,23 +7,44 @@
 #include "ctl_util.h"
 #include "ctl_render.h"
 #include "ctl_appR2T.h"  
+#include "ctl_mainloop.h"
+#include "ctl_stopwatch.h"
 
 using namespace std;
 using namespace ctl;
-using namespace vsr;
+using namespace vsr;  
 
-struct MyApp : AppR2T {
-   
+struct Timer {
+  float t, d;
+  Timer(float d) : t(0), d(d) {}
+  bool operator()(float dt) {
+    bool returnValue = (t > d);
+    if (returnValue)
+      t -= d;
+    t += dt;
+    return returnValue;
+  }
+};
+
+struct MyApp :  AppR2T {  //MainLoop,
+     
+	StopWatch<> stopWatch;  
+
 	MBO * field;
+    MBO * potentials;  
+	float equiAmt;
+	float fieldAmt;
  
     Field<Pnt> f;
 	Field<Vec> vf;
+    Field<Vec> orth; // orthogonal field to vf;
 
 	float * s;   
 	   
-	int numDipoles, numParticles; 
+	int numDipoles, numParticles, numPotentials;
 	
 	float vel;
+	float cam; // camera z position
 
 	vsr::Vec * dp;   
     vsr::Dls * dls;  
@@ -35,11 +56,15 @@ struct MyApp : AppR2T {
 
 	MyApp() : 
 	AppR2T( 14. + 3./8., 10. + 11./16. ),
-    f(40,7,1,2), vf(20,5,3,3)    
+    f(40,7,1,2), vf(25,5,1,2.5), orth(25,5,1,2.5)    
 	{
         
+		//defaults
 		bReset = 0;
-
+		vel = .5; 
+		equiAmt = .5;
+		fieldAmt = .5;
+		
 		numDipoles = 4;
 		dp = new Vec[numDipoles]; 
 		dls = new Dls[numDipoles];
@@ -59,21 +84,49 @@ struct MyApp : AppR2T {
 		addListener(GetVelocity, "/vel", "f", this);
 	    addListener(GetReset, "/reset", "f", this);  
 		addListener(GetTouch, "/touch", "iii", this);
+		addListener(GetCam, "/cam", "f", this);  
 		
 		 ow = - ( width * 2)/ 2.0; 
 		 tw = width * 4;    
 		
 		 oh = - height/ 2.0; 
-		 th = height;  
+		 th = height; 
+		
+		//push field back away from screen a bit
+		// for (int i = 0; i < vf.num(); ++i){
+		// 	vf.grid(i) = vf.grid(i).trs(0,0,-3);
+		// } 
 		
 		field = new MBO( Mesh::Points2( &( vf.grid(0) ), vf.dataPtr(), vf.num() ).mode(GL::L), GL::DYNAMIC );
 		for (int i = 0; i < vf.num(); ++i){ 
-			field -> mesh[i*2].Col.set(1,0,0,1); 
-			field -> mesh[i*2+1].Col.set(0,0,1,.9);  
-		 } 
+			field -> mesh[i*2].Col.set(0,0,1,1); 
+			field -> mesh[i*2+1].Col.set(1,0,1,.5);  
+		 }    
+		
+		numPotentials = 10;    
+		potentials = new MBO[numPotentials];
+		for (int i = 0; i < numPotentials; ++i){  
+			float t = 1.0 * i/ numPotentials;
+			potentials[i]  = MBO( Mesh::Circle(1).color(0,1,0).mode(GL::LS) );
+		}  
+		
 	}   
 	
 	~MyApp(){}  
+	
+	// virtual void onLoop(float dt) {
+	// 
+	//     static Timer frameTimer(1.0f / 30);
+	//     if (frameTimer(dt)) {
+	//       stopWatch.start();
+	//       onFrame();
+	//       stopWatch.stop();
+	//     }
+	// 
+	//     static Timer reportTimer(1.0f);
+	//     if (reportTimer(dt))
+	//       stopWatch.report();  
+	//   } 
 	
 	void updateMeshes(){ 
 		for (int i = 0; i < vf.num(); ++i){  
@@ -85,16 +138,30 @@ struct MyApp : AppR2T {
 			for (int i = 0 ;i < f.num(); ++i){
 				f[i] = ( Vec( f.grid(i) ) + Vec(Rand::Num(), Rand::Num(), 0 ) ).null();
 			}
-		}
+		}  
+		
+		for (int i = 0; i < numPotentials; ++i){
+			float t = (-1.0 + 2.0 * i/numPotentials) * 40;
+			Vec nv(t, - height/2.0, 0);  //starting point
+			
+			for (int j = 0; j < potentials[i].mesh.num(); ++j ){
+				float tt = 1.0 * j/potentials[i].mesh.num();
+				potentials[i].mesh[j].Pos.set( nv[0], nv[1], nv[2] );
+			    potentials[i].mesh[j].Col.set( 0,  1,  t * .3, .9); 
+				nv += orth.euler2d( nv ); 
+			}  
+			potentials[i].update();
+		}  
 	}   
 	
 	virtual void drawScene(){  
  
    		updateMeshes();
 		
-		static float time = 0.0; time += .05;  
+		static float time = 0.0; time += .05;
+		static Rot ninetydegrees = Gen::rot( Biv::xy * PIOVERFOUR );  
 			
-			Vec tally;
+  //  		Vec tally;
 			
 			for (int i = 0; i < f.num(); ++i){   
 				  Par tpar;
@@ -104,7 +171,7 @@ struct MyApp : AppR2T {
 					tpar += par[j] * dist;
 				 }
 				f[i] = Ro::loc( f[i].sp(  Gen::bst( tpar  * s[i] * vel)  )  );  
-				tally += f[i];  
+ //   			tally += f[i];  
 			 } 
 			
 			for (int i = 0; i < vf.num(); ++i){
@@ -115,26 +182,12 @@ struct MyApp : AppR2T {
 					tpar += par[j] * dist;
 				 }
 				Pnt np = Ro::loc( vf.grid(i).sp ( Gen::bst( tpar * vel )  ) );
-				vf[i] = np - vf.grid(i);
+				vf[i] = Vec(np - vf.grid(i)) * fieldAmt; 
+			    orth[i] = vf[i].sp( ninetydegrees );
 			}
 					   
-			// Average particle position is used as Camera Target
-		    tally /= f.num(); 
-			//cout << tally << endl;  
-			// Vec tp( scene.camera.pos()[0], scene.camera.pos()[1], scene.camera.pos()[2] );  
-			// Vec goal = ( tally - tp ).unit();    
-			// Rot rot  = Gen::ratio( -Vec::z, goal ); 
-			// 
-			// scene.camera.quat() = Rot2Quat(rot); 		
-			// scene.camera.orient();   
+//		    tally /= f.num(); 
 
-			// Oscillation of the Dipoles Position  		   
-			// for (int j = 0; j < numDipoles; ++j ){     
-			// 	float t = 1.0 * j/numDipoles;
-			// 	dp[j] = tally + ( Vec::x * width * sin(time) * (j&1? -1 : 1) );
-			// 	dls[j] = Ro::dls( dp[j], .2 + .3 * t).trs (0, t * cos(time) * height, 0);
-			// 	par[j] = Ro::par( dls[j], Vec::x * (j&1?-1:1) ) * .1; 
-			// 		   } 
 			
 			for (int j = 0; j < numDipoles; ++j ){ 
 				float t = 1.0 * j/numDipoles;
@@ -145,16 +198,24 @@ struct MyApp : AppR2T {
 		
 		Mat4f mvm = scene.xf.modelViewMatrixf(); 
 		
-		Render( f, mvm, pipe ); 
+    	Render( f, mvm, pipe ); 
 		
 		//Flow Field Lines
-		pipe.line( *field );
-		//Render( vf, mvm, pipe );
+		pipe.line( *field );   
+		
+		//equipotentials
+		for (int i = 0; i < numPotentials; i++){ 
+			pipe.line( potentials[i] );
+		 }
+
+		Render( vf, mvm, pipe );
 			
 		for (int j = 0; j < numDipoles; ++j){  
 			Render( dls[j], mvm, pipe );
-		}  
-	} 
+		}   
+	}  
+	
+	
 	
 	static int GetPositions(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) {
 	
@@ -180,12 +241,22 @@ struct MyApp : AppR2T {
 	}
 	
 	static int GetReset( const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) {
-	    
+	
 		MyApp& app = *(MyApp*)user_data;    
 		
 		app.bReset = argv[0] -> f;
 		
 	} 
+
+	static int GetCam( const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) {
+	
+		MyApp& app = *(MyApp*)user_data;    
+		
+		app.cam = argv[0] -> f;
+		
+		app.initView(app.width,app.height,app.cam);
+		
+	}
 	
 	static int GetTouch( const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) { 
 	  
@@ -209,12 +280,17 @@ void quit(int) {
 
 int main(){
 	
-	MyApp app; 
-  
-	while(running){
-		app.onFrame();
-		usleep(1666);
-	}   
+ //   MyApp().start();
+	MyApp app;
+	
+    while(running){
+ 		app.onFrame();
+ 		usleep(1666);
+ 	}   
+     // while(running){
+	// 	app.onFrame();
+	// 	usleep(1666);
+	// }   
 	
 	  return 0; 
 }
