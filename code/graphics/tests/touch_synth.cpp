@@ -62,7 +62,7 @@ struct MyApp : MainLoop, Touch, Sound, Host, OSCPacketHandler {
       while (io()) {
         float f = 0;
         for (int i = 0; i < 5; ++i)
-          f += sineD[i];
+          f += sineD[i]();
         f /= 5;
         io.out(0) = io.out(1) = f;
       }
