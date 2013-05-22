@@ -1,0 +1,33 @@
+Script started on Mon 20 May 2013 04:12:15 PM PDT
+]0;pi@pi-m: ~[01;32mpi@pi-m[00m [01;34m~ $[00m iperf -s -u -B 224.0.55.55
+------------------------------------------------------------
+Server listening on UDP port 5001
+Binding to local address 224.0.55.55
+Joining multicast group  224.0.55.55
+Receiving 1470 byte datagrams
+UDP buffer size:  160 KByte (default)
+------------------------------------------------------------
+[  3] local 224.0.55.55 port 5001 connected with 128.111.26.166 port 41495
+[ ID] Interval       Transfer     Bandwidth        Jitter   Lost/Total Datagrams
+[  3]  0.0-10.0 sec  49.8 MBytes  41.8 Mbits/sec   0.184 ms  314/35872 (0.88%)
+[  3]  0.0-10.0 sec  1 datagrams received out-of-order
+[  4] local 224.0.55.55 port 5001 connected with 128.111.26.166 port 41495
+[  4]  0.0- 0.0 sec  1.44 KBytes   261 Mbits/sec   0.000 ms 35870/35871 (1e+02%)
+[  5] local 224.0.55.55 port 5001 connected with 128.111.26.166 port 57514
+[  5]  0.0-10.0 sec  51.2 MBytes  43.0 Mbits/sec   0.275 ms    0/36540 (0%)
+[  5]  0.0-10.0 sec  1 datagrams received out-of-order
+[  3] local 224.0.55.55 port 5001 connected with 128.111.26.166 port 42033
+[  3]  0.0-10.0 sec  50.3 MBytes  42.2 Mbits/sec   0.187 ms    0/35864 (0%)
+[  3]  0.0-10.0 sec  1 datagrams received out-of-order
+[  4] local 224.0.55.55 port 5001 connected with 128.111.26.166 port 42033
+[  4]  0.0- 0.0 sec  18.7 KBytes   493 Mbits/sec   0.060 ms 35851/35864 (1e+02%)
+[  4]  0.0- 0.0 sec  1 datagrams received out-of-order
+[  5] local 224.0.55.55 port 5001 connected with 128.111.26.166 port 46639
+[  5]  0.0-10.0 sec  50.5 MBytes  42.3 Mbits/sec   0.178 ms    0/36005 (0%)
+[  5]  0.0-10.0 sec  1 datagrams received out-of-order
+[  3] local 224.0.55.55 port 5001 connected with 128.111.26.166 port 57019
+[  3]  0.0-10.0 sec  51.3 MBytes  43.0 Mbits/sec   0.655 ms    0/36567 (0%)
+[  3]  0.0-10.0 sec  1 datagrams received out-of-order
+^C]0;pi@pi-m: ~[01;32mpi@pi-m[00m [01;34m~ $[00m iperf -s -u -B 224.0.55.55[C[C[C[C[C[C[C[C[C[C[C[C[Kexit
+
+Script done on Mon 20 May 2013 04:13:32 PM PDT

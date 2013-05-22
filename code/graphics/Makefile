@@ -74,7 +74,7 @@ many-kill:
 	parallel-ssh -h hosts.txt "pkill main"
 
 mpssh:
-	mpssh -s -r build/bin/main
+	mpssh -sqr build/bin/main
 
 mpssh-kill:
 	mpssh -s "pkill main"

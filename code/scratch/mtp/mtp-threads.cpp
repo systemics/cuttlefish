@@ -1,10 +1,11 @@
 #include <algorithm>
 #include <fcntl.h>
 #include <linux/input.h>
-
+#include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <thread>
 #include <unistd.h>
 
 using namespace std;
@@ -15,7 +16,7 @@ using namespace std;
 #define BIT(x) (1UL<<OFF(x))
 #define LONG(x) ((x)/BITS_PER_LONG)
 #define test_bit(bit, array) ((array[LONG(bit)] >> OFF(bit)) & 1)
-#define N_TOUCHES (10)
+#define N_SLOTS (16)
 
 struct Touch {
   int id, n, x, y, major, minor, orientation;
@@ -25,34 +26,44 @@ struct Touch {
   }
 };
 
-int main () {
+bool running = true;
+void quit(int) {
+  running = false;
+}
+
+int main_other();
+int main() {
+  signal(SIGINT, quit);
+  thread other(main_other);
+  other.join();
+}
+
+int main_other() {
   int fd, rd;
   struct input_event ev[64];
-  //unsigned short id[4];
   unsigned long bit[EV_MAX][NBITS(KEY_MAX)];
 
-  if ((fd = open("/dev/input/event0", O_RDONLY)) < 0) {
-    perror("evtest");
+  if ((fd = open("/dev/input/event0", O_RDONLY | O_NONBLOCK)) < 0) {
+    printf("FAIL!\n");
     return 1;
   }
 
   memset(bit, 0, sizeof(bit));
   ioctl(fd, EVIOCGBIT(0, EV_MAX), bit[0]);
 
-  Touch touch[N_TOUCHES];
-  Touch sorted[N_TOUCHES];
-  for (int i = 0; i < N_TOUCHES; ++i)
+  Touch touch[N_SLOTS];
+  Touch sorted[N_SLOTS];
+  for (int i = 0; i < N_SLOTS; ++i)
     touch[i].make();
-  int active = 0, count = 0;
+  int slot = -1, count = 0;
 
-  while (true) {
+  while (running) {
+    usleep(1000);
+
     rd = read(fd, ev, sizeof(struct input_event) * 64);
 
-    if (rd < (int) sizeof(struct input_event)) {
-      printf("yyy\n");
-      perror("\nevtest: error reading");
-      return 1;
-    }
+    if (rd < (int) sizeof(struct input_event))
+      continue;
 
     for (unsigned i = 0; i < rd / sizeof(struct input_event); i++) {
       if (ev[i].type != 3)
@@ -63,50 +74,60 @@ int main () {
         // x position
         //
         case 53:
-        case 0:
-          touch[active].x = ev[i].value;
+        //case 0:
+          if (slot == -1)
+            continue;
+          touch[slot].x = ev[i].value;
           break;
 
         // y position
         //
         case 54:
-        case 1:
-          touch[active].y = ev[i].value;
+        //case 1:
+          if (slot == -1)
+            continue;
+          touch[slot].y = ev[i].value;
           break;
 
         // touch ellipse size on the major axis
         //
         case 48:
-          touch[active].major = ev[i].value;
+          if (slot == -1)
+            continue;
+          touch[slot].major = ev[i].value;
           break;
 
         // touch ellipse size on the major axis
         //
         case 49:
-          touch[active].minor = ev[i].value;
+          if (slot == -1)
+            continue;
+          touch[slot].minor = ev[i].value;
           break;
 
         // touch ellipse orientation
         //
         case 52:
-          touch[active].orientation = ev[i].value;
+          if (slot == -1)
+            continue;
+          touch[slot].orientation = ev[i].value;
           break;
 
         // slot
         //
         case 47:
-          active = ev[i].value;
+          slot = ev[i].value;
           break;
 
         // unique tracking id
         //
         case 57:
-          touch[active].n = count;
+          touch[slot].n = count;
           if (ev[i].value == -1)
             count--;
           else
             count++;
-          touch[active].id = ev[i].value;
+          touch[slot].id = ev[i].value;
           break;
       }
     }
@@ -118,9 +139,18 @@ int main () {
       }
     );
 
-    for (int k = 0; k < N_TOUCHES; ++k)
+    //printf("%u ", count);
+    //for (int k = 0; k < N_SLOTS; ++k)
+    //  if (touch[k].id != -1)
+    //    printf("%u:(%i, %i) ", touch[k].id, touch[k].x, touch[k].y);
+    //printf("\n");
+
+    printf("%u ", count);
+    for (int k = 0; k < N_SLOTS; ++k)
       if (sorted[k].id != -1)
         printf("%u:(%i, %i) ", sorted[k].n, sorted[k].x, sorted[k].y);
     printf("\n");
   }
+
+  return 0;
 }

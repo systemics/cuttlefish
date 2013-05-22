@@ -1,6 +1,7 @@
 PORT = 22
-HOST = pi@192.168.2.4
-NAME = mtp
+HOST = pi-z
+#NAME = mtp
+NAME = mtp-threads
 ROOT = $(HOME)/code/pi/root
 
 CXX = arm-linux-gnueabihf-g++ -std=c++0x
