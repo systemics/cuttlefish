@@ -51,15 +51,16 @@ struct MyApp :  AppR2T, Sound {  //MainLoop,
 
 	MyApp() : 
 	AppR2T( 21.5, 14.5 ),
-    f(20,3,1,4), vf(25,5,1,2.5), orth(25,5,1,2.5),
-    delay(0.2)
+    f(20,3,1,4), vf(33,7,1,2.5), orth(33,7,1,2.5),
+
+    delay(0.211)
 	{
     for (int i = 0; i < 5; ++i)
-      sineD[i] = gam::SineD<>(300 * ((0.7*i) + 1), 0.9, 0.3);
+      sineD[i] = gam::SineD<>(300.0 + (213.0 * i) , 0.9, 0.3);
 
 		//defaults
-		bReset = 0;
-		vel = .5; 
+		bReset = 1;
+		vel = .99; 
 		equiAmt = .5;
 		fieldAmt = .5;
 		
@@ -81,7 +82,7 @@ struct MyApp :  AppR2T, Sound {  //MainLoop,
 	    addListener(GetPositions, "/xy", "ffffffff", this);  
 		addListener(GetVelocity, "/vel", "f", this);
 	    addListener(GetReset, "/reset", "f", this);  
-		addListener(GetTouch, "/touch", "iii", this);
+		addListener(GetTouch, "/touch", "iiii", this);
 		addListener(GetCam, "/cam", "f", this);  
 		
 		 ow = - ( width * 2)/ 2.0; 
@@ -118,7 +119,7 @@ struct MyApp :  AppR2T, Sound {  //MainLoop,
       for (int i = 0; i < 5; ++i)
         f += sineD[i]();
       f /= 5;
-      f += delay(f + delay()*0.7);
+      f += delay(f + delay()*0.4);
       io.out(0) = io.out(1) = f;
     }
 	}
@@ -164,6 +165,7 @@ struct MyApp :  AppR2T, Sound {  //MainLoop,
 	}   
 	
 	virtual void drawScene(){  
+    glClearColor(0, 0, 0, 1);
  
    		updateMeshes();
 		
@@ -270,16 +272,19 @@ struct MyApp :  AppR2T, Sound {  //MainLoop,
 	static int GetTouch( const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) { 
 	  
 		MyApp& app = *(MyApp*)user_data;
-		for (int i = 0; i < 4; ++i){ 
-			int idx = argv[0] -> i; 
-			float x =  ( argv[1] -> i ) / 3000.0; 
-			float y =  ( argv[2] -> i ) / 2500.0; 
+		//for (int i = 0; i < 4; ++i){ 
+			int idx = argv[0]->i; 
+			float x =  ( argv[1]->i ) / 3000.0; 
+			float y =  ( argv[2]->i ) / 2500.0; 
 			
 			app.dp[idx] = vsr::Vec( (app.tw / 2.0 )*x, ( app.th /2.0) * (-y),0); 
-		} 
+		//} 
 
-    if (argv[0]->i < 5)
-      app.sineD[argv[0]->i].reset();
+
+    if (argv[0]->i < 5) {
+      app.sineD[argv[0]->i].set((app.sineD[argv[0]->i].freq() + (argv[3]->i) / 4.0f), 0.9f, 0.3f);
+    //  app.sineD[argv[0]->i].reset();
+    }
 	}
   
 };
@@ -294,7 +299,7 @@ int main(){
  //   MyApp().start();
 	MyApp app;
 	
-    while(running){
+  while(running){
  		app.onFrame();
  		usleep(1666);
  	}   
