@@ -64,7 +64,7 @@ struct MyApp :  AppR2T, Sound {  //MainLoop,
 		equiAmt = .5;
 		fieldAmt = .5;
 		
-		numDipoles = 4;
+		numDipoles = 5;
 		dp = new vsr::Vec[numDipoles]; 
 		dls = new Dls[numDipoles];
 		par = new Par[numDipoles]; 
@@ -164,7 +164,6 @@ struct MyApp :  AppR2T, Sound {  //MainLoop,
 	}   
 	
 	virtual void drawScene(){  
-    glClearColor(0, 0, 0, 1);
  
    		updateMeshes();
 		
@@ -272,17 +271,17 @@ struct MyApp :  AppR2T, Sound {  //MainLoop,
 	  
 		MyApp& app = *(MyApp*)user_data;
 		//for (int i = 0; i < 4; ++i){ 
+
+    if (argv[0]->i < app.numDipoles) {
 			int idx = argv[0]->i; 
 			float x =  ( argv[1]->i ) / 3000.0; 
 			float y =  ( argv[2]->i ) / 2500.0; 
+
+      // argv[3]->i // this is the orientation (-32, 32)
 			
 			app.dp[idx] = vsr::Vec( (app.tw / 2.0 )*x, ( app.th /2.0) * (-y),0); 
-		//} 
 
-
-    if (argv[0]->i < 5) {
-      app.sineD[argv[0]->i].set((app.sineD[argv[0]->i].freq() + (argv[3]->i) / 4.0f), 0.9f, 0.3f);
-    //  app.sineD[argv[0]->i].reset();
+      app.sineD[argv[0]->i].set((app.sineD[argv[0]->i].freq() + (argv[3]->i) / 8.0f), 0.9f, 0.3f);
     }
 	}
   
