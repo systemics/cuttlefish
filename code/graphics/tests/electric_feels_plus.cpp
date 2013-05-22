@@ -8,7 +8,10 @@
 #include "ctl_render.h"
 #include "ctl_appR2T.h"  
 #include "ctl_mainloop.h"
-#include "ctl_stopwatch.h"
+#include "ctl_stopwatch.h" 
+#include "ctl_sound.h" 
+
+#include <Gamma/Oscillator.h>
 
 using namespace std;
 using namespace ctl;
@@ -26,18 +29,20 @@ struct Timer {
   }
 };
 
-struct MyApp :  AppR2T {  //MainLoop,
+struct MyApp :  AppR2T, Sound {  //MainLoop,
      
 	StopWatch<> stopWatch;  
+    
+	gam::Sine<> sine;
 
 	MBO * field;
     MBO * potentials;  
 	float equiAmt;
 	float fieldAmt;
  
-    Field<Pnt> f;
-	Field<Vec> vf;
-    Field<Vec> orth; // orthogonal field to vf;
+    Field<vsr::Pnt> f;
+	Field<vsr::Vec> vf;
+    Field<vsr::Vec> orth; // orthogonal field to vf;
 
 	float * s;   
 	   
@@ -56,9 +61,12 @@ struct MyApp :  AppR2T {  //MainLoop,
 
 	MyApp() : 
 	AppR2T( 14. + 3./8., 10. + 11./16. ),
-    f(40,7,1,2), vf(25,5,1,2.5), orth(25,5,1,2.5)    
+    f(20,3,1,4), vf(25,5,1,2.5), orth(25,5,1,2.5)    
 	{
-        
+         
+		//SOUND
+		sine.freq( 440 );
+
 		//defaults
 		bReset = 0;
 		vel = .5; 
@@ -66,7 +74,7 @@ struct MyApp :  AppR2T {  //MainLoop,
 		fieldAmt = .5;
 		
 		numDipoles = 4;
-		dp = new Vec[numDipoles]; 
+		dp = new vsr::Vec[numDipoles]; 
 		dls = new Dls[numDipoles];
 		par = new Par[numDipoles]; 
 	   
@@ -112,7 +120,13 @@ struct MyApp :  AppR2T {  //MainLoop,
 		
 	}   
 	
-	~MyApp(){}  
+	~MyApp(){}   
+	
+	virtual void onSound( gam::AudioIOData& io ){
+	   while (io()){
+			io.out(0) = sine() * .3;
+		} 
+	}
 	
 	// virtual void onLoop(float dt) {
 	// 
@@ -136,13 +150,13 @@ struct MyApp :  AppR2T {  //MainLoop,
 		
 		if (bReset){
 			for (int i = 0 ;i < f.num(); ++i){
-				f[i] = ( Vec( f.grid(i) ) + Vec(Rand::Num(), Rand::Num(), 0 ) ).null();
+				f[i] = ( vsr::Vec( f.grid(i) ) + vsr::Vec(Rand::Num(), Rand::Num(), 0 ) ).null();
 			}
 		}  
 		
 		for (int i = 0; i < numPotentials; ++i){
 			float t = (-1.0 + 2.0 * i/numPotentials) * 40;
-			Vec nv(t, - height/2.0, 0);  //starting point
+			vsr::Vec nv(t, - height/2.0, 0);  //starting point
 			
 			for (int j = 0; j < potentials[i].mesh.num(); ++j ){
 				float tt = 1.0 * j/potentials[i].mesh.num();
@@ -182,7 +196,7 @@ struct MyApp :  AppR2T {  //MainLoop,
 					tpar += par[j] * dist;
 				 }
 				Pnt np = Ro::loc( vf.grid(i).sp ( Gen::bst( tpar * vel )  ) );
-				vf[i] = Vec(np - vf.grid(i)) * fieldAmt; 
+				vf[i] = vsr::Vec(np - vf.grid(i)) * fieldAmt; 
 			    orth[i] = vf[i].sp( ninetydegrees );
 			}
 					   
@@ -192,7 +206,7 @@ struct MyApp :  AppR2T {  //MainLoop,
 			for (int j = 0; j < numDipoles; ++j ){ 
 				float t = 1.0 * j/numDipoles;
 				dls[j] = Ro::dls( dp[j], .2 + .3 * t);
-				par[j] = Ro::par( dls[j], Vec::y );// * (j&1?-1:1) ) * .1; 
+				par[j] = Ro::par( dls[j], vsr::Vec::y );// * (j&1?-1:1) ) * .1; 
 		   } 	            
 		 
 		
@@ -224,7 +238,7 @@ struct MyApp :  AppR2T {  //MainLoop,
 		for (int i = 0; i < app.numDipoles; ++i){ 
 			float x =  argv[i*2]->f; 
 			float y =  argv[i*2+1]->f; 
-			app.dp[i] = Vec( app.ow + app.tw*x, app.oh + app.th*(1-y),0);
+			app.dp[i] = vsr::Vec( app.ow + app.tw*x, app.oh + app.th*(1-y),0);
 			//cout << " x " << x << " y " << y << endl;
 		 }  
 		  
@@ -266,7 +280,7 @@ struct MyApp :  AppR2T {  //MainLoop,
 			float x =  ( argv[1] -> i ) / 3000.0; 
 			float y =  ( argv[2] -> i ) / 2500.0; 
 			
-			app.dp[idx] = Vec( (app.tw / 2.0 )*x, ( app.th /2.0) * (-y),0); 
+			app.dp[idx] = vsr::Vec( (app.tw / 2.0 )*x, ( app.th /2.0) * (-y),0); 
 		} 
 	}
   

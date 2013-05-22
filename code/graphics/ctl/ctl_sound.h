@@ -16,20 +16,20 @@
 
 namespace ctl {
 
-using namespace gam;
+//using namespace gam;
 
-void audioCB(AudioIOData& io);
+void audioCB(gam::AudioIOData& io);
 
 struct Sound {
-  AudioIO io;
-  Sound() : io(512, 44100, audioCB, this, 2) {
-    Sync::master().spu(io.framesPerSecond());
+  gam::AudioIO io;
+  Sound() : io(1024, 22050, audioCB, this, 1) {
+    gam::Sync::master().spu(io.framesPerSecond());
     io.start();
   }
-  virtual void onSound(AudioIOData& io) = 0;
+  virtual void onSound(gam::AudioIOData& io) = 0;
 };
 
-void audioCB(AudioIOData& io) {
+void audioCB(gam::AudioIOData& io) {
   ((Sound*)io.user())->onSound(io);
 }
 
