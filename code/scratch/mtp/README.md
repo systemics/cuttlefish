@@ -21,7 +21,9 @@
 
 # information on the ASUS bluetooth dongle on the pi #
 
-note: tested in linux/macbookair. same hanging behaviour as on the pi.
+note: tested in linux/macbookair. same hanging behaviour as on the pi. that
+means that it's a hardware issue. not a power or driver issue. buy a different
+part.
 
 hci0: Type: BR/EDR  Bus: USB
   BD Address: 00:02:72:C0:66:02  ACL MTU: 1022:8  SCO MTU: 121:3
