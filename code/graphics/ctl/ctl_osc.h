@@ -17,7 +17,7 @@ namespace ctl {
 	     
 		lo_server_thread st;   
 		
-		OSCPacketHandler() { start(); }
+		OSCPacketHandler() { startOSC(); }
 		                                                                                                          
 		//LIBLO MESSAGE SIGNATURE
 		typedef int (*CB)(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data); 
@@ -31,7 +31,7 @@ namespace ctl {
 		    lo_server_thread_add_method( st, name.c_str(), types.c_str(), *cb, ud); 
 		}
 		
-		void start(){
+		void startOSC(){
 			
 		
 	       st = lo_server_thread_new("8082", 0); 

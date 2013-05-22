@@ -33,10 +33,16 @@ struct AppR2T : App, OSCPacketHandler {
 		Texture * tmp = textureA; textureA = textureB; textureB = tmp;
 	}  
 	  
-	void initPipeline(){    
+	void initPipeline(){ 
+	   
+	 	//defaults
+		ux = uy = .05;
+		traceAmt = .9;
+		bluramt = 0.17;    
 		
 		//Make Two Textures the size of the screen (as big as possible anyway: there are memeory limitations )   
-		int tw = surface.width/2.0; int th =  surface.width/2.0;
+		//int tw = surface.width; int th =  surface.width; 
+		int tw = 1280; int th = 853;
 		textureA = new Texture( tw,th);//surface.width/2.0, surface.height/2.0 );   
 		textureB = new Texture( tw,th);//surface.width/2.0, surface.height/2.0 );  		                    
 		                                                                             
