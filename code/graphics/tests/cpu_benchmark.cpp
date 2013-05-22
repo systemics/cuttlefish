@@ -15,7 +15,7 @@
 #include "ctl_gl.h"
 
 #include "ctl_glsl.h"
-#include "ctl_mdraw.h"
+#include "ctl_pipe.h"
 #include "ctl_scene.h"
 
 #include "ctl_render.h"  
@@ -39,7 +39,7 @@ using namespace vsr;
 int identifier;   
 
 
-struct MyWindow : BCM, Timer, public Window {    
+struct MyWindow : BCM,  public Window {    
 	
 	 	Scene scene;
 		ShaderProgram program;
@@ -81,7 +81,7 @@ struct MyWindow : BCM, Timer, public Window {
              srand( time(NULL) );
 
 			string Vert = AVertex + Varying + UMatrix  + NTransform + VLighting + VCalc + MVert;
-			string Frag = USampler + Varying + MFrag;
+			string Frag = MFrag;
 
 	        program.source(Vert,Frag);
 			program.bind();

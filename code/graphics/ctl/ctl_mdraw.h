@@ -9,8 +9,8 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-#ifndef ctl_pipe_h
-#define ctl_pipe_h
+#ifndef ctl_mdraw_h
+#define ctl_mdraw_h
 
 #include "ctl_gl_vattrib.h"
 #include "ctl_gl_vbo.h"

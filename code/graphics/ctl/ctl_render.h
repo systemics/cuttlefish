@@ -15,22 +15,15 @@
 #ifndef CTL_RENDER_H_INCLUDED
 #define CTL_RENDER_H_INCLUDED
 
-#include "VSR/vsr.h"
+#include "vsr.h"
 #include "vsr_xf.h"
 #include "vsr_field.h"
 
-//#include "ctl_matrix.h"
-#include "ctl_mdraw.h"
-// #include "ctl_scene.h"
-// #include "ctl_gl_mbo.h"
-// #include "ctl_gl_shader.h"  
+#include "ctl_pipe.h"
  
 using namespace vsr;
 	
 namespace ctl {
-     
-
-	using GL::Pipe;
 	
 	template<class A> void Render ( const A& a, const Mat4f& mvm, Pipe& pipe ){ cout << "nothing to render this element\n" << endl;  }
 	template<class A> void Render (  vsr::Field<A>& a, const Mat4f& mvm, Pipe& pipe ){ cout << "nothing to render this field\n" << endl; }
@@ -122,9 +115,7 @@ namespace ctl {
 	
 	
 	template<> void Render(vsr::Field<vsr::Pnt>& f, const Mat4f& mvm, Pipe& pipe ){
-		static float mv[16];
-		static Mat4f mat;
-		static Mat4f tmp;
+
 		static MBO points ( Mesh::Points( f.dataPtr(), f.num() ), GL::DYNAMIC );
 		
 		// points.mesh
@@ -134,7 +125,22 @@ namespace ctl {
 		points.update();
 		pipe.line(points);
 		
-	}
+	}  
+	
+	template<> void Render(vsr::Field<vsr::Vec>& f, const Mat4f& mvm, Pipe& pipe ){
+
+		static MBO points ( Mesh::Points2( &(f.grid(0)), f.dataPtr(), f.num() ).mode(GL::L), GL::DYNAMIC );
+		
+		// points.mesh
+		for (int i = 0; i < f.num(); ++i){  
+			Vec3f v( f.grid(i) );
+			points.mesh[i*2+1].Pos = v + Vec3f( f[i] ); 
+		}
+		points.update();
+		pipe.line(points);
+		
+	}	
+	
 }
 
 #endif

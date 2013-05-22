@@ -5,6 +5,9 @@ pablo colapinto and karl yerkes
 
 */    
 
+#ifndef CTL_APP_H_INCLUDED
+#define CTL_APP_H_INCLUDED
+
 #include "ctl_egl.h"
 #include "ctl_gl.h"
 #include "ctl_bcm.h"
@@ -115,4 +118,6 @@ namespace ctl {
 	  
 	};
 	
-}
+} 
+
+#endif

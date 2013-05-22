@@ -42,6 +42,21 @@
       target:"OSC", key:'/bluramt',
     })
 
+    // send a message to the address '/slider'
+    f = new Interface.Slider({
+      bounds:[0,.50,.5,.10],
+      isVertical:false, 
+	  label: 'velocity',
+      target:"OSC", key:'/vel',
+    })   
+
+    g = new Interface.Button({
+      bounds:[.5,.5,.1,.1],
+	  label: 'reset',
+	  mode:'toggle',
+      target:"OSC", key:'/reset',
+    })
+
      xy = new Interface.XY({
 	  childWidth: 25,
 	  numChildren: 4, 
@@ -64,7 +79,7 @@
 	});
 
 
-    panel.add( b, c, d, e, xy );
+    panel.add( b, c, d, e, f,g, xy );
     
     Interface.OSC.receive = function(address, typetags, parameters) {
       window.alert(address + typetags + parameters);
