@@ -1,5 +1,6 @@
 PORT = 22
-HOST = pi@192.168.2.4
+HOST = pi-la
+#pi@192.168.2.4
 #@192.168.2.2
 NAME = main
 
