@@ -2,6 +2,7 @@
 #define CTL_SCREEN_H_INCLUDED  
 
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
