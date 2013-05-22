@@ -8,145 +8,146 @@
 #ifndef CTL_TOUCH_H_INCLUDED
 #define CTL_TOUCH_H_INCLUDED
 
-#include <assert.h>
-#include <stdint.h>
-#include <linux/input.h>
-#include <string.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <map>
-#include <iostream>
 #include <algorithm>
+#include <fcntl.h>
+#include <linux/input.h>
+#include <signal.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+#include <thread>
+#include <unistd.h>
+
 using namespace std;
 
 #define BITS_PER_LONG (sizeof(long) * 8)
 #define NBITS(x) ((((x)-1)/BITS_PER_LONG)+1)
-#define OFF(x)  ((x)%BITS_PER_LONG)
-#define BIT(x)  (1UL<<OFF(x))
+#define OFF(x) ((x)%BITS_PER_LONG)
+#define BIT(x) (1UL<<OFF(x))
 #define LONG(x) ((x)/BITS_PER_LONG)
-#define test_bit(bit, array)  ((array[LONG(bit)] >> OFF(bit)) & 1)
+#define test_bit(bit, array) ((array[LONG(bit)] >> OFF(bit)) & 1)
+#define N_SLOTS (16)
+
+namespace ctl {
 
 struct TouchPoint {
-  int id;
-  int x, y, major, minor, orientation;
-
+  int id, n, x, y, major, minor, orientation;
   inline void make() {
     id = -1;
     x = y = major = minor = orientation = 0;
   }
 };
 
-struct CompareTouchPoint {
-  bool operator() (const TouchPoint& a, const TouchPoint& b) {
-    return a.id < b.id;
-  }
-};
-
-namespace ctl {
-
 struct Touch {
-  unsigned activeTouchIndex, touchCount;
-  TouchPoint touchPoint[16];
   int fd, rd;
+  int slot = -1, touchCount = 0;
   struct input_event ev[64];
-  int version;
-  unsigned short id[4];
   unsigned long bit[EV_MAX][NBITS(KEY_MAX)];
+  TouchPoint rawTouch[N_SLOTS];
+  TouchPoint touchPoint[N_SLOTS];
 
-  Touch(const char* deviceName = "/dev/input/event0") {
-    make(deviceName);
-  }
+  Touch() {
+    if ((fd = open("/dev/input/event0", O_RDONLY | O_NONBLOCK)) < 0) {
+      printf("FAIL!\n");
+    }
 
-  virtual ~Touch() {
-  }
-
-  int make(const char* deviceName) {
-    assert((fd = open(deviceName, O_RDONLY | O_NONBLOCK)) >= 0);
     memset(bit, 0, sizeof(bit));
     ioctl(fd, EVIOCGBIT(0, EV_MAX), bit[0]);
 
-    for (int i = 0; i < 16; ++i)
-      touchPoint[i].make();
-    activeTouchIndex = -1, touchCount = 0;
+    for (int i = 0; i < N_SLOTS; ++i)
+      rawTouch[i].make();
+
+    slot = -1;
+    touchCount = 0;
   }
 
-  int poll() {
-    rd = read(fd, ev, sizeof(struct input_event) * 64);
+  bool pollTouches() {
+    usleep(1000);
 
-    if (rd < (int) sizeof(struct input_event)) {
-      //perror("error reading\n");
-      return -1;
-    }
+    rd = read(fd, ev, sizeof(struct input_event) * 64);
+    if (rd < (int) sizeof(struct input_event))
+      return false;
 
     for (unsigned i = 0; i < rd / sizeof(struct input_event); i++) {
       if (ev[i].type != 3)
         continue;
 
       switch (ev[i].code) {
+
+        // x position
+        //
         case 53:
-        case 0:
-          if (activeTouchIndex == -1)
+        //case 0:
+          if (slot == -1)
             continue;
-          touchPoint[activeTouchIndex].x = ev[i].value;
+          rawTouch[slot].x = ev[i].value;
           break;
 
+        // y position
+        //
         case 54:
-        case 1:
-          if (activeTouchIndex == -1)
+        //case 1:
+          if (slot == -1)
             continue;
-          touchPoint[activeTouchIndex].y = ev[i].value;
+          rawTouch[slot].y = ev[i].value;
           break;
 
+        // rawTouch ellipse size on the major axis
+        //
         case 48:
-          if (activeTouchIndex == -1)
+          if (slot == -1)
             continue;
-          touchPoint[activeTouchIndex].major = ev[i].value;
+          rawTouch[slot].major = ev[i].value;
           break;
 
+        // rawTouch ellipse size on the major axis
+        //
         case 49:
-          if (activeTouchIndex == -1)
+          if (slot == -1)
             continue;
-          touchPoint[activeTouchIndex].minor = ev[i].value;
+          rawTouch[slot].minor = ev[i].value;
           break;
 
+        // rawTouch ellipse orientation
+        //
         case 52:
-          if (activeTouchIndex == -1)
+          if (slot == -1)
             continue;
-          touchPoint[activeTouchIndex].orientation = ev[i].value;
+          rawTouch[slot].orientation = ev[i].value;
           break;
 
+        // slot
+        //
         case 47:
-          activeTouchIndex = ev[i].value;
+          slot = ev[i].value;
           break;
 
+        // unique tracking id
+        //
         case 57:
-          if (ev[i].value == -1) {
+          rawTouch[slot].n = touchCount;
+          if (ev[i].value == -1)
             touchCount--;
-            cout << "lost touch\n";
-          }
-          else {
+          else
             touchCount++;
-            cout << "found touch\n";
-          }
-          touchPoint[activeTouchIndex].id = ev[i].value;
+          rawTouch[slot].id = ev[i].value;
           break;
       }
     }
 
-    //sort(touchPoint, touchPoint + (sizeof(touchPoint) / sizeof(touchPoint[0])), CompareTouchPoint());
+    memcpy(touchPoint, rawTouch, sizeof(rawTouch));
     sort(touchPoint, touchPoint + (sizeof(touchPoint) / sizeof(touchPoint[0])),
       [](const TouchPoint& a, const TouchPoint& b) {
-        return a.id < b.id;
+        return a.n < b.n;
       }
     );
 
-    /*
-    for (int k = 0; k < 16; ++k)
-      if (touchPoint[k].id != -1)
-        printf("(%i, %i) ", touchPoint[k].x, touchPoint[k].y);
-    printf("\n");
-    */
+    //printf("%u ", touchCount);
+    //for (int k = 0; k < N_SLOTS; ++k)
+    //  if (touchPoint[k].id != -1)
+    //    printf("%u:(%i, %i) ", touchPoint[k].n, touchPoint[k].x, touchPoint[k].y);
+    //printf("\n");
+    return true;
   }
 };
 
