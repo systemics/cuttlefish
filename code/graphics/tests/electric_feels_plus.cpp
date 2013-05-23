@@ -51,9 +51,9 @@ struct MyApp :  AppR2T, Sound {  //MainLoop,
 
 	MyApp() : 
 	AppR2T( 21.5, 14.5 ),
-    f(20,3,1,4), vf(33,7,1,2.5), orth(33,7,1,2.5),
-
+    f(20,3,1,4), vf(34,7,1,2.5), orth(34,7,1,2.5),
     delay(0.211)
+
 	{
     for (int i = 0; i < 5; ++i)
       sineD[i] = gam::SineD<>(300.0 + (213.0 * i) , 0.9, 0.3);
@@ -69,8 +69,7 @@ struct MyApp :  AppR2T, Sound {  //MainLoop,
 		dls = new Dls[numDipoles];
 		par = new Par[numDipoles]; 
 	   
-		//INITIALIZE RANDOM WEIGHTS  
-		
+		//INITIALIZE RANDOM WEIGHTS  	
 		numParticles = f.num();
 		Rand::Seed(10);
 		s = new float[ numParticles ];
@@ -296,17 +295,12 @@ void quit(int) {
 
 int main(){
 	
- //   MyApp().start();
 	MyApp app;
 	
   while(running){
  		app.onFrame();
  		usleep(1666);
  	}   
-     // while(running){
-	// 	app.onFrame();
-	// 	usleep(1666);
-	// }   
 	
 	  return 0; 
 }

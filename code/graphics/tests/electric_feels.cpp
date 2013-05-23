@@ -38,7 +38,7 @@ struct MyApp : AppR2T {
     f(40,7,1,2), vf(20,5,3,3)    
 	{
         
-		bReset = 0;
+		bReset = 1;
 
 		numDipoles = 4;
 		dp = new Vec[numDipoles]; 

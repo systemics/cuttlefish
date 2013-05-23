@@ -45,7 +45,7 @@ struct AppR2T : App, OSCPacketHandler {
 		bUX = bUY = bBLUR = bTRACE = 0;   
 		
 		//Make Two Textures the size of the screen (as big as possible anyway: there are memeory limitations )   
-		int tw = surface.width /2.0; int th =  surface.width/2.0; 
+	    int tw = surface.width /2.0; int th =  surface.width/2.0; 
 		//int tw = 1280; int th = 853;
 		textureA = new Texture( tw,th);//surface.width/2.0, surface.height/2.0 );   
 		textureB = new Texture( tw,th);//surface.width/2.0, surface.height/2.0 );  		                    
