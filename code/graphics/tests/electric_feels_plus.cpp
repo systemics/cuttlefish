@@ -42,6 +42,7 @@ struct MyApp :  AppR2T, Sound {  //MainLoop,
 	float cam; // camera z position
 
 	vsr::Vec * dp;   
+	vsr::Vec * dpdir; 
     vsr::Dls * dls;  
 	vsr::Par * par; 
 	
@@ -51,21 +52,22 @@ struct MyApp :  AppR2T, Sound {  //MainLoop,
 
 	MyApp() : 
 	AppR2T( 21.5, 14.5 ),
-    f(20,3,1,4), vf(34,7,1,2.5), orth(34,7,1,2.5),
+    f(20,7,1,2), vf(25,5,1,3.5), orth(25,5,1,3.5),
     delay(0.211)
 
 	{
     for (int i = 0; i < 5; ++i)
-      sineD[i] = gam::SineD<>(300.0 + (213.0 * i) , 0.9, 0.3);
-
+ //     sineD[i] = gam::SineD<>(300.0 + (213.0 * i) , 0.9, 0.3);
+      sineD[i] = gam::SineD<>(300.0 + (113.0 * i) , 0.9, 0.3); 
 		//defaults
 		bReset = 1;
-		vel = .99; 
+		vel = 3.99; 
 		equiAmt = .5;
 		fieldAmt = .5;
 		
 		numDipoles = 5;
 		dp = new vsr::Vec[numDipoles]; 
+		dpdir = new vsr::Vec[numDipoles];
 		dls = new Dls[numDipoles];
 		par = new Par[numDipoles]; 
 	   
@@ -190,7 +192,7 @@ struct MyApp :  AppR2T, Sound {  //MainLoop,
 					float dist = 1.0 / sqd;  
 					tpar += par[j] * dist;
 				 }
-				Pnt np = Ro::loc( vf.grid(i).sp ( Gen::bst( tpar * vel )  ) );
+				Pnt np = Ro::loc( vf.grid(i).sp ( Gen::bst( tpar  )  ) );
 				vf[i] = vsr::Vec(np - vf.grid(i)) * fieldAmt; 
 			    orth[i] = vf[i].sp( ninetydegrees );
 			}
@@ -201,7 +203,7 @@ struct MyApp :  AppR2T, Sound {  //MainLoop,
 			for (int j = 0; j < numDipoles; ++j ){ 
 				float t = 1.0 * j/numDipoles;
 				dls[j] = Ro::dls( dp[j], .2 + .3 * t);
-				par[j] = Ro::par( dls[j], vsr::Vec::y );// * (j&1?-1:1) ) * .1; 
+				par[j] = Ro::par( dls[j],  dpdir[j] );//vsr::Vec::y );// * (j&1?-1:1) ) * .1; 
 		   } 	            
 		 
 		
@@ -277,7 +279,7 @@ struct MyApp :  AppR2T, Sound {  //MainLoop,
 			float x =  ( argv[1]->i ) / 3000.0; 
 			float y =  ( argv[2]->i ) / 2500.0; 
 
-      // argv[3]->i // this is the orientation (-32, 32)
+		    app.dpdir[idx] = vsr::Vec::y.sp( Gen::rot( Biv::xy * ( argv[3]->i ) / 32.0 ) ); // this is the orientation (-32, 32)
 			
 			app.dp[idx] = vsr::Vec( (app.tw / 2.0 )*x, ( app.th /2.0) * (-y),0); 
 

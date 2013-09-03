@@ -59,12 +59,49 @@ struct AppR2T : App, OSCPacketHandler {
 		//This Shader Will Be the "Feedback Shader" that adds a bit of the previously drawn Frame on top
 		string FragB = TFragAlpha;
 		texalpha.program = new ShaderProgram( ClipSpaceVert, FragB, 0 );
-		texalpha.bindAll();		
+		texalpha.bindAll();	
+		
+		 fboA.attach(*textureA, GL::COLOR);
+
+			
+		// swapBuffers();
+		//   fboA.attach(*textureA, GL::COLOR); 
+		// fboA.bind();               
+		// 
+		//     glViewport(0,0,textureA->width(),textureA->height() ); 
+		// 	glClearColor(0,0,0,1);
+		//            	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// fboA.unbind();	
 	}
  
-	void initSlab(){
+	void initSlab(){    
+		
 		cout << "init buffer objects" << endl;   	    	
-		rect = new MBO( Mesh::Rect( 2.0, 2.0 ).color(0,0,0,1.0) );
+		rect = new MBO( Mesh::Rect( 2.0, 2.0 ).color(0,0,0,1.0) ); 
+		 
+		glClearColor(0,0,0,1);  
+		
+		//        	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// 
+		// fboA.bind();
+		// glViewport(0,0,textureA->width(),textureA->height() ); 
+		// glClearColor(0,0,0,1);
+		//        	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// 	pipe.bind(scene.xf);
+		// 	pipe.line(*rect); 
+		// 	pipe.unbind();
+		// fboA.unbind();   
+		// 
+		// glViewport(0,0,surface.width,surface.height); 
+		// 
+		//  
+		// texpipe.bind (); 
+		// 
+		// texpipe.line(*rect);
+		// 	    
+		// 	    texpipe.unbind(); 
+	
+	             
 	}
 	
 	void initOSC(){
@@ -90,7 +127,7 @@ struct AppR2T : App, OSCPacketHandler {
    //This is the texture feedback loop 
 	virtual void onDraw(){     
         
- 		swapTextures();
+
 		//Write into textureA using textureB 
 		fboA.attach(*textureA, GL::COLOR);  
 		fboA.bind();               
@@ -101,8 +138,8 @@ struct AppR2T : App, OSCPacketHandler {
 			
 			//We add a bit of the previously drawn frame
 			texalpha.bind();
-			float nt = traceAmt;
-			    texalpha.program -> uniform("alpha", nt); 
+		   // float nt = traceAmt;
+			    texalpha.program -> uniform("alpha", traceAmt); 
 							
 			    textureB -> bind();      
 					texalpha.line( *rect );
@@ -122,14 +159,16 @@ struct AppR2T : App, OSCPacketHandler {
 		//Switch to full Viewport and Bind Texture to Rect 
 	   glViewport(0,0,surface.width,surface.height);		
 		texpipe.bind ();
-		float nux = ux; float nuy = uy; float nb = bluramt;
-		texpipe.program -> uniform("ux" ,nux);
-		texpipe.program -> uniform("uy" ,nuy); 
-		texpipe.program -> uniform("bluramt", nb);
+		//float nux = ux; float nuy = uy; float nb = bluramt;
+		texpipe.program -> uniform("ux" ,ux);
+		texpipe.program -> uniform("uy" ,uy); 
+		texpipe.program -> uniform("bluramt", bluramt);
 			textureA -> bind();
 				texpipe.line( *rect );
 			textureA -> unbind();
-	    texpipe.unbind();
+	    texpipe.unbind();  
+	
+	 		swapTextures(); 
 
 	}  
 	

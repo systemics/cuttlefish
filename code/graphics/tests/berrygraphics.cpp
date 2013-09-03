@@ -16,7 +16,7 @@
 #include "ctl_egl.h"
 
 using namespace std;
-using namespace vsr::EGL;
+using namespace ctl::EGL;
 
 
 struct MyWindow : public Window {
