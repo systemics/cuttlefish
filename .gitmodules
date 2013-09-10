@@ -1,9 +1,6 @@
 [submodule "tools/mpssh"]
 	path = tools/mpssh
 	url = git://github.com/ndenev/mpssh.git
-[submodule "tools/murder"]
-	path = tools/murder
-	url = git://github.com/lg/murder.git
 [submodule "ext/Gamma"]
 	path = ext/Gamma
 	url = git://github.com/LancePutnam/Gamma.git
