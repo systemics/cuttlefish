@@ -1,0 +1,15 @@
+HashKnownHosts no
+
+Host *.cf
+  User pi
+  IdentityFile ~/.ssh/id_rsa.pi
+  StrictHostKeyChecking no
+  UserKnownHostsFile = /dev/null
+  LogLevel = quiet
+
+Host 192.168.2.*
+  User pi
+  IdentityFile ~/.ssh/id_rsa.pi
+  StrictHostKeyChecking no
+  UserKnownHostsFile = /dev/null
+  LogLevel = quiet
