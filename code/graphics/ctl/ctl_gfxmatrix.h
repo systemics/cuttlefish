@@ -13,15 +13,15 @@
 //#include "vsr/vsr_frame.h"
 
 // #include "ctl_matrix.h" 
-#include "vsr_matrix.h" 
+#include "gfx/gfx_matrix.h" 
 #include <math.h>
 
 using namespace std;
 
 namespace ctl{
     
-    typedef vsr::Mat4<float> Mat4f;
-    typedef vsr::Mat4<double> Mat4d; 
+    typedef gfx::Mat4<float> Mat4f;
+    typedef gfx::Mat4<double> Mat4d; 
     
     /*! Transformation Matrices Container */
     struct XformMat {

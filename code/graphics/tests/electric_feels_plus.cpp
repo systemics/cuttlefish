@@ -22,8 +22,8 @@ struct MyApp :  AppR2T, Sound {  //MainLoop,
      
 	StopWatch<> stopWatch;  
     
-  gam::SineD<> sineD[5];
-  gam::Delay<> delay;
+  	gam::SineD<> sineD[5];
+  	gam::Delay<> delay;
 
 	MBO * field;
     MBO * potentials;  

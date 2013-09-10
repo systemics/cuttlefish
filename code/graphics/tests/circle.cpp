@@ -13,7 +13,7 @@
 #include "ctl_glsl.h"
 #include "ctl_mdraw.h"
 #include "ctl_scene.h"
-#include "ShaderManager.h"
+#include "ctl_shader_manager.h"
 
 #include <iostream>
 
@@ -24,10 +24,8 @@ using namespace ctl::GL;
 using namespace ctl::EGL;
 using namespace ctl::GLSL;
 
- 
 
 struct MyWindow : public Window {
-
 
 	
 	 	Scene scene;

@@ -1,24 +1,28 @@
 /*
 An App class for the raspberry pi built on the cuttlefish framework
 
-pablo colapinto and karl yerkes
+pablo colapinto and karl yerkes hell yeah!
 
 */    
 
-#ifndef CTL_APP_H_INCLUDED
-#define CTL_APP_H_INCLUDED
+#ifndef CF_APP_H_INCLUDED
+#define CF_APP_H_INCLUDED
 
-#include "ctl_egl.h"
-#include "ctl_gl.h"
+#ifndef __raspberry__
+#define __raspberry__
+#endif
+
 #include "ctl_bcm.h"
 #include "ctl_timer.h"
-
-#include "ctl_glsl.h"
-#include "ctl_pipe.h"
-#include "ctl_scene.h"  
 #include "ctl_host.h"
- 
 
+#include "gfx/gfx_scene.h" 
+#include "gfx/gfx_pipe.h"
+#include "gfx/gfx_gl.h"  
+
+#include "ctl_egl.h"
+ 
+using namespace gfx;
 
 namespace ctl {
 	
@@ -27,17 +31,19 @@ namespace ctl {
 
 	struct App :  BCM, Host, Window { 
 	        
-		Scene scene;   		///<-- Transformation Matrices
-		
+		Scene scene;   		///<-- Transformation Matrices   	
 		Pipe pipe;	   		///<-- Graphics Pipeline    
+		 
+		Vec4f background;
 		
 		Pose viewpose;
 		float width, height; ///<-- Width, Height of each screen in inches
 	
-	     App (float w, float h) : Window()
+	     App (float w, float h, float z=30.0) : Window(), background(0,0,0,1)
 		{        		
-			initView(w,h);
+			initView(w,h,z);
             initGL();
+
         }
 
 	    ~App(){}     
@@ -63,17 +69,18 @@ namespace ctl {
 			
 		}
 		      
-		void initView(float w, float h, float z = 20.0){
+		void initView(float w, float h, float z){
 
 			width =  w;
 			height = h;     
 
   		    float aspect = width / height;   
-
+             
+			scene.fit(w,h);
 
 			int numscreens = 4;
 
-			vsr::Vec3f viewer(0,0,z);  //Position in inches
+			Vec3f viewer(0,0,z);  //Position in inches
 
 
 			Pose p(-width/2.0,-height/2.0, 0);
@@ -98,51 +105,17 @@ namespace ctl {
 		          break;  
 			}
 
-			scene.camera.view() = View( viewer, p, aspect, height );
-			scene.camera.pos() = Vec3f( 0, 0, z);
+			scene.cam.view = View( viewer, p, aspect, height );
+			scene.cam.pos() = Vec3f( 0, 0, z);
        }  
-
-		// void viewerAt( float x, float y, float z){ 
-		// 	
-		// 	width =  w;
-		// 	height = h;     
-		// 
-		//   		    float aspect = width / height;
-		// 
-		// 	 vsr::Vec3f viewer(0,0,50);  //Position in inches
-		// 	 
-		// 	Pose p(-width/2.0,-height/2.0, 0);  
-		// 	
-		// 	switch( identifier ){
-		// 
-		// 		case 2:
-		// 			p = Pose( - width * 2, - height / 2.0, 0 );
-		// 			break;
-		// 		case 3:
-		// 			p = Pose( - width , - height / 2.0, 0 );
-		// 			break;
-		// 		case 4:
-		// 			p = Pose( 0, - height / 2.0, 0 );
-		// 			break;
-		// 		case 5:
-		// 			p = Pose( width, - height / 2.0, 0 );
-		// 			break;
-		// 
-		//         default:  
-		// 			cout << "USING DEFAULT SCREEN VIEW POSE" << endl;
-		//           break;  
-		// 	}
-		// 
-		// 	scene.camera.view() = View( viewer, p, aspect, height );
-		// 	scene.camera.pos() = Vec3f( 0, 0, 50);
-		// }    
+   
 
 	
 		virtual void onFrame(){
 
 			  
-			
-	         glClearColor(0,0,0,1);
+			 glViewport(0,0,surface.width,surface.height); 
+	         glClearColor(background[0],background[1],background[2],background[3]);
 	         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
              
              scene.onFrame();

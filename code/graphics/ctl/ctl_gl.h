@@ -16,7 +16,7 @@ using namespace std;
 
 #include "ctl_gxlib.h"
 //#include "ctl_matrix.h"
-#include "vsr_matrix.h" 
+#include "gfx/gfx_matrix.h" 
 
 #include <stdio.h>   
 

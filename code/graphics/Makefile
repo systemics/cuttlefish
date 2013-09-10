@@ -17,14 +17,14 @@ LIB_DIR		= $(BUILD_DIR)lib/
 PCH_DIR 	= $(BUILD_DIR)pch/
 EXT_DIR		= ../../ext/
 
-EXEC_TARGETS = tests/%.cpp tests/%.c
+EXEC_TARGETS = tests/%.cpp tests/%.c  examples/%.cpp
 
-PIROOT = $(HOME)/code/pi/root/
+PIROOT = $(HOME)/pi-root/
 
 INC_DIR = ctl/
 SRC_DIR = src/
 
-VPATH = $(EXT_DIR)/vsr/build/pch/:\
+VPATH = $(EXT_DIR)/vsr/:\
 		$(INC_DIR):\
 		$(SRC_DIR):\
 		$(PIROOT):\
@@ -40,12 +40,13 @@ IPATH += -I$(PIROOT)opt/vc/include/interface/vmcs_host/linux
 LDFLAGS += -L$(PIROOT)lib
 LDFLAGS += -L$(PIROOT)usr/lib
 LDFLAGS += -L$(PIROOT)usr/local/lib
-LDFLAGS += -L$(PIROOT)opt/vc/lib
+LDFLAGS += -L$(PIROOT)opt/vc/lib 
+LDFLAGS += -L$(EXT_DIR)Gamma/build/lib
 #LDFLAGS += -L$(PIROOT)lib/arm-linux-gnueabihf
 #LDFLAGS += -L$(PIROOT)usr/lib/arm-linux-gnueabihf
 LDFLAGS += -lEGL
 LDFLAGS += -lGLESv2
-LDFLAGS += -lGamma
+#LDFLAGS += -lGamma
 LDFLAGS += -lpthread
 LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libportaudio.a
 LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libjack.a
@@ -62,8 +63,8 @@ LDFLAGS += -lvchiq_arm
 LDFLAGS += -lvcos
 
 USEVSR = 0
-VSRFLAGS = -L$(EXT_DIR)/vsr/build/lib/ -lvsr -I$(EXT_DIR)/vsr/build/pch/ -I$(EXT_DIR)/vsr/ -I$(EXT_DIR)/vsr/VSR/Elements/ -I$(EXT_DIR)/vsr/VSR/
-
+VSRFLAGS = -I$(EXT_DIR)/vsr/ -I$(EXT_DIR)/gfx/
+#-L$(EXT_DIR)/vsr/build/lib/ -lvsr -I$(EXT_DIR)/vsr/build/pch/ 
 
 FORCE:
 
