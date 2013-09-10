@@ -4,9 +4,9 @@
 [submodule "tools/murder"]
 	path = tools/murder
 	url = git://github.com/lg/murder.git
-[submodule "ext/vsr"]
-	path = ext/vsr
-	url = git://github.com/wolftype/vsr.git
 [submodule "ext/Gamma"]
 	path = ext/Gamma
 	url = git://github.com/LancePutnam/Gamma.git
+[submodule "ext/gfx"]
+	path = ext/gfx
+	url = git://github.com/wolftype/gfx.git
