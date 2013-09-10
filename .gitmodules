@@ -9,4 +9,4 @@
 	url = git://github.com/wolftype/gfx.git
 [submodule "ext/vsr"]
 	path = ext/vsr
-	url = git@github.com:wolftype/vsr2.0.git
+	url = git://github.com/wolftype/vsr2.0.git

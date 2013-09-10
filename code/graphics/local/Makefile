@@ -1,6 +1,6 @@
 #MAKEFILE FOR MAKING ON THE RASPBERRY PI ITSELF
 
-CXX=g++
+CXX=g++ -std=c++0x
 
 #define raspberry and undefine linux
 CXXFLAGS = -D __raspberry__ -U __linux__
@@ -9,10 +9,10 @@ CXXFLAGS = -D __raspberry__ -U __linux__
 LDFLAGS =  -L/usr/lib -L/opt/vc/lib/ -lGLESv2 -lEGL -lstdc++ -lm -lbcm_host -lvcos
 
 #include path
-IPATH = -Ictl -I/usr/include -I/opt/vc/include -I/opt/vc/include/interface/vcos/pthreads
+IPATH = -Ictl -I/usr/include -I/opt/vc/include -I/opt/vc/include/interface/vcos/pthreads -I/opt/vc/include/interface/vmcs_host/linux -I../../ext/gfx/ -I../../ext/vsr/
 
 #executables
-EXEC= tests/%.cpp tests/%.c
+EXEC= tests/%.cpp tests/%.c examples/%.cpp
 
 BIN_DIR = build/bin/
 OBJ_DIR = build/obj/
