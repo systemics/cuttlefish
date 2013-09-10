@@ -56,7 +56,12 @@ namespace ctl {
 		}
 	     
 		virtual void init() = 0; 		
-		virtual void onDraw() = 0;
+		virtual void onDraw() = 0;   
+		
+		//calculation view from row, col and width height
+		Pose calcView(int row, int col, int trow, int tcol, float w, float h){
+			
+		}
 		      
 		void initView(float w, float h, float z = 20.0){
 
