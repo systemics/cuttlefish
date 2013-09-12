@@ -38,8 +38,7 @@ struct MyApp : public App {
 	void update(){
 	   
 		time +=.01; 
-	     
-		mbo -> mesh.moveTo( )
+
 	}
 
 	//THIS DRAWS THE CIRCLE TO THE SCREEN
