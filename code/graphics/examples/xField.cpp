@@ -45,21 +45,5 @@ struct MyApp : public App {
 	
 }; 
 
-bool running = true;
-void quit(int) {
-  running = false;
-}
-
-
-int main(){
-	
-	MyApp app; 
-  
-	while(running){
-		app.onFrame();
-		usleep(166);
-	}   
-	
-	  return 0; 
-}
+STARTANDRUN()
 

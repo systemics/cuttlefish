@@ -37,8 +37,11 @@ namespace ctl {
 		Vec4f background;
 		
 		Pose viewpose;
-		float width, height; ///<-- Width, Height of each screen in inches
-	
+		float width, height; ///<-- Width, Height of each screen in inches  
+		
+		Mat4f mvm; 			 //transformation matrix of scene
+		
+		
 	     App (float w, float h, float z=30.0) : Window(), background(0,0,0,1)
 		{        		
 			initView(w,h,z);
@@ -61,7 +64,8 @@ namespace ctl {
 			
 		}
 	     
-		virtual void init() = 0; 		
+		virtual void init() = 0; 
+		virtual void update() = 0;
 		virtual void onDraw() = 0;   
 		
 		//calculation view from row, col and width height
@@ -80,7 +84,7 @@ namespace ctl {
 
 			int numscreens = 4;
 
-			Vec3f viewer(0,0,z);  //Position in inches
+			Vec3f viewer(0,0,z);  
 
 
 			Pose p(-width/2.0,-height/2.0, 0);
@@ -119,8 +123,15 @@ namespace ctl {
 	         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
              
              scene.onFrame();
- 
-	         onDraw();
+              
+             update();
+
+		   	 mvm = scene.xf.modelViewMatrixf();
+	         pipe.bind( scene.xf );
+
+	         	onDraw();
+			 
+		     pipe.unbind();
 			 swapBuffers();
 			
 		}  
@@ -130,7 +141,25 @@ namespace ctl {
 	      onFrame();
 	    }
 	  
-	};
+	}; 
+	
+	#define STARTANDRUN()  \
+	bool running = true; \
+	void quit(int) {     \
+	  running = false;   \
+	}                    \
+                         \
+	int main(){          \
+                         \
+		MyApp app;       \
+                         \
+		while(running){  \
+		   app.onFrame();\
+		   usleep(166);  \
+		}                \
+                         \
+		  return 0;      \
+	}
 	
 } 
 

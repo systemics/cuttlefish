@@ -35,15 +35,9 @@ struct MyApp : public App {
 
 	//THIS DRAWS THE CIRCLE TO THE SCREEN
 	virtual void onDraw(){ 
-		
-	   update();
-	   
-		
-       pipe.bind( scene.xf );  
-
-			pipe.line( *circle );
+		 
+		pipe.line( *circle );
 	
-	   pipe.unbind();
 	} 
 	
 }; 
