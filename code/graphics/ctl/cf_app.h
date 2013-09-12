@@ -109,8 +109,8 @@ namespace ctl {
 		          break;  
 			}
 
-			scene.cam.view = View( viewer, p, aspect, height );
-			scene.cam.pos() = Vec3f( 0, 0, z);
+			scene.camera.view = View( viewer, p, aspect, height );
+			scene.camera.pos() = Vec3f( 0, 0, z);
        }  
    
 

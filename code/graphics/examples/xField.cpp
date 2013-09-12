@@ -8,39 +8,36 @@ using namespace std;
 using namespace ctl; 
 using namespace vsr;
 
-struct MyApp : public App {
-    
-	Field<Vec> f;
+struct MyApp : public App {    
+	
+	float time;
+	
     //THIS IS THE APP SPECIFIC STUFF,    
-	MyApp() : App(30,20,40), f(10,10,10){ 
+	MyApp() : App(30,20,40){ 
 		init();
 	}
 	 
 	virtual void init(){
-		cir = CXY(1);
-		dlp = Dlp(0,1,0,0);
-		vec = Vec(1,0,0);
+
 	}  
 	
 	void update(){                          
-		static float time = 0; time+=.05;      
-		
-		for (int i =0; i < f.num(); ++i){
-			
-		}
+		time += .01;
 	}
 	
 	//YOUR CODE HERE!!!!!
 	virtual void onDraw(){
-		
-	   update();
-	   
-	   Mat4f m = scene.xf.modelViewMatrixf();
-       pipe.bind( scene.xf );  
-
-		    Render( f, m, pipe, 0, 1, 0, 1 );
-
-	   pipe.unbind();
+	    
+		Par p = Tnv(0,0,1) * sin(time);
+	
+	   	Field<Pnt> f(10,10,1);
+	
+		for (int i = 0; i < f.num(); ++i){
+			f[i] = f.grid(i).bst( p );
+		}
+	
+		DRAW(f);
+	 
 	} 
 	
 }; 

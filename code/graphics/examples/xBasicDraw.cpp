@@ -8,6 +8,9 @@ struct MyApp : public App {
         
     //THIS IS THE APP SPECIFIC STUFF, 
 	MBO * mbo;  
+	 
+	Quat model;
+	//Frame model;
 	
 	float time; 
 	
@@ -21,13 +24,11 @@ struct MyApp : public App {
 		
 		//Make a Mesh and add vertices
 		Mesh mesh;
-		mesh.add ( -1, -1, 0);
-		mesh.add ( -1, 1, 0);
-		mesh.add ( 1, 1,  0);
-		mesh.add ( 1, -1, 0);  
+		mesh.add ( -1, -1, 0).add();
+		mesh.add ( -1, 1, 0).add();
+		mesh.add ( 1, 1,  0).add();
+		mesh.add ( 1, -1, 0).add();  
 		
-		//add order vertices should be drawn
-		mesh.add(0).add(1).add(2).add(3);
 				
 		mbo = new MBO( mesh );
 	}  
@@ -35,7 +36,14 @@ struct MyApp : public App {
 	//THIS CHANGES THE POSITION OF THE CIRCLE
 	void update(){
 	   
-		time +=.01; 
+		time +=.01;
+		 
+		scene.model.rot() 	= Quat( sin( time) * PI, Vec3f(1,0,0) );
+		scene.camera.rot()  = Quat( sin( time) * PI, Vec3f(0,1,0) );
+		
+		// mbo -> mesh.rotateA( Quat( sin(time), Vec3f(0,1,0) ) );
+		// mbo -> mesh.translate( .05, 0, 0 );
+		// mbo -> update(); 
 
 	}
 
