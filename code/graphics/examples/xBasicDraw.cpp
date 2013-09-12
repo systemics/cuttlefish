@@ -9,10 +9,10 @@ struct MyApp : public App {
     //THIS IS THE APP SPECIFIC STUFF, 
 	MBO * mbo;  
 	
-	float time = 0; 
+	float time; 
 	
 	//INSTANTIATE THE APPLICATION WITH WIDTH AND HEIGHT
-	MyApp() : App(30, 20){ 
+	MyApp() : App(30, 20), time(0){ 
 		init();
 	}                                  
 	
