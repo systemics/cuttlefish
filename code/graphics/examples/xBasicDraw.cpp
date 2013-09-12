@@ -28,8 +28,6 @@ struct MyApp : public App {
 		
 		//add order vertices should be drawn
 		mesh.add(0).add(1).add(2).add(3);
-	   
-	    // mesh.mode( GL::LS );
 				
 		mbo = new MBO( mesh );
 	}  
