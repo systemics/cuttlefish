@@ -1,8 +1,6 @@
 #include "cf_app.h"
 #include "vsr/vsr.h"
 
-#include "vsr/vsr_frame.h"
-
 using namespace std;
 using namespace ctl; 
 using namespace vsr;
@@ -29,24 +27,17 @@ struct MyApp : public App {
 	
     //DRAW GEOMETRY TO SCREEN  
 	void onDraw(){ 
-		
-		for (int i = 0; i < 10; ++i){   
+	   
+			// Vec vec( sin(time) * height/4.0, cos(time) * height/4.0, 0 );
+			// DRAWCOLOR( vec, 1,1,0 ); 
 			
-			float t = 1.0 * i/10.0;
-            
-			Vec vec( sin(time) * width/6.0, 0, 0 );
+			Biv b = Biv::xz * .5 + Biv::xy * .5; //A Bivector (plane) Element
 			
-			//Create a complex operator
-			Bst bst = Gen::bst( Par( Tnv(1,0,0) ).sp( Gen::trs( vec ) ) * t );
-			    
-			//Apply operator to a circle
-			Cir cir = CXY(5).sp(bst);  
+			// Vec rvec = vec.re( b );
+			// DRAWCOLOR( rvec,0,1,1);  
 			
-			//		  name, r, g, b
-			DRAWCOLOR( cir, 0,1,0 ); 
-			DRAWCOLOR( vec, 1,1,0 );
-		}
-		 
+			DRAWCOLOR( b, 1,0,0);   
+			
 	} 
 	
 }; 
