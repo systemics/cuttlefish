@@ -1,0 +1,16 @@
+
+
+
+
+cross compile environment
+  troubles with windows
+    vagrant ssh does not work
+      gotta setup a putty key
+  need vagrant puppet to work so we can update the cross-compile machine
+
+wireless network
+  network is very slow here
+
+
+
+
