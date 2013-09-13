@@ -21,6 +21,7 @@ pablo colapinto and karl yerkes hell yeah!
 #include "gfx/gfx_gl.h"  
 
 #include "ctl_egl.h"
+#include "ctl_osc.h"
  
 using namespace gfx;
 
@@ -29,7 +30,7 @@ namespace ctl {
 	using namespace EGL;
     using namespace GLSL; 
 
-	struct App :  BCM, Host, Window { 
+	struct App :  BCM, Host, Window, OSCPacketHandler { 
 	        
 		Scene scene;   		///<-- Transformation Matrices   	
 		Pipe pipe;	   		///<-- Graphics Pipeline    
@@ -42,12 +43,23 @@ namespace ctl {
 		Mat4f mvm; 			 //transformation matrix of scene
 		
 		
-	     App (float w, float h, float z=30.0) : Window(), background(0,0,0,1)
+	     App (float w, float h, float z=30.0) : Window(), background(0,0,0,1), OSCPacketHandler() 
 		{        		
 			initView(w,h,z);
             initGL();
 
+	    addListener(GetTouch, "/touch", "iiii", this);  
+
         }
+
+      static int GetTouch( const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) { 
+        App& app = *(App*)user_data;
+        app.onTouch(argv[0]->i, argv[1]->i, argv[2]->i, argv[3]->i);
+      }
+
+      virtual void onTouch(int n, int x, int y, int t) {
+        cout << n << endl;
+      }
 
 	    ~App(){}     
 	 
