@@ -48,7 +48,7 @@ struct Touch {
   TouchPoint touchPoint[N_SLOTS];
 
   Touch() {
-    assert((fd = open("/dev/input/event0", O_RDONLY | O_NONBLOCK)) >= 0);
+    assert((fd = open("/dev/input/event2", O_RDONLY | O_NONBLOCK)) >= 0);
 
     memset(bit, 0, sizeof(bit));
     ioctl(fd, EVIOCGBIT(0, EV_MAX), bit[0]);

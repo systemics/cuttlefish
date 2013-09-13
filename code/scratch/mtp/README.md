@@ -4,7 +4,7 @@
 # install dependencies #
 
     sudo -s
-    apt-get install bluetooth bluez-tools
+    apt-get install bluetooth bluez-tools evtest
     /etc/init.d/bluetooth status
     /etc/init.d/bluetooth start
     /etc/init.d/bluetooth restart

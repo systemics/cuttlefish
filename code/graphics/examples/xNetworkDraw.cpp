@@ -47,8 +47,8 @@ struct MyApp : public App {
     //scene.model.rot()   = Quat( sin( time) * PI, Vec3f(1,0,0) );
     //scene.camera.rot()  = Quat( sin( time) * PI, Vec3f(0,1,0) );
 
-    mbo -> mesh.rotateA( Quat( sin(x), Vec3f(0,1,0) ) );
-    mbo -> mesh.translate( y, 0, 0 );
+    mbo -> mesh.rotateA( Quat( sin((x - 0.5) * 2), Vec3f(0,1,0) ) );
+    mbo -> mesh.translate( (y - 0.5) * 3, 0, 0 );
     mbo -> update();
   }
 
