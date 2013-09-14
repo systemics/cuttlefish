@@ -27,9 +27,14 @@ struct MyApp : public App {
 	}
 	
 	void onDraw(){	              
-		
+		 
+		Dll ln = DLN(0,1,0).rot( Biv::xy * time );
 		//
-		Dll twist = Twist::Along( DLN(0,1,0), PI * sin(time), 1 );
+		Dll twist = Twist::Along( ln, PI * sin(time), 1 );
+		
+		Cir c = CXY(1).trs( Vec(sin(time)*10, 0, 0) );
+		//
+		DRAWCOLOR(ln,1,0,0);
 		
 		//100 iterations 
 		for (int i = 0; i < 10; ++i){      
@@ -37,7 +42,7 @@ struct MyApp : public App {
 			float t = 1.0 * i/10.0;   ///<-- This value "t" will go from 0 to 1 as i increases from 0 to 100
 		   
 		 	// Twist a Circle around the line
-	    	Cir cir = CXY(1).sp( Gen::mot( twist * t ) );		
+	    	Cir cir = c.sp( Gen::mot( twist * t ) );		
 		   
 		 	DRAWCOLOR( cir, 0,1,0 );
 		

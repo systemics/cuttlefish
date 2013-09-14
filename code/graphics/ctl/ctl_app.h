@@ -19,7 +19,6 @@ pablo colapinto and karl yerkes
 #include "ctl_host.h"
  
 
-
 namespace ctl {
 	
 	using namespace EGL;

@@ -11,9 +11,9 @@ using namespace vsr;
 struct MyApp : public App {
     
 	//Some Geometric Elements
-	Cir cir;    //A Circle
+	Sph cir;    //A Circle
 	Vec vec;    //A Vector
-	Dlp dlp;    //A Dual Plane
+	Dlp dlp;    //A Plane
 	Par par;    //A Point Pair
 	Lin lin;    //A Line
 	
@@ -36,25 +36,29 @@ struct MyApp : public App {
 		time+=.05;      
 		
 		//a rotating circle
-		cir = CXY(5).sp( Gen::rot( Biv::xz * time) );
-		dlp = Dlp(0,1,0,0).sp( Gen::trs(0, sin(time)*height/4.0,0) );
-		vec = vec.sp( Gen::rot( Biv::xy * .1) ); 
+		cir = Ro::sur( CXY(5) );//.rot( Biv::xz * time );
+		dlp = Dlp(0,1,0,0).trs( Vec(0, sin(time)*height/4.0,0) );
+		vec = vec.rot( Biv::xy * .1 ); 
 		
-		par = (cir.dual() ^ dlp).dual();
-		lin = par ^ Inf(1);
+
+		
+		scene.model.rot() = Quat(sin(time)*.2, Vec(1,0,0) );
 	}
 	
 
 	//DRAW GEOMETRY TO SCREEN  
 
-    void onDraw(){
+    void onDraw(){         
+	
+		auto a = (cir.dual() ^ dlp).dual();
+		auto b = a ^ Inf(1); 
 		
 		//		  name, r, g, b
 		DRAWCOLOR( cir, 0,1,0 );
 		DRAWCOLOR( vec, 0,0,1 );  		
 		DRAWCOLOR( dlp, 0,1,1 );
-		DRAWCOLOR( par, 1,1,0 );
-		DRAWCOLOR( lin, 1,0,1 );  
+		DRAWCOLOR( a, 1,1,0 );
+		DRAWCOLOR( b, 1,0,1 );  
 
 	} 
 	

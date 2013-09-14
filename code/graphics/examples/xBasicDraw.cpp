@@ -38,12 +38,12 @@ struct MyApp : public App {
 	   
 		time +=.01;
 		 
-		scene.model.rot() 	= Quat( sin( time) * PI, Vec3f(1,0,0) );
-		scene.camera.rot()  = Quat( sin( time) * PI, Vec3f(0,1,0) );
-		
-		// mbo -> mesh.rotateA( Quat( sin(time), Vec3f(0,1,0) ) );
+		//scene.model.rot() 	= Quat( sin( time) * PI, Vec3f(1,0,0) );
+	    //scene.camera.rot()  = Quat( sin( time) * .2, Vec3f(0,1,0) );
+		//scene.camera.pos() = Vec3f(0,0,sin(time));
+		mbo -> mesh.rotate( Quat( .05, Vec3f(0,1,0) ) );
 		// mbo -> mesh.translate( .05, 0, 0 );
-		// mbo -> update(); 
+		mbo -> update(); 
 
 	}
 

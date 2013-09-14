@@ -37,7 +37,7 @@ struct MyApp : public App {
 			Vec vec( sin(time) * width/6.0, 0, 0 );
 			
 			//Create a complex operator
-			Bst bst = Gen::bst( Par( Tnv(1,0,0) ).sp( Gen::trs( vec ) ) * t );
+			Bst bst = Gen::bst( Par( Tnv(1,0,0) ).trs( vec ) ) * t );
 			    
 			//Apply operator to a circle
 			Cir cir = CXY(5).sp(bst);  
