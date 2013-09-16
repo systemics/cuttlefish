@@ -1,0 +1,2 @@
+# turn on hdmi default output
+amixer cset numid=3 2
