@@ -1,0 +1,1 @@
+g++ curtain.cpp -lncursesw -o curtain
