@@ -1,14 +1,37 @@
-#include "cf_app.h"
+#include "ctl_app.h"
  
 using namespace ctl;
 
 struct MyApp : public App {
-     
-	MyApp() : App( Layout(1,1) ) {}
+   
+	MBO * mboR;
+	MBO * mboC;
+  
+	MyApp() : App(21.5,14.5){
+		
+		init();
+		
+	}
 
-   virtual void init() {}
-   virtual void update() {}
-   virtual void onDraw() {}
+   virtual void init() {          
+	
+		mboR = new MBO( Mesh::Num(identifier.row).translate(-1,0,0) );
+		mboC = new MBO( Mesh::Num(identifier.col).translate(1,0,0) );   
+	
+	
+	}
+   
+	virtual void update() {
+
+	}  
+	
+   virtual void onDraw() {
+	    
+	
+		pipe.line( *mboR );
+		pipe.line( *mboC );   
+	
+   }
  
 };
 

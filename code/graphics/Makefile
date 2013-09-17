@@ -98,7 +98,7 @@ sync:
 copy:
 	parallel-scp -h hosts.txt build/bin/$(NAME) /tmp
 
-many: copy
+many:
 	parallel-ssh -h hosts.txt /tmp/$(NAME)
 
 many-kill:

@@ -1,4 +1,4 @@
-#include "cf_appR2T.h"
+#include "ctl_appR2T.h"
 #include "vsr/vsr.h" 
 #include "vsr/vsr_field.h"
 //#include "gfx/gfx_mbo.h"
@@ -9,19 +9,23 @@ using namespace vsr;
 
 struct MyApp : public AppR2T {     
 	 
-	Field<Vec> vf; 
-	Field<Vec> orth;
-	int numDipoles;
-	Pnt * touch;  
-	Par * par;       
+	Field<Vec> vf;  	/// THE VECTOR FIELD
+	Field<Vec> orth; 	/// THE ORTHOGONAL VECTOR FIELD
+	
+	int numDipoles;  	/// NUMBER OF DIPOLES TO CALCULATE
+	Pnt * touch; 	    /// AN ARRAY OF TOUCHES 
+	Par * par;   		/// DIPOLES THEMSELVES    
 	
 	int numPotentials;
 	MBO * potentials;  
-	MBO * potentialsB;  
+	MBO * potentialsB; 
+	
+	Vec left, right; /// Left and Right Speaker positions in absolute space  
+	
     //a time element
 	float time;
 	
-	MyApp() : AppR2T(21.5, 14.5, 10), 
+	MyApp() : AppR2T( Layout(1,4) ), 
 		time(0),
 		vf(20,10,1),
 		orth(20,10,1),
@@ -40,7 +44,9 @@ struct MyApp : public AppR2T {
 			 potentialsB[i]  = MBO( Mesh::Contour(50).color(0,1,0).mode(GL::LS) );    
 		}
 		
-		//vf.spacing( scene.width  / vf.width() )
+		//vf.spacing( scene.width  / vf.width() )  
+		
+		Vec left( layout.left( identifier.row, identifier.col )  );  
 	}	 
 	
 	//Initialize
@@ -56,12 +62,17 @@ struct MyApp : public AppR2T {
 		calcVecFields();  
 		
 		calcEquipotentials();
-	} 
+	}  
+	
+	//get field info
+	void pollData(){
+		
+	}
 	
 	void calcDipoles(){
 		for (int i = 0; i < numDipoles; ++i){
 			float t = 1.0 * i/numDipoles;
-			touch[i] = Point( sin(time*t) * width, t * height, 0 );
+			touch[i] = Point( sin(time*t) * layout.screenWidth, t * layout.screenHeight, 0 );
 			par[i] = Par(Tnv(0,1,0)).trs( touch[i] ); 
 		}
 	}  

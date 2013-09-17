@@ -56,10 +56,19 @@ namespace ctl {
 		//gets Pose (bottom left corner) of Mth Row and Nth Col screen
 		Pose poseOf( int M, int N){
 			return Pose( 
-				- totalWidth() / 2.0 + N * screenWidth,// + N * wPitch,
-				- totalHeight() / 2.0 + M * screenHeight,// + M * hPitch, 
+				left(M,N),
+				bottom(M,N), 
 				0 );
+		}  
+		   
+		float left(int M, int N){
+			return - totalWidth() / 2.0 + N * screenWidth + N * wPitch;
+		}  
+		
+		float bottom(int M, int N){
+			return - totalHeight() / 2.0 + M * screenHeight + M * hPitch;
 		}
+		
 	};
 
 	struct App :  BCM, Host, Window, OSCPacketHandler, Sound { 

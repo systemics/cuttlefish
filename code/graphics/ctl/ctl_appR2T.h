@@ -29,7 +29,10 @@ struct AppR2T : App {
     
 	AppR2T(float w, float h, float z = 30) : App(w, h, z) {	
 		//init();
-	}  
+	}    
+	AppR2T( const Layout& layout, float z = 30) : App(layout, z) {	
+		//init();
+	}
 	
 	void swapTextures(){
 		Texture * tmp = textureA; textureA = textureB; textureB = tmp;
