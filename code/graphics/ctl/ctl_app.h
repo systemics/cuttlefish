@@ -1,43 +1,115 @@
 /*
 An App class for the raspberry pi built on the cuttlefish framework
 
-pablo colapinto and karl yerkes
+pablo colapinto and karl yerkes hell yeah!
 
 */    
 
-#ifndef CTL_APP_H_INCLUDED
-#define CTL_APP_H_INCLUDED
+#ifndef CF_APP_H_INCLUDED
+#define CF_APP_H_INCLUDED
 
-#include "ctl_egl.h"
-#include "ctl_gl.h"
+#ifndef __raspberry__
+#define __raspberry__
+#endif
+
 #include "ctl_bcm.h"
 #include "ctl_timer.h"
+#include "ctl_host.h" 
+#include "ctl_sound.h"
 
-#include "ctl_glsl.h"
-#include "ctl_pipe.h"
-#include "ctl_scene.h"  
-#include "ctl_host.h"
+#include "gfx/gfx_scene.h" 
+#include "gfx/gfx_pipe.h"
+#include "gfx/gfx_gl.h"    
+
+#include "ctl_egl.h" 
+#include "ctl_osc.h"
  
+using namespace gfx;
 
 namespace ctl {
 	
 	using namespace EGL;
     using namespace GLSL; 
 
-	struct App :  BCM, Host, Window { 
-	        
-		Scene scene;   		///<-- Transformation Matrices
+ 	//rowcolumn layout, default is 1 x 1 (single screen). . .
+    struct Layout{  
+	
+		Layout( int M, int N, float w = 21.5, float h = 14.5, float wb = 1.0, float hb = 1.0) :
+		numRow(M), numCol(N), screenWidth(w), screenHeight(h), wPitch(wb), hPitch(hb) {}
+	
+		int numRow; int numCol;                 /// Number of Rows and Columns in Multidisplay
 		
+		float screenWidth; float screenHeight; 	/// Width of individual screens in inches
+		float wPitch; float hPitch;  			/// Bezel
+	     
+	
+	 	//Total Width of MxN Display
+		float totalWidth(){
+			return numCol * screenWidth + (numCol-1) * wPitch;
+		}  
+		
+		//Total Height of MxN Display
+		float totalHeight(){
+			return numRow * screenHeight + (numRow-1) * hPitch;
+		} 
+		
+		//gets Pose (bottom left corner) of Mth Row and Nth Col screen
+		Pose poseOf( int M, int N){
+			return Pose( 
+				- totalWidth() / 2.0 + N * screenWidth,// + N * wPitch,
+				- totalHeight() / 2.0 + M * screenHeight,// + M * hPitch, 
+				0 );
+		}
+	};
+
+	struct App :  BCM, Host, Window, OSCPacketHandler, Sound { 
+	    
+		Layout layout; 		///<--- Screen Layout
+	    
+		Scene scene;   		///<-- ModelViewProjection Transformation Matrices   	
 		Pipe pipe;	   		///<-- Graphics Pipeline    
+		 
+		Vec4f background;  	///<--- Background Color
 		
 		Pose viewpose;
-		float width, height; ///<-- Width, Height of each screen in inches
-	
-	     App (float w, float h) : Window()
-		{        		
-			initView(w,h);
-            initGL();
-        }
+		//float width, height; ///<-- Width, Height of each screen in inches  
+		
+		Mat4f mvm; 			 ///<-- temporary save of scene's transformation matrix 
+	    
+         
+	     App (float w, float h, float z=30.0) : Window(), background(0,0,0,1), OSCPacketHandler(),
+			layout(1,1, w, h, 0, 0)
+		{   
+			     		
+			initView(z, false);
+            initGL();     
+
+			//INITIALIZE AUDIO
+			Sound::init();
+
+	    	addListener(GetTouch, "/touch", "iiii", this);  
+
+        }  
+
+		//or pass in an MxN layout . . .
+		 App( const Layout& l, float z = 30.0 ) : Window(), background(0,0,0,1), OSCPacketHandler(), layout(l) {
+			initView(z, true);
+			initGL();
+			addListener(GetTouch, "/touch", "iiii", this); 
+		} 
+		
+	 virtual void onSound( SoundData& io ){
+		
+     }
+
+      static int GetTouch( const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) { 
+        App& app = *(App*)user_data;
+        app.onTouch(argv[0]->i, argv[1]->i, argv[2]->i, argv[3]->i);
+      }
+
+      virtual void onTouch(int n, int x, int y, int t) {
+        cout << n << endl;
+      }
 
 	    ~App(){}     
 	 
@@ -54,109 +126,77 @@ namespace ctl {
 			
 		}
 	     
-		virtual void init() = 0; 		
+		virtual void init() = 0; 
+		virtual void update() = 0;
 		virtual void onDraw() = 0;   
-		
-		//calculation view from row, col and width height
-		Pose calcView(int row, int col, int trow, int tcol, float w, float h){
+       
+		void initView(float z, bool isGrid){
+            
+			float w = layout.screenWidth;
+			float h = layout.screenHeight;   
+
+  		    float aspect = w / h;   
+             
+			scene.fit(w,h);
+
+			Pose p( -w/2.0,-h/2.0, 0);
 			
-		}
-		      
-		void initView(float w, float h, float z = 20.0){
+			if (isGrid) p = layout.poseOf( identifier.row, identifier.col );   
+			
+			p.print();
 
-			width =  w;
-			height = h;     
+			scene.camera.pos() = Vec3f( 0, 0, z); 
+			scene.camera.view = View( scene.camera.pos(), p, aspect, h );
 
-  		    float aspect = width / height;   
-
-
-			int numscreens = 4;
-
-			vsr::Vec3f viewer(0,0,z);  //Position in inches
-
-
-			Pose p(-width/2.0,-height/2.0, 0);
-
-			switch( identifier ){
-
-				case 2:
-					p = Pose( - width * 2, - height / 2.0, 0 );
-					break;
-				case 3:
-					p = Pose( - width , - height / 2.0, 0 );
-					break;
-				case 4:
-					p = Pose( 0, - height / 2.0, 0 );
-					break;
-				case 5:
-					p = Pose( width, - height / 2.0, 0 );
-					break;
-
-		        default:  
-					cout << "USING DEFAULT SCREEN VIEW POSE" << endl;
-		          break;  
-			}
-
-			scene.camera.view() = View( viewer, p, aspect, height );
-			scene.camera.pos() = Vec3f( 0, 0, z);
        }  
-
-		// void viewerAt( float x, float y, float z){ 
-		// 	
-		// 	width =  w;
-		// 	height = h;     
-		// 
-		//   		    float aspect = width / height;
-		// 
-		// 	 vsr::Vec3f viewer(0,0,50);  //Position in inches
-		// 	 
-		// 	Pose p(-width/2.0,-height/2.0, 0);  
-		// 	
-		// 	switch( identifier ){
-		// 
-		// 		case 2:
-		// 			p = Pose( - width * 2, - height / 2.0, 0 );
-		// 			break;
-		// 		case 3:
-		// 			p = Pose( - width , - height / 2.0, 0 );
-		// 			break;
-		// 		case 4:
-		// 			p = Pose( 0, - height / 2.0, 0 );
-		// 			break;
-		// 		case 5:
-		// 			p = Pose( width, - height / 2.0, 0 );
-		// 			break;
-		// 
-		//         default:  
-		// 			cout << "USING DEFAULT SCREEN VIEW POSE" << endl;
-		//           break;  
-		// 	}
-		// 
-		// 	scene.camera.view() = View( viewer, p, aspect, height );
-		// 	scene.camera.pos() = Vec3f( 0, 0, 50);
-		// }    
+   
 
 	
 		virtual void onFrame(){
-
-			  
-			
-	         glClearColor(0,0,0,1);
+   	  
+			 glViewport(0,0,surface.width,surface.height); 
+	         glClearColor(background[0],background[1],background[2],background[3]);
 	         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
              
              scene.onFrame();
- 
-	         onDraw();
+              
+             update();
+
+		   	 mvm = scene.xf.modelViewMatrixf();
+	         pipe.bind( scene.xf );
+
+	         	onDraw();
+			 
+		     pipe.unbind();  
+		
 			 swapBuffers();
 			
 		}  
 		
 		virtual void onTimer(){   
-			cout << "timer func\n";
+		   // cout << "timer func\n";
 	      onFrame();
 	    }
 	  
-	};
+	}; 
+	
+	#define STARTANDRUN()  \
+	bool running = true; \
+	void quit(int) {     \
+	  running = false;   \
+	}                    \
+                         \
+	int main(){          \
+                         \
+		MyApp app;       \
+                         \
+		while(running){  \
+		   app.onFrame();\
+		   usleep(166);  \
+		}                \
+                         \
+		  return 0;      \
+	}
 	
 } 
 

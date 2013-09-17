@@ -1,10 +1,10 @@
-#include "Sound.h"
+#include "ctl_sound.h"
 #include "RtAudio.h"
 #include <iostream>
 #include <cstdlib>
 #include <unistd.h>
 
-namespace cf {
+namespace ctl {
 
 unsigned int channels;
 RtAudio::StreamOptions options;

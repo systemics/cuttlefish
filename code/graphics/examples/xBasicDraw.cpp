@@ -1,4 +1,4 @@
-#include "cf_app.h"
+#include "ctl_app.h"
 #include "gfx/gfx_mbo.h"
 
 using namespace std;
@@ -15,9 +15,18 @@ struct MyApp : public App {
 	float time; 
 	
 	//INSTANTIATE THE APPLICATION WITH WIDTH AND HEIGHT
-	MyApp() : App(30, 20), time(0){ 
+	MyApp() : App(21.5,14.5), time(0){ 
 		init();
-	}                                  
+	}   
+	
+	virtual void onSound( SoundData& io ){
+		// for (int i = 0; i < io.n; ++i) {
+		// 	     	float s = i / (float)io.n;
+		// 	     	for (int j = 0; j < 2; j++) {
+		// 	       		*io.outputBuffer++ = (short)(s * 32767.0);
+		// 	     	}
+		// 	    }  
+	}                               
 	
 	//INIITIALIZE ELEMENTS OF THE SCENE 
 	virtual void init(){

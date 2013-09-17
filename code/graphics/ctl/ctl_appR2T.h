@@ -2,14 +2,14 @@
 #define CTL_APPR2T_INCLUDED
 
 #include "ctl_app.h"
-#include "ctl_gl_mbo.h" 
-#include "ctl_gl_fbo.h"
+#include "gfx/gfx_mbo.h" 
+#include "gfx/gfx_fbo.h"
 #include "ctl_osc.h"
 
 namespace ctl {
 
 /// A Render to Texture Application with OSC calls for blur effects etc.  Subclass ths and render objects in a drawScene() method.
-struct AppR2T : App, OSCPacketHandler {
+struct AppR2T : App {
 	
 	//ALL THIS IS THE GL PIPELINE STUFF.
 	MBO * rect;   
@@ -20,14 +20,14 @@ struct AppR2T : App, OSCPacketHandler {
 	
 	Pipe texpipe; 
 	Pipe texalpha; 	
-	Pipe blurpipe;
+	//Pipe blurpipe;
 	
 	float traceAmt;
 	float ux, uy, bluramt;  
 	
 	bool bUX, bUY, bBLUR, bTRACE; //update bools
     
-	AppR2T(float w, float h) : App(w, h), OSCPacketHandler() {	
+	AppR2T(float w, float h, float z = 30) : App(w, h, z) {	
 		//init();
 	}  
 	
@@ -45,14 +45,15 @@ struct AppR2T : App, OSCPacketHandler {
 		bUX = bUY = bBLUR = bTRACE = 0;   
 		
 		//Make Two Textures the size of the screen (as big as possible anyway: there are memeory limitations )   
-	    int tw = surface.width /2.0; int th =  surface.width/2.0; 
-		//int tw = 1280; int th = 853;
+		int tw = surface.width; int th = surface.height; 
+		//int tw = 1280; int th = 853; 
+		printf("surface: %d\t%d\n", tw, th);
 		textureA = new Texture( tw,th);//surface.width/2.0, surface.height/2.0 );   
 		textureB = new Texture( tw,th);//surface.width/2.0, surface.height/2.0 );  		                    
 		                                                                             
 		//This is the shader used to draw the Rendered Texture to screen 
 		//It doesn't use any transformation matrices, just clip space and the texture values
-		string FragA = TFragBlur;//TFrag;
+		string FragA = FXAA;//TFragBlur;//TFrag; //FXAA;//
 		texpipe.program = new ShaderProgram( ClipSpaceVert, FragA, 0 );
 		texpipe.bindAll();  
 		
@@ -62,44 +63,15 @@ struct AppR2T : App, OSCPacketHandler {
 		texalpha.bindAll();	
 		
 		 fboA.attach(*textureA, GL::COLOR);
-
-			
-		// swapBuffers();
-		//   fboA.attach(*textureA, GL::COLOR); 
-		// fboA.bind();               
-		// 
-		//     glViewport(0,0,textureA->width(),textureA->height() ); 
-		// 	glClearColor(0,0,0,1);
-		//            	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		// fboA.unbind();	
+ 
 	}
  
 	void initSlab(){    
 		
-		cout << "init buffer objects" << endl;   	    	
+		printf("init buffer objects\n");   	    	
 		rect = new MBO( Mesh::Rect( 2.0, 2.0 ).color(0,0,0,1.0) ); 
 		 
 		glClearColor(0,0,0,1);  
-		
-		//        	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		// 
-		// fboA.bind();
-		// glViewport(0,0,textureA->width(),textureA->height() ); 
-		// glClearColor(0,0,0,1);
-		//        	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		// 	pipe.bind(scene.xf);
-		// 	pipe.line(*rect); 
-		// 	pipe.unbind();
-		// fboA.unbind();   
-		// 
-		// glViewport(0,0,surface.width,surface.height); 
-		// 
-		//  
-		// texpipe.bind (); 
-		// 
-		// texpipe.line(*rect);
-		// 	    
-		// 	    texpipe.unbind(); 
 	
 	             
 	}
@@ -112,7 +84,7 @@ struct AppR2T : App, OSCPacketHandler {
 	}
 
 	virtual void init(){ 
-		
+		printf("initializing r2t pipeline\n");
 		initPipeline();  //<-- Initialize the Graphics Pipeline Shaders, Textures, etc.
 		initSlab();      //<-- Create and bind all the VBO's   
 	    initOSC();    	 //<-- Initialize OSC handling for shader settings
@@ -122,7 +94,30 @@ struct AppR2T : App, OSCPacketHandler {
 	virtual void updateMeshes(){}  
 	
 	//This is where the actual objects get rendered
-	virtual void drawScene() = 0;  
+	virtual void drawScene() = 0;   
+	               
+	//We can add a bit of the previously drawn frame  
+	void addTrace(){
+		texalpha.bind();
+	   // float nt = traceAmt;
+		    texalpha.program -> uniform("alpha", traceAmt); 
+
+		    textureB -> bind();      
+				texalpha.line( *rect );
+			textureB -> unbind();  
+
+		texalpha.unbind();  
+	}   
+	
+	void setBlur(){
+		texpipe.program -> uniform("ux" ,ux);
+		texpipe.program -> uniform("uy" ,uy); 
+		texpipe.program -> uniform("bluramt", bluramt);
+	}  
+	
+	void setFrameBuf(){
+		texpipe.program -> uniform("frameBufSize", surface.width, surface.height );
+	}
 	     
    //This is the texture feedback loop 
 	virtual void onDraw(){     
@@ -136,41 +131,52 @@ struct AppR2T : App, OSCPacketHandler {
 			glClearColor(0,0,0,1);
            	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
-			//We add a bit of the previously drawn frame
-			texalpha.bind();
-		   // float nt = traceAmt;
-			    texalpha.program -> uniform("alpha", traceAmt); 
-							
-			    textureB -> bind();      
-					texalpha.line( *rect );
-				textureB -> unbind();  
-				    
-			texalpha.unbind(); 
+			//if (bTrace) addTrace()
 			 
 			//And add a new frame on top
+			 mvm = scene.xf.modelViewMatrixf();
 			 pipe.bind( scene.xf );
 				
 				drawScene();  
 		
-			pipe.unbind( );  
+			 pipe.unbind( );  
 			
 		fboA.unbind();  
 
 		//Switch to full Viewport and Bind Texture to Rect 
-	   glViewport(0,0,surface.width,surface.height);		
+	   glViewport(0,0,surface.width,surface.height);	 
+	   
 		texpipe.bind ();
-		//float nux = ux; float nuy = uy; float nb = bluramt;
-		texpipe.program -> uniform("ux" ,ux);
-		texpipe.program -> uniform("uy" ,uy); 
-		texpipe.program -> uniform("bluramt", bluramt);
-			textureA -> bind();
-				texpipe.line( *rect );
-			textureA -> unbind();
+	
+		//if using TFragBlur 
+		
+ 		//setBlur();
+		setFrameBuf();
+		
+		textureA -> bind();
+			texpipe.line( *rect );
+		textureA -> unbind();     
+			
 	    texpipe.unbind();  
 	
-	 		swapTextures(); 
+	   swapTextures(); 
 
 	}  
+	
+	virtual void onFrame(){
+		
+        glClearColor(background[0],background[1],background[2],background[3]);
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+        scene.onFrame();
+         
+        update();
+
+        onDraw();
+		 	
+		swapBuffers();
+		
+	}
 	
 	
 	static int GetTrace(const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) {

@@ -5,8 +5,8 @@ HOST = pi-z
 NAME = main
 
 CXX = arm-linux-gnueabihf-g++ -std=c++0x
-#AR = ar crs
-CXXFLAGS = -D __raspberry__ -U __linux__
+AR = ar crs
+CXXFLAGS = -D __raspberry__ -U __linux__  -D __LINUX_ALSA__
 
 SYNCITEMS = opt usr/include usr/lib lib code
 
@@ -66,6 +66,8 @@ USEVSR = 0
 VSRFLAGS = -I$(EXT_DIR)/vsr/ -I$(EXT_DIR)/gfx/
 #-L$(EXT_DIR)/vsr/build/lib/ -lvsr -I$(EXT_DIR)/vsr/build/pch/ 
 
+OBJ_FILES = src/ctl_sound.cpp src/RtAudio.cpp
+
 FORCE:
 
 title:
@@ -77,7 +79,7 @@ $(OBJ_DIR)%.o: $(OBJ_DIR)%.cpp %.h
 	$(CXX) $(CXXFLAGS) $(IPATH) -c $< -o $@ 
 
 # vsr:
-# 	@make --no-print-directory -C $@ #install DESTDIR=BUILDDIR = $(LIB_DIR)
+# 	@make --no-print-directory -C $@ #install DESTDIR=BUILDDIR = $(LIB_DIR) 
 
 dir:
 	@mkdir -p $(BIN_DIR)
@@ -87,7 +89,7 @@ dir:
 .PRECIOUS: $(EXEC_TARGETS)
 $(EXEC_TARGETS) : title dir FORCE
 	@echo "cross compiling executable" $@
-	$(CXX) $(CXXFLAGS) $(IPATH) $@ -o $(BIN_DIR)$(NAME) $(LDFLAGS) $(VSRFLAGS)
+	$(CXX) $(CXXFLAGS) $(IPATH) $(OBJ_FILES) $@ -o $(BIN_DIR)$(NAME) $(LDFLAGS) $(VSRFLAGS)
 	#@make deploy
 
 sync:
