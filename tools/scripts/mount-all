@@ -1,0 +1,7 @@
+#!/usr/bin/perl
+
+for ("00", "01", "02", "03", "10", "11", "12", "13", "20", "21", "22", "23") {
+  print qx(umount $_);
+  print qx(mkdir -p $_);
+  print qx(sshfs -o reconnect,allow_root,sshfs_sync,no_readahead,cache=no root\@$_.cf:/ $_);
+}

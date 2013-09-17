@@ -1,0 +1,6 @@
+#!/bin/sh
+
+diskutil unmount /dev/disk1s1
+time dd bs=1M count=7461 if=/dev/rdisk1 of=cf-satellite.dd
+say "the image is done. ejecting cd card."
+diskutil eject /dev/rdisk1

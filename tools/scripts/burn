@@ -1,0 +1,29 @@
+#!/usr/bin/perl -w
+
+sub speak {
+  $_ = shift;
+  print qx(say "$_");
+}
+
+@ARGV == 2 or die<<EOF;
+  ./burn <diskNumber> <imageName>
+  ./burn 1 image.dd
+EOF
+
+$image = $ARGV[1];
+-e $image or die $!;
+
+$n = $ARGV[0];
+($root) = split(' ', qx(mount|grep " / "));
+if ($root =~ m#/dev/disk$n#) {
+  die "refusing to fuckup /";
+}
+
+if (qx(mount|grep /dev/disk$n)) {
+  print "diskutil unmountDisk /dev/disk$n\n";
+  qx(diskutil unmountDisk /dev/disk$n);
+}
+
+$_ = qx(sudo time dd bs=1M of=/dev/rdisk$n if=$image);
+
+qx(diskutil eject /dev/rdisk$n)
