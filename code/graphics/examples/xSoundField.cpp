@@ -51,13 +51,10 @@ void quit(int) {
 }
 
 int main() {
-
   MyApp app;
-
   while(running){
     app.onFrame();
     usleep(1);
   }
-
   return 0;
 }
