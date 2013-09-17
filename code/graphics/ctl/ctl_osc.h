@@ -1,7 +1,7 @@
 #ifndef CTL_OSC_H_INCLUDED
 #define CTL_OSC_H_INCLUDED
 
-#include <iostream>
+//#include <iostream>
 #include <lo/lo.h>       
 #include <vector>
 

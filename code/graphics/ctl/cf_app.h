@@ -18,9 +18,9 @@ pablo colapinto and karl yerkes hell yeah!
 
 #include "gfx/gfx_scene.h" 
 #include "gfx/gfx_pipe.h"
-#include "gfx/gfx_gl.h"  
+#include "gfx/gfx_gl.h"    
 
-#include "ctl_egl.h"
+#include "ctl_egl.h" 
 #include "ctl_osc.h"
  
 using namespace gfx;
@@ -30,27 +30,69 @@ namespace ctl {
 	using namespace EGL;
     using namespace GLSL; 
 
+ 	//rowcolumn layout, default is 1 x 1 (single screen). . .
+    struct Layout{  
+	
+		Layout( int M, int N, float w = 21.5, float h = 14.5, float wb = 1.0, float hb = 1.0) :
+		numRow(M), numCol(N), screenWidth(w), screenHeight(h), wPitch(wb), hPitch(hb) {}
+	
+		int numRow; int numCol;                 /// Number of Rows and Columns in Multidisplay
+		
+		float screenWidth; float screenHeight; 	/// Width of individual screens in inches
+		float wPitch; float hPitch;  			/// Bezel
+	     
+	
+	 	//Total Width of MxN Display
+		float totalWidth(){
+			return numCol * screenWidth + (numCol-1) * wPitch;
+		}  
+		
+		//Total Height of MxN Display
+		float totalHeight(){
+			return numRow * screenHeight + (numRow-1) * hPitch;
+		} 
+		
+		//gets Pose (bottom left corner) of Mth Row and Nth Col screen
+		Pose poseOf( int M, int N){
+			return Pose( 
+			 	- totalHeight() / 2.0 + M * screenHeight + M * hPitch,
+				- totalWidth() / 2.0 + N * screenWidth + N * wPitch,
+				0 );
+		}
+	};
+
 	struct App :  BCM, Host, Window, OSCPacketHandler { 
-	        
-		Scene scene;   		///<-- Transformation Matrices   	
+	    
+		Layout layout; 		///<--- Screen Layout
+	    
+		Scene scene;   		///<-- ModelViewProjection Transformation Matrices   	
 		Pipe pipe;	   		///<-- Graphics Pipeline    
 		 
-		Vec4f background;
+		Vec4f background;  	///<--- Background Color
 		
 		Pose viewpose;
-		float width, height; ///<-- Width, Height of each screen in inches  
+		//float width, height; ///<-- Width, Height of each screen in inches  
 		
-		Mat4f mvm; 			 //transformation matrix of scene
-		
-		
-	     App (float w, float h, float z=30.0) : Window(), background(0,0,0,1), OSCPacketHandler() 
-		{        		
-			initView(w,h,z);
+		Mat4f mvm; 			 ///<-- temporary save of scene's transformation matrix 
+	    
+         
+	     App (float w, float h, float z=30.0) : Window(), background(0,0,0,1), OSCPacketHandler(),
+			layout(1,1, w, h, 0, 0)
+		{   
+			     		
+			initView(z);
             initGL();
 
-	    addListener(GetTouch, "/touch", "iiii", this);  
+	    	addListener(GetTouch, "/touch", "iiii", this);  
 
-        }
+        }  
+
+		//or pass in an MxN layout . . .
+		 App( const Layout& l, float z = 30.0 ) : Window(), background(0,0,0,1), OSCPacketHandler(), layout(l) {
+			initView(z);
+			initGL();
+			addListener(GetTouch, "/touch", "iiii", this); 
+		} 
 
       static int GetTouch( const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) { 
         App& app = *(App*)user_data;
@@ -79,50 +121,25 @@ namespace ctl {
 		virtual void init() = 0; 
 		virtual void update() = 0;
 		virtual void onDraw() = 0;   
-		
-		//calculation view from row, col and width height
-		Pose calcView(int row, int col, int trow, int tcol, float w, float h){
-			
-		}
-		      
-		void initView(float w, float h, float z){
+       
+		void initView(float z){
+            
+			float w = layout.screenWidth;
+			float h = layout.screenHeight;   
 
-			width =  w;
-			height = h;     
-
-  		    float aspect = width / height;   
+  		    float aspect = w / h;   
              
 			scene.fit(w,h);
 
-			int numscreens = 4;
+			Pose p( -w/2.0,-h/2.0, 0);
+			
+			p = layout.poseOf( identifier.row, identifier.col );   
+			
+			p.print();
 
-			Vec3f viewer(0,0,z);  
+			scene.camera.pos() = Vec3f( 0, 0, z); 
+			scene.camera.view = View( scene.camera.pos(), p, aspect, h );
 
-
-			Pose p(-width/2.0,-height/2.0, 0);
-
-			switch( identifier ){
-
-				case 2:
-					p = Pose( - width * 2, - height / 2.0, 0 );
-					break;
-				case 3:
-					p = Pose( - width , - height / 2.0, 0 );
-					break;
-				case 4:
-					p = Pose( 0, - height / 2.0, 0 );
-					break;
-				case 5:
-					p = Pose( width, - height / 2.0, 0 );
-					break;
-
-		        default:  
-					cout << "USING DEFAULT SCREEN VIEW POSE" << endl;
-		          break;  
-			}
-
-			scene.camera.view = View( viewer, p, aspect, height );
-			scene.camera.pos() = Vec3f( 0, 0, z);
        }  
    
 
@@ -142,13 +159,14 @@ namespace ctl {
 
 	         	onDraw();
 			 
-		     pipe.unbind();
+		     pipe.unbind();  
+		
 			 swapBuffers();
 			
 		}  
 		
 		virtual void onTimer(){   
-			cout << "timer func\n";
+		   // cout << "timer func\n";
 	      onFrame();
 	    }
 	  

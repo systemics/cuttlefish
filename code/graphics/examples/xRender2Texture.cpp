@@ -1,22 +1,27 @@
-#include "cf_app.h"
-#include "vsr/vsr.h"
+#include "cf_appR2T.h"
+#include "vsr/vsr.h" 
+#include "vsr/vsr_field.h"
 //#include "gfx/gfx_mbo.h"
 
 using namespace std;
 using namespace ctl; 
 using namespace vsr;
 
-struct MyApp : public App {     
-	        
+struct MyApp : public AppR2T {     
+	  
     //a time element
 	float time;
 	
-	MyApp() : App(30,20,80), time(0) { 
-		init();
+	MyApp() : AppR2T(30,20,80), 
+		time(0),
+		f(10,10,1) 
+	
+	{ 
+		AppR2T::init();
 	}	 
 	
 	//Initialize
-	void init(){}  
+	void initMeshes(){}  
 	
 	//Update the Geometry
 	void update(){   
@@ -27,11 +32,12 @@ struct MyApp : public App {
 	}
 	
     //DRAW GEOMETRY TO SCREEN  
-	void onDraw(){	
+	 virtual void drawScene(){	
 
+		
 		auto cir = Circle( Vec(0, 0, 1) );
 		DRAWCOLOR( cir, 0,1,0 ); 
-        
+		        
 		auto pa = Point(5,0,0);
 		auto pb = Point(-5,0,0);
 		
@@ -39,11 +45,26 @@ struct MyApp : public App {
 		DRAWCOLOR( pb, 0, 1, 0); 
 				
 		auto line = Line(pa, pb);
-		DRAWCOLOR( line, 1, 1, 0);
+		DRAWCOLOR( line, 1, 1, 0);  
   
 		  
 	} 
 	
 }; 
 
-STARTANDRUN()
+bool running = true;
+void quit(int) {
+  running = false;
+}
+
+int main(){
+	
+	MyApp app;
+	
+  while(running){
+ 		app.onFrame();
+ 		usleep(1666);
+ 	}   
+	
+	  return 0; 
+}
