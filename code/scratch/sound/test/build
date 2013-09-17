@@ -1,0 +1,1 @@
+arm-linux-gnueabihf-g++ test.cpp -I../ -L../ -L/home/vagrant/pi-root/usr/lib/arm-linux-gnueabihf -lasound
