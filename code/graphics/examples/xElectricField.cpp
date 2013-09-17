@@ -16,21 +16,21 @@ struct MyApp : public AppR2T {
 	Pnt * touch; 	    /// AN ARRAY OF TOUCHES 
 	Par * par;   		/// DIPOLES THEMSELVES    
 	
-	int numPotentials;
+	int numPotentials; 
+	int pRes;
 	MBO * potentials;  
 	MBO * potentialsB; 
-	
-	Vec left, right; /// Left and Right Speaker positions in absolute space  
 	
     //a time element
 	float time;
 	
-	MyApp() : AppR2T( Layout(1,4) ), 
+	MyApp() : AppR2T( 21.5,14.5),//Layout(1,4) ), 
 		time(0),
 		vf(20,10,1),
 		orth(20,10,1),
 		numDipoles(5),
-		numPotentials(10) 
+		numPotentials(10), 
+		pRes(50) 
 	
 	{ 
 		AppR2T::init(); 
@@ -38,15 +38,16 @@ struct MyApp : public AppR2T {
 		touch = new Pnt[numDipoles]; 
 		par = new Par[numDipoles];  
 		potentials = new MBO[numPotentials]; 
-		potentialsB = new MBO[numPotentials];  		
+		potentialsB = new MBO[numPotentials];  
+				
 		for (int i = 0; i < numPotentials; ++i){  
-			 potentials[i]  = MBO( Mesh::Contour(50).color(0,1,0).mode(GL::LS) );    
-			 potentialsB[i]  = MBO( Mesh::Contour(50).color(0,1,0).mode(GL::LS) );    
+			 potentials[i]   = MBO( Mesh::Contour(pRes).color(0,1,0).mode(GL::LS) );    
+			 potentialsB[i]  = MBO( Mesh::Contour(pRes).color(0,1,0).mode(GL::LS) );    
 		}
 		
 		//vf.spacing( scene.width  / vf.width() )  
 		
-		Vec left( layout.left( identifier.row, identifier.col )  );  
+
 	}	 
 	
 	//Initialize

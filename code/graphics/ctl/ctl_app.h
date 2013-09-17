@@ -60,11 +60,13 @@ namespace ctl {
 				bottom(M,N), 
 				0 );
 		}  
-		   
+		
+		//Absolute (GL coord) position of left speaker   
 		float left(int M, int N){
 			return - totalWidth() / 2.0 + N * screenWidth + N * wPitch;
 		}  
-		
+		   
+		//absolute (GL coord) position of right speaker
 		float bottom(int M, int N){
 			return - totalHeight() / 2.0 + M * screenHeight + M * hPitch;
 		}
@@ -75,22 +77,25 @@ namespace ctl {
 	    
 		Layout layout; 		///<--- Screen Layout
 	    
-		Scene scene;   		///<-- ModelViewProjection Transformation Matrices   	
+		Scene scene;   		///<-- ModelViewProjection Transformation Matrices  
+		 	
 		Pipe pipe;	   		///<-- Graphics Pipeline    
 		 
 		Vec4f background;  	///<--- Background Color
 		
-		Pose viewpose;
-		//float width, height; ///<-- Width, Height of each screen in inches  
+		Mat4f mvm; 			 ///<-- temporary save of scene's transformation matrix    
 		
-		Mat4f mvm; 			 ///<-- temporary save of scene's transformation matrix 
+		Vec3f speakerL, speakerR;     ///<-- left and right speaker positions   
 	    
          
 	     App (float w, float h, float z=30.0) : Window(), background(0,0,0,1), OSCPacketHandler(),
 			layout(1,1, w, h, 0, 0)
 		{   
-			     		
-			initView(z, false);
+			
+			//CALCULATE CAMERA POSE     		
+			initView(z, false); 
+			
+			//INITIALIZE GRAPHICS
             initGL();     
 
 			//INITIALIZE AUDIO
@@ -150,9 +155,23 @@ namespace ctl {
 
 			Pose p( -w/2.0,-h/2.0, 0);
 			
-			if (isGrid) p = layout.poseOf( identifier.row, identifier.col );   
+			speakerL = Vec3f( -w/2.0, 0, 0);
+			speakerR = Vec3f( w/2.0, 0, 0);
+			              
+			//If we're in multi-screen mode, RE-DO pose and speaker positions based on grid layout . . .
+			if (isGrid) {
+				p = layout.poseOf( identifier.row, identifier.col );   
 			
-			p.print();
+				//only works on a grid . . .
+				speakerL = Vec3f( 
+					layout.left( identifier.row, identifier.col ), 
+					layout.bottom( identifier.row, identifier.col ) + layout.screenHeight / 2.0, 0);
+
+				speakerR = Vec3f(
+				 	layout.left( identifier.row, identifier.col ) + layout.screenWidth, 
+					layout.bottom( identifier.row, identifier.col ) + layout.screenHeight / 2.0, 0);
+			 }
+			
 
 			scene.camera.pos() = Vec3f( 0, 0, z); 
 			scene.camera.view = View( scene.camera.pos(), p, aspect, h );
