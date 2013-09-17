@@ -1,0 +1,17 @@
+mkdir -p ~/pi-root
+cd ~/pi-root
+
+mkdir -p usr/local
+mkdir -p usr/lib
+mkdir -p opt/vc
+mkdir -p lib
+
+rsync -az --links --copy-unsafe-links --progress $1:/lib/arm-linux-gnueabihf lib
+rsync -az --links --copy-unsafe-links --progress $1:/opt/vc/lib opt/vc
+rsync -az --links --copy-unsafe-links --progress $1:/usr/lib usr
+rsync -az --links --copy-unsafe-links --progress $1:/usr/local/lib usr/local
+rsync -az --links --copy-unsafe-links --progress $1:/usr/include usr
+rsync -az --links --copy-unsafe-links --progress $1:/opt/vc/include opt/vc
+rsync -az --links --copy-unsafe-links --progress $1:/usr/local/include usr/local
+
+#rsync -az --links --copy-unsafe-links --progress 192.168.0.113:/usr/lib/arm-linux-gnueabihf usr/lib

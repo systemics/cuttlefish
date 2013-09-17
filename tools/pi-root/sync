@@ -1,9 +1,0 @@
-rsync -avz 192.168.2.16:/opt .
-rsync -avz 192.168.2.16:/lib .
-rsync -avz 192.168.2.16:/include .
-mkdir -p usr
-mkdir -p usr/local
-rsync -avz 192.168.2.16:/usr/lib usr
-rsync -avz 192.168.2.16:/usr/include usr
-rsync -avz 192.168.2.16:/usr/local/lib usr/local
-rsync -avz 192.168.2.16:/usr/local/include usr/local
