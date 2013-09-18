@@ -36,7 +36,7 @@ struct MyApp : public AppR2T {
 		rf(44,7,1,2),
 		gf(44,7,1,2),
 		bf(44,7,1,2),
-		numDipoles(1),
+		numDipoles(5),
 		numPotentials(10), 
 		pRes(20),
 		step(.2)
@@ -56,7 +56,20 @@ struct MyApp : public AppR2T {
 		}
 		
 
-	}	 
+	}  
+	
+  void onTouch(int finger, int xPosition, int yPosition, int orientation) {     
+
+		if (finger < 5){
+			
+			float tx = xPosition / 3600.0;
+		    float ty = yPosition / -2600.0;
+			 
+			touch[finger] = Point( layout.totalWidth()/2.0 * tx, layout.totalHeight()/2.0 * ty, 0 );
+			  
+		}
+	
+	}   
 	
 	//Initialize
 	void initMeshes(){}  
@@ -109,8 +122,8 @@ struct MyApp : public AppR2T {
 	
 	void calcDipoles(){
 		for (int i = 0; i < numDipoles; ++i){
-			float t =  1. + 1.0 * i/numDipoles;
-			touch[i] = Point( sin(time*t) * layout.totalWidth()/2.0, 0, 0 );
+			//float t =  1. + 1.0 * i/numDipoles;
+			//touch[i] = Point( sin(time*t) * layout.totalWidth()/2.0, 0, 0 );
 			par[i] = Par(Tnv(0,1,0)).trs( touch[i] ); 
 		}
 	}  
