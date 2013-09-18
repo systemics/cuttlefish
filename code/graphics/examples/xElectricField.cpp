@@ -17,7 +17,8 @@ struct MyApp : public AppR2T {
 	Field< Sca > bf;    /// Div and Curl of the Field   
 	
 	int numDipoles;  	/// NUMBER OF DIPOLES TO CALCULATE
-	Pnt * touch; 	    /// AN ARRAY OF TOUCHES 
+	Vec2f * touch; 	    /// AN ARRAY OF TOUCHES 
+	Pnt * dipole; 
 	Par * par;   		/// DIPOLES THEMSELVES    
 	
 	int numPotentials; 
@@ -45,7 +46,7 @@ struct MyApp : public AppR2T {
 	{ 
 		AppR2T::init(); 
 
-		touch = new Pnt[numDipoles]; 
+		dipole = new Pnt[numDipoles]; 
 		par = new Par[numDipoles];  
 		potentials = new MBO[numPotentials]; 
 		potentialsB = new MBO[numPotentials];  
@@ -63,9 +64,11 @@ struct MyApp : public AppR2T {
 		if (finger < 5){
 			
 			float tx = xPosition / 3600.0;
-		    float ty = yPosition / -2600.0;
+		    float ty = yPosition / -2600.0;    
+		
+			touch[finger] = Vec2f(tx,ty);
 			 
-			touch[finger] = Point( layout.totalWidth()/2.0 * tx, layout.totalHeight()/2.0 * ty, 0 );
+			dipole[finger] = Point( layout.totalWidth()/2.0 * tx, layout.totalHeight()/2.0 * ty, 0 );
 			  
 		}
 	
@@ -124,7 +127,7 @@ struct MyApp : public AppR2T {
 		for (int i = 0; i < numDipoles; ++i){
 			//float t =  1. + 1.0 * i/numDipoles;
 			//touch[i] = Point( sin(time*t) * layout.totalWidth()/2.0, 0, 0 );
-			par[i] = Par(Tnv(0,1,0)).trs( touch[i] ); 
+			par[i] = Par(Tnv(0, 1.0 / numDipoles  ,0)).trs( dipole[i]  ); 
 		}
 	}  
 	
@@ -135,7 +138,7 @@ struct MyApp : public AppR2T {
 				
 				//sum in respective dipoles
 				for (int j = 0; j < numDipoles; ++j ){ 
-					float sqd =  ( Ro::sqd( vf.grid(i), touch[j] ) + .1 );
+					float sqd =  ( Ro::sqd( vf.grid(i), dipole[j] ) + .1 );
 					float dist = 1.0 / sqd;  
 					tpar += par[j] * dist;
 				 }   
@@ -184,10 +187,10 @@ struct MyApp : public AppR2T {
 		Render( vf, mvm, pipe, rf, gf, bf );
 		//DRAWCOLOR( orth, 0,1,0);
 		
-		// for (int i = 0; i < 5; ++i){
-		// 	pipe.line( potentials[i] );
-		// 	pipe.line( potentialsB[i] );
-		// }   
+		for (int i = 0; i < numPotentials; ++i){
+			pipe.line( potentials[i] );
+			pipe.line( potentialsB[i] );
+		}   
 		  
 		  
 	} 
