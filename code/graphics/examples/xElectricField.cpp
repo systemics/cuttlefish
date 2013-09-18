@@ -9,8 +9,8 @@ using namespace vsr;
 
 struct MyApp : public AppR2T {     
 	 
-	Field<Vec> vf;  	/// THE VECTOR FIELD
-	Field<Vec> orth; 	/// THE ORTHOGONAL VECTOR FIELD
+	Field<Vec2D> vf;  	/// THE VECTOR FIELD
+	Field<Vec2D> orth; 	/// THE ORTHOGONAL VECTOR FIELD
 	
 	int numDipoles;  	/// NUMBER OF DIPOLES TO CALCULATE
 	Pnt * touch; 	    /// AN ARRAY OF TOUCHES 
@@ -18,19 +18,22 @@ struct MyApp : public AppR2T {
 	
 	int numPotentials; 
 	int pRes;
+	float step;
 	MBO * potentials;  
 	MBO * potentialsB; 
 	
     //a time element
 	float time;
 	
-	MyApp() : AppR2T( 21.5,14.5),//Layout(1,4) ), 
+	MyApp() : AppR2T( Layout(1,4) ),  //( 21.5,14.5),//
 		time(0),
-		vf(20,10,1),
-		orth(20,10,1),
-		numDipoles(5),
+		vf(40,7,2),
+		orth(40,7,2),
+		numDipoles(2),
 		numPotentials(10), 
-		pRes(50) 
+		pRes(20),
+		step(.2)
+		 
 	
 	{ 
 		AppR2T::init(); 
@@ -63,10 +66,25 @@ struct MyApp : public AppR2T {
 		calcVecFields();  
 		
 		calcEquipotentials();
+		
+		pollData();
 	}  
 	
-	//get field info
+	//get field info at speaker locations
 	void pollData(){
+
+		Vec2D ld = vf.range( Vec2D(speakerL[0], speakerL[1]) ); // bounded 
+		Vec2D rd = vf.range( Vec2D(speakerR[0], speakerR[1]) ); // bounded  
+		
+		Patch lp = vf.surfIdx( ld[0], ld[1] );
+		Patch rp = vf.surfIdx( rd[0], rd[1] );   
+		
+		//calculate div and curl upon patch
+		auto a = e1(1) * vf[lp.a];
+		auto b = e2(1) * vf[lp.a]; 
+		
+		a.vprint();
+		b.vprint();
 		
 	}
 	
@@ -102,30 +120,35 @@ struct MyApp : public AppR2T {
 		for (int i = 0; i < 10; ++i){  
 			float theta = (TWOPI * i/numPotentials);
 			float ta = cos( theta ) * orth.tw()/2.0;  
-			float tb = sin( theta ) * orth.th()/2.0;
-			Vec nv(ta, tb, 0);  //starting point  
-			Vec nvB(ta, tb, 0);  //starting point  
+			float tb = sin( theta ) * orth.th()/2.0; 
+			
+			// Vec nv(ta, tb, 0);  //starting point  
+			// Vec nvB(ta, tb, 0);  //starting point   
+			Vec2D nv(ta, tb);  //starting point  
+			Vec2D nvB(ta, tb);  //starting point
 			
 			for (int j = 0; j < potentials[i].mesh.num(); ++j ){
 				//float tt = 1.0 * j/potentials[i].mesh.num();
-				potentials[i].mesh[j].Pos.set( nv[0], nv[1], nv[2] );
+				potentials[i].mesh[j].Pos.set( nv[0], nv[1], 0 );     //2D
 			    //potentials[i].mesh[j].Col.set( 0,  1,  ta * .3, .9); 
-				potentialsB[i].mesh[j].Pos.set( nvB[0], nvB[1], nvB[2] );
+				potentialsB[i].mesh[j].Pos.set( nvB[0], nvB[1], 0 );  //2D
 			    //potentialsB[i].mesh[j].Col.set( 0,  1,  ta * .3, .9); 
-				nvB -= orth.euler2d( nvB ) * .2;
-				nv += orth.euler2d( nv ) * .2; 
+				nvB -= orth.euler2d( nvB ) * step;
+				nv += orth.euler2d( nv ) * step; 
 			}        
 			
 			potentials[i].update(); 
 			potentialsB[i].update();
 		}
-	}
+	}  
+	
+
 	
     //DRAW GEOMETRY TO SCREEN  
 	 virtual void drawScene(){	
  
           
-	   // DRAWCOLOR( vf, 1,1,0 );
+	    DRAWCOLOR( vf, 1,1,0 );
 		//DRAWCOLOR( orth, 0,1,0);
 		
 		for (int i = 0; i < 5; ++i){
