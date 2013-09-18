@@ -51,6 +51,7 @@ LDFLAGS += -lpthread
 #LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libportaudio.a
 #LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libjack.a
 LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libasound.so
+LDFLAGS += -lGamma
 #LDFLAGS += -lasound
 #LDFLAGS += -ljack
 #LDFLAGS += -lportaudio

@@ -42,14 +42,11 @@ struct MyApp : public App {
 	MyApp() : App(21.5,14.5), time(0) { 
 		init();
 
-    biquad.set(10, 4, BAND_PASS);
-    lfo.set(0.6, 0, 0.5);
+    biquad.set(300, 0.2, BAND_PASS);
 	}   
 	
 	virtual void onSound( SoundData& io ){
 		for (int i = 0; i < io.n; ++i) {
-            float cutoff = scl::pow3(lfo.triU()) * 10000;
-            biquad.freq(cutoff);
 			     	float s = biquad(noise()) * 0.5;
 			     	for (int j = 0; j < 2; j++) {
 			       		*io.outputBuffer++ = (short)(s * 32767.0);
