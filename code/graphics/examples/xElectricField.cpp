@@ -45,7 +45,8 @@ struct MyApp : public AppR2T {
 	
 	{ 
 		AppR2T::init(); 
-
+        
+		touch = new Vec2f[numDipoles];
 		dipole = new Pnt[numDipoles]; 
 		par = new Par[numDipoles];  
 		potentials = new MBO[numPotentials]; 
@@ -61,7 +62,7 @@ struct MyApp : public AppR2T {
 	
   void onTouch(int finger, int xPosition, int yPosition, int orientation) {     
 
-		if (finger < 5){
+		if (finger < numDipoles){
 			
 			float tx = xPosition / 3600.0;
 		    float ty = yPosition / -2600.0;    
