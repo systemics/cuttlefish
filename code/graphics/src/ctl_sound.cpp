@@ -53,8 +53,8 @@ struct SoundImpl {
     }
   }
 
-  void init() {
-    unsigned int bufferFrames = 512, fs = 48000, device = 0, offset = 0;
+  void init(unsigned int bufferFrames, unsigned int sampleRate) {
+    unsigned int device = 0, offset = 0;
 
     if (dac.getDeviceCount() < 1) {
       std::cout << "\nNo audio devices found!\n";
@@ -71,7 +71,7 @@ struct SoundImpl {
     options.flags = RTAUDIO_HOG_DEVICE | RTAUDIO_SCHEDULE_REALTIME;
 
     try {
-      dac.openStream(&oParams, NULL, RTAUDIO_SINT16, fs, &bufferFrames, &processSoundFrame, (void*)sound, &options);
+      dac.openStream(&oParams, NULL, RTAUDIO_SINT16, sampleRate, &bufferFrames, &processSoundFrame, (void*)sound, &options);
       dac.startStream();
     }
     catch (RtError& e) {
@@ -83,9 +83,9 @@ struct SoundImpl {
   }
 };
 
-void Sound::init() {
+void Sound::init(unsigned int bufferFrames, unsigned int sampleRate) {
   impl = new SoundImpl(this);
-  impl->init();
+  impl->init(bufferFrames, sampleRate);
 }
 
 void Sound::onSound(SoundData& io) {
