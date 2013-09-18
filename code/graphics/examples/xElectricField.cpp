@@ -52,23 +52,27 @@ struct MyApp : public AppR2T {
 		rf(44,7,1,2),
 		gf(44,7,1,2),
 		bf(44,7,1,2),
-		numDipoles(5),
+		numDipoles(3),
 		numPotentials(10),
-		pRes(20),
-		step(.2)
+		pRes(40),
+		step(2.0),
 		numAgents(100),
 		agent(numAgents,1,1,1)
 	
 	{
 		AppR2T::init();
 		Sound::init();
-    gam::Sync::master().spu(48000); // XXX!!!
+    	gam::Sync::master().spu(48000); // XXX!!!
+
+		bDoTrace 		= true;
+		traceAmt 		= .2; 
 
 
-		touch = new Vec2f[numDipoles];
-		dipole = new Pnt[numDipoles];
-		par = new Par[numDipoles];
-		potentials = new MBO[numPotentials];
+		touch 		= new Vec2f[numDipoles];
+		dipole 		= new Pnt[numDipoles];
+		par 		= new Par[numDipoles];  
+		
+		potentials 	= new MBO[numPotentials];
 		potentialsB = new MBO[numPotentials];
 				
 		for (int i = 0; i < numPotentials; ++i){
@@ -76,9 +80,9 @@ struct MyApp : public AppR2T {
 			 potentialsB[i]  = MBO( Mesh::Contour(pRes).color(0,1,0).mode(GL::LS) );
 		}
 		
-    gain = 0.5f;
-    cutoff = 500.0f;
-    res = 1.0f;
+    	gain = 0.5f;
+    	cutoff = 500.0f;
+    	res = 1.0f;
 	}
 	
   void onTouch(int finger, int xPosition, int yPosition, int orientation) {
@@ -101,14 +105,14 @@ struct MyApp : public AppR2T {
 	}
 
   virtual void onSound( SoundData& io ){
-    for (int i = 0; i < io.n; ++i) {
-      biquad.freq(cutoff);
-      biquad.res(res);
-      float s = biquad(noise()) * gain;
-      for (int j = 0; j < 2; j++) {
-        *io.outputBuffer++ = (short)(s * 32767.0);
-      }
-    }
+    // for (int i = 0; i < io.n; ++i) {
+    //   biquad.freq(cutoff);
+    //   biquad.res(res);
+    //   float s = biquad(noise()) * gain;
+    //   for (int j = 0; j < 2; j++) {
+    //     *io.outputBuffer++ = (short)(s * 32767.0);
+    //   }
+    // }   
   }
 	
 	//Initialize
@@ -124,20 +128,25 @@ struct MyApp : public AppR2T {
 		calcVecFields();
 		
 		calcEquipotentials();
-
+		
 		calcDivCurl();  
 		
-		calcAgents();
+		calcAgents();   
+		
 	}      
 	
 	void calcAgents(){
-		
+		for (int i = 0; i < agent.num(); ++i ){  
+			
+			// for (int )
+			// agent.grid(i).bst( par)   
+		}
 	}
 	
 	void calcDivCurl(){
 		
 		for (int i = 0; i<vf.num(); ++i){  
-			auto a = Vec2(1,1) * vf[i];
+			auto a = Vec2D(1,1)* vf[i];
 			rf[i] = a[0];
 			gf[i] = a[1];
 		}
@@ -145,23 +154,6 @@ struct MyApp : public AppR2T {
 		for (int i = 0 ; i < gf.num(); ++i){
 			bf[i] = gf.sumNbrs(i) / 4.0;
 		}
-	}
-	
-	//get field info at speaker locations
-	void pollData(){
-
-		Vec2D ld = vf.range( Vec2D(speakerL[0], speakerL[1]) ); // bounded
-		Vec2D rd = vf.range( Vec2D(speakerR[0], speakerR[1]) ); // bounded
-		
-		Patch lp = vf.surfIdx( ld[0], ld[1] );
-		Patch rp = vf.surfIdx( rd[0], rd[1] );
-		
-		//calculate div and curl upon patch
-		auto a = E1 * vf[lp.a];
-		auto b = E1 * vf[lp.b];
-	    auto c = E1 * vf[lp.c];
-	    auto d = E1 * vf[lp.d];
-				
 	}
 	
 	void calcDipoles(){
@@ -193,7 +185,7 @@ struct MyApp : public AppR2T {
 	
 	void calcEquipotentials(){
 		
-		for (int i = 0; i < 10; ++i){
+		for (int i = 0; i < numPotentials; ++i){
 			float theta = (TWOPI * i/numPotentials);
 			float ta = cos( theta ) * orth.tw()/2.0;
 			float tb = sin( theta ) * orth.th()/2.0;
@@ -223,15 +215,15 @@ struct MyApp : public AppR2T {
     //DRAW GEOMETRY TO SCREEN
 	 virtual void drawScene(){	
 
-
-	    // DRAWCOLOR( vf, 1,1,0 );
+		// 
+			    // DRAWCOLOR( vf, 1,1,0 );
 		Render( vf, mvm, pipe, rf, gf, bf );
 		//DRAWCOLOR( orth, 0,1,0);
 		
 		for (int i = 0; i < numPotentials; ++i){
 			pipe.line( potentials[i] );
 			pipe.line( potentialsB[i] );
-		}
+		}     
 		
 		
 	}

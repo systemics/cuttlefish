@@ -22,15 +22,16 @@ struct AppR2T : App {
 	Pipe texalpha; 	
 	//Pipe blurpipe;
 	
+	bool bDoTrace;
 	float traceAmt;
 	float ux, uy, bluramt;  
 	
 	bool bUX, bUY, bBLUR, bTRACE; //update bools
     
-	AppR2T(float w, float h, float z = 30) : App(w, h, z) {	
+	AppR2T(float w, float h, float z = 30) : App(w, h, z), bDoTrace(false) {	
 		//init();
 	}    
-	AppR2T( const Layout& layout, float z = 30) : App(layout, z) {	
+	AppR2T( const Layout& layout, float z = 30) : App(layout, z), bDoTrace(false) {	
 		//init();
 	}
 	
@@ -42,7 +43,7 @@ struct AppR2T : App {
 	   
 	 	//defaults
 		ux = uy = .02;
-		traceAmt = .9;
+		traceAmt = .5;
 		bluramt = 0.2; 
 		
 		bUX = bUY = bBLUR = bTRACE = 0;   
@@ -134,7 +135,7 @@ struct AppR2T : App {
 			glClearColor(0,0,0,1);
            	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
-			//if (bTrace) addTrace()
+			if (bDoTrace) addTrace();
 			 
 			//And add a new frame on top
 			 mvm = scene.xf.modelViewMatrixf();
