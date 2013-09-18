@@ -10,7 +10,11 @@ using namespace vsr;
 struct MyApp : public AppR2T {     
 	 
 	Field<Vec2D> vf;  	/// THE VECTOR FIELD
-	Field<Vec2D> orth; 	/// THE ORTHOGONAL VECTOR FIELD
+	Field<Vec2D> orth; 	/// THE ORTHOGONAL VECTOR FIELD  
+	
+	Field< Sca > rf;    /// Div and Curl of the Field
+	Field< Sca > gf;    /// Div and Curl of the Field   
+	Field< Sca > bf;    /// Div and Curl of the Field   
 	
 	int numDipoles;  	/// NUMBER OF DIPOLES TO CALCULATE
 	Pnt * touch; 	    /// AN ARRAY OF TOUCHES 
@@ -27,9 +31,12 @@ struct MyApp : public AppR2T {
 	
 	MyApp() : AppR2T( Layout(1,4) ),  //( 21.5,14.5),//
 		time(0),
-		vf(40,7,2),
-		orth(40,7,2),
-		numDipoles(2),
+		vf(44,7,1,2),
+		orth(44,7,1,2), 
+		rf(44,7,1,2),
+		gf(44,7,1,2),
+		bf(44,7,1,2),
+		numDipoles(1),
 		numPotentials(10), 
 		pRes(20),
 		step(.2)
@@ -48,8 +55,6 @@ struct MyApp : public AppR2T {
 			 potentialsB[i]  = MBO( Mesh::Contour(pRes).color(0,1,0).mode(GL::LS) );    
 		}
 		
-		//vf.spacing( scene.width  / vf.width() )  
-		
 
 	}	 
 	
@@ -66,9 +71,24 @@ struct MyApp : public AppR2T {
 		calcVecFields();  
 		
 		calcEquipotentials();
+		 
+		//colorMeshes();
 		
-		pollData();
-	}  
+		calcDivCurl();
+	}   
+	
+	void calcDivCurl(){
+		
+		for (int i = 0; i<vf.num(); ++i){  
+			auto a = E1 * vf[i];
+			rf[i] = a[0];
+			gf[i] = a[1];
+		}                
+		
+		for (int i = 0 ; i < gf.num(); ++i){
+			bf[i] = gf.sumNbrs(i) / 4.0;
+		}
+	}
 	
 	//get field info at speaker locations
 	void pollData(){
@@ -80,18 +100,17 @@ struct MyApp : public AppR2T {
 		Patch rp = vf.surfIdx( rd[0], rd[1] );   
 		
 		//calculate div and curl upon patch
-		auto a = e1(1) * vf[lp.a];
-		auto b = e2(1) * vf[lp.a]; 
-		
-		a.vprint();
-		b.vprint();
-		
+		auto a = E1 * vf[lp.a];
+		auto b = E1 * vf[lp.b];   
+	    auto c = E1 * vf[lp.c];   
+	    auto d = E1 * vf[lp.d]; 
+				
 	}
 	
 	void calcDipoles(){
 		for (int i = 0; i < numDipoles; ++i){
-			float t = 1.0 * i/numDipoles;
-			touch[i] = Point( sin(time*t) * layout.screenWidth, t * layout.screenHeight, 0 );
+			float t =  1. + 1.0 * i/numDipoles;
+			touch[i] = Point( sin(time*t) * layout.totalWidth()/2.0, 0, 0 );
 			par[i] = Par(Tnv(0,1,0)).trs( touch[i] ); 
 		}
 	}  
@@ -148,13 +167,14 @@ struct MyApp : public AppR2T {
 	 virtual void drawScene(){	
  
           
-	    DRAWCOLOR( vf, 1,1,0 );
+	    // DRAWCOLOR( vf, 1,1,0 );    
+		Render( vf, mvm, pipe, rf, gf, bf );
 		//DRAWCOLOR( orth, 0,1,0);
 		
-		for (int i = 0; i < 5; ++i){
-			pipe.line( potentials[i] );
-			pipe.line( potentialsB[i] );
-		}   
+		// for (int i = 0; i < 5; ++i){
+		// 	pipe.line( potentials[i] );
+		// 	pipe.line( potentialsB[i] );
+		// }   
 		  
 		  
 	} 
