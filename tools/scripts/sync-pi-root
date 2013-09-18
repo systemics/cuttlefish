@@ -1,3 +1,9 @@
+# here's stats for a full sync on a wired network
+#
+# real  8m53.019s
+# user  0m5.940s
+# sys 0m43.119s
+
 mkdir -p ~/pi-root
 cd ~/pi-root
 
