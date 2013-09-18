@@ -34,8 +34,12 @@ struct MyApp : public AppR2T {
 	int numPotentials;
 	int pRes;
 	float step;
-	MBO * potentials;
-	MBO * potentialsB;
+
+	MBO * potentials;  
+	MBO * potentialsB;  
+	
+	int numAgents;
+	Field< Vec > agent;
 	
     //a time element
 	float time;
@@ -52,7 +56,8 @@ struct MyApp : public AppR2T {
 		numPotentials(10),
 		pRes(20),
 		step(.2)
-		
+		numAgents(100),
+		agent(numAgents,1,1,1)
 	
 	{
 		AppR2T::init();
@@ -119,16 +124,20 @@ struct MyApp : public AppR2T {
 		calcVecFields();
 		
 		calcEquipotentials();
+
+		calcDivCurl();  
 		
-		//colorMeshes();
+		calcAgents();
+	}      
+	
+	void calcAgents(){
 		
-		calcDivCurl();
 	}
 	
 	void calcDivCurl(){
 		
-		for (int i = 0; i<vf.num(); ++i){
-			auto a = E1 * vf[i];
+		for (int i = 0; i<vf.num(); ++i){  
+			auto a = Vec2(1,1) * vf[i];
 			rf[i] = a[0];
 			gf[i] = a[1];
 		}
