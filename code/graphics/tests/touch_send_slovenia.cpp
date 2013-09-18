@@ -7,7 +7,7 @@ using namespace std;
 using namespace ctl;
 
 struct MyApp : MainLoop, Touch {
-  lo_address loa[9];
+  lo_address loa[8];
 
   MyApp() {
     loa[0] = lo_address_new("00.cf", "8082");
@@ -18,7 +18,6 @@ struct MyApp : MainLoop, Touch {
     loa[5] = lo_address_new("11.cf", "8082");
     loa[6] = lo_address_new("12.cf", "8082");
     loa[7] = lo_address_new("13.cf", "8082");
-    loa[8] = lo_address_new("test.cf", "8082");
   }
 
   virtual void onLoop(float dt) {
@@ -26,7 +25,8 @@ struct MyApp : MainLoop, Touch {
     if (pollTouches()) {
       for (int k = 0; k < N_SLOTS; ++k)
         if ((touchPoint[k].id != 0) && (touchPoint[k].dirty == 1)) {
-          for (int j = 0; j < 9; ++j) {
+          cout << touchPoint[k].x << ", " << touchPoint[k].y << endl;
+          for (int j = 0; j < 8; ++j) {
             lo_send(loa[j], "/touch", "iiii", touchPoint[k].n, touchPoint[k].x, touchPoint[k].y, touchPoint[k].orientation);
           }
           sent++;

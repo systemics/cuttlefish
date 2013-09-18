@@ -30,24 +30,30 @@ struct MyApp : public App {
 	MBO * mbo;  
 
   NoisePink<> noise;
-  LFO<> lfo;
   Biquad<> biquad;
+  SineD<> bonk;
 	 
 	Quat model;
 	//Frame model; 
 	
 	float time; 
+  float gain, cutoff, res;
 	
 	//INSTANTIATE THE APPLICATION WITH WIDTH AND HEIGHT
-	MyApp() : App(21.5,14.5), time(0) { 
+	MyApp() : App(21.5,14.5), time(0) {
+    Sync::master().spu(48000);
 		init();
 
-    biquad.set(300, 0.2, BAND_PASS);
+    gain = 0.5f;
+    cutoff = 500.0f;
+    res = 1.0f;
 	}   
 	
 	virtual void onSound( SoundData& io ){
 		for (int i = 0; i < io.n; ++i) {
-			     	float s = biquad(noise()) * 0.5;
+            biquad.freq(cutoff);
+            biquad.res(res);
+			     	float s = biquad(noise()) * gain;
 			     	for (int j = 0; j < 2; j++) {
 			       		*io.outputBuffer++ = (short)(s * 32767.0);
 			     	}
@@ -67,6 +73,15 @@ struct MyApp : public App {
 				
 		mbo = new MBO( mesh );
 	}  
+
+  void onTouch(int finger, int xPosition, int yPosition, int orientation) {
+    if (finger == 0) {
+      gain = (-yPosition / 5200.0f) + 0.5f;
+      cutoff = ((xPosition / 6400.0f) + 0.5) * 900 + 100;
+      res = ((orientation / 64.0f) + 0.5f) * 2;
+      cout << gain << ", " << cutoff << ", " << res << endl;
+    }
+  }
 	
 	//THIS CHANGES THE POSITION OF THE CIRCLE
 	void update(){
