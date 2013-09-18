@@ -18,7 +18,7 @@ struct Sound {
     short* inputBuffer;
     short n;
   } soundData;
-  void init(int bufferFrames = 512, int sampleRate = 48000);
+  void init(unsigned int bufferFrames = 512, unsigned int sampleRate = 48000);
   virtual void onSound(SoundData& io);
 };
 

@@ -42,7 +42,9 @@ struct MyApp : public App {
 	//INSTANTIATE THE APPLICATION WITH WIDTH AND HEIGHT
 	MyApp() : App(21.5,14.5), time(0) {
     Sync::master().spu(48000);
-		init();
+
+    init();
+		Sound::init(1024, 24000);
 
     gain = 0.5f;
     cutoff = 500.0f;
@@ -50,14 +52,14 @@ struct MyApp : public App {
 	}   
 	
 	virtual void onSound( SoundData& io ){
-		for (int i = 0; i < io.n; ++i) {
-            biquad.freq(cutoff);
-            biquad.res(res);
-			     	float s = biquad(noise()) * gain;
-			     	for (int j = 0; j < 2; j++) {
-			       		*io.outputBuffer++ = (short)(s * 32767.0);
-			     	}
-			    }  
+    for (int i = 0; i < io.n; ++i) {
+      float s = 0.0f;
+      biquad.freq(cutoff);
+      biquad.res(res);
+      s = biquad(noise()) * gain;
+      for (int j = 0; j < 2; j++)
+        *io.outputBuffer++ = (short)(s * 32767.0);
+    }  
 	}                               
 	
 	//INIITIALIZE ELEMENTS OF THE SCENE 

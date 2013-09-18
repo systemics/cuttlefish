@@ -61,8 +61,9 @@ struct MyApp : public AppR2T {
 	
 	{
 		AppR2T::init();
+
+    gam::Sync::master().spu(48000); // XXX!!!
 		Sound::init();
-    	gam::Sync::master().spu(48000); // XXX!!!
 
 		bDoTrace 		= true;
 		traceAmt 		= .2; 
@@ -105,14 +106,14 @@ struct MyApp : public AppR2T {
 	}
 
   virtual void onSound( SoundData& io ){
-    // for (int i = 0; i < io.n; ++i) {
-    //   biquad.freq(cutoff);
-    //   biquad.res(res);
-    //   float s = biquad(noise()) * gain;
-    //   for (int j = 0; j < 2; j++) {
-    //     *io.outputBuffer++ = (short)(s * 32767.0);
-    //   }
-    // }   
+    for (int i = 0; i < io.n; ++i) {
+      biquad.freq(cutoff);
+      biquad.res(res);
+      float s = biquad(noise()) * gain;
+      for (int j = 0; j < 2; j++) {
+        *io.outputBuffer++ = (short)(s * 32767.0);
+      }
+    }   
   }
 	
 	//Initialize
@@ -123,15 +124,15 @@ struct MyApp : public AppR2T {
 		
 		time += .05;
 		
-		calcDipoles();
-		
-		calcVecFields();
-		
-		calcEquipotentials();
-		
-		calcDivCurl();  
-		
-		calcAgents();   
+//		calcDipoles();
+//		
+//		calcVecFields();
+//		
+//		calcEquipotentials();
+//		
+//		calcDivCurl();  
+//		
+//		calcAgents();   
 		
 	}      
 	
@@ -214,18 +215,18 @@ struct MyApp : public AppR2T {
 	
     //DRAW GEOMETRY TO SCREEN
 	 virtual void drawScene(){	
-
-		// 
-			    // DRAWCOLOR( vf, 1,1,0 );
-		Render( vf, mvm, pipe, rf, gf, bf );
-		//DRAWCOLOR( orth, 0,1,0);
-		
-		for (int i = 0; i < numPotentials; ++i){
-			pipe.line( potentials[i] );
-			pipe.line( potentialsB[i] );
-		}     
-		
-		
+//
+//		// 
+//			    // DRAWCOLOR( vf, 1,1,0 );
+//		Render( vf, mvm, pipe, rf, gf, bf );
+//		//DRAWCOLOR( orth, 0,1,0);
+//		
+//		for (int i = 0; i < numPotentials; ++i){
+//			pipe.line( potentials[i] );
+//			pipe.line( potentialsB[i] );
+//		}     
+//		
+//		
 	}
 	
 };

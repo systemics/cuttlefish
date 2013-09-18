@@ -98,9 +98,6 @@ namespace ctl {
 			//INITIALIZE GRAPHICS
             initGL();     
 
-			//INITIALIZE AUDIO
-			Sound::init();
-
 	    	addListener(GetTouch, "/touch", "iiii", this);  
 
         }  
