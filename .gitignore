@@ -4,7 +4,6 @@ doxygen_objdb_*
 .DS_Store
 .svn
 rpcc/.vagrant/
-
 *.a
 *.d
 *.dylib
