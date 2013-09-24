@@ -26,4 +26,6 @@ if (qx(mount|grep /dev/disk$n)) {
 
 $_ = qx(sudo time dd bs=1M of=/dev/rdisk$n if=$image);
 
+speak("sd card imaging complete.");
+
 qx(diskutil eject /dev/rdisk$n)
