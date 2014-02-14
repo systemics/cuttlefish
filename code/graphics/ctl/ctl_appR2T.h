@@ -58,12 +58,12 @@ struct AppR2T : App {
 		//This is the shader used to draw the Rendered Texture to screen 
 		//It doesn't use any transformation matrices, just clip space and the texture values
 		string FragA = FXAA;//TFragBlur;//TFrag; //FXAA;//
-		texpipe.program = new ShaderProgram( ClipSpaceVert, FragA, 0 );
+		texpipe.program = new ShaderProgram( ClipSpaceVertES, FragA, 0 );
 		texpipe.bindAll();  
 		
 		//This Shader Will Be the "Feedback Shader" that adds a bit of the previously drawn Frame on top
-		string FragB = TFragAlpha;
-		texalpha.program = new ShaderProgram( ClipSpaceVert, FragB, 0 );
+		string FragB = TFragAlphaES;
+		texalpha.program = new ShaderProgram( ClipSpaceVertES, FragB, 0 );
 		texalpha.bindAll();	
 		
 		 fboA.attach(*textureA, GL::COLOR);
@@ -104,7 +104,7 @@ struct AppR2T : App {
 	void addTrace(){
 		texalpha.bind();
 	   // float nt = traceAmt;
-		    texalpha.program -> uniform("alpha", traceAmt); 
+		    texalpha.program -> uniform("alpha", .1f); 
 
 		    textureB -> bind();      
 				texalpha.line( *rect );
@@ -135,6 +135,7 @@ struct AppR2T : App {
 			glClearColor(0,0,0,1);
            	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
+			//add a bit of last frame
 			if (bDoTrace) addTrace();
 			 
 			//And add a new frame on top

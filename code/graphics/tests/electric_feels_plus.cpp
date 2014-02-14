@@ -1,7 +1,7 @@
-#include "vsr.h"
-#include "vsr_op.h"
-#include "vsr_xf.h" 
-#include "vsr_stat.h"   
+#include "vsr/vsr.h"
+#include "vsr/vsr_op.h"
+#include "vsr/vsr_xf.h" 
+#include "vsr/vsr_stat.h"   
 #include "vsr_field.h"
 
 #include "ctl_util.h"
