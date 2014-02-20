@@ -10,7 +10,7 @@ struct MyApp : App {
         
 
 	MBO 	* circles;   	  //<-- Circle Objects
-	Vec3f 	* touches;        //<-- Vec3f touch posiitons
+	Vec3f 	* touches;    //<-- Vec3f touch posiitons
 	
 	int num;   					
 

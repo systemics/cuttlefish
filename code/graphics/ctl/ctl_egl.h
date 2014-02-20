@@ -256,8 +256,8 @@ namespace ctl {
                 EGLBoolean swapBuffers(){
                     return eglSwapBuffers( display.display, surface.surface );
                 }
-                //init
-                //adopted from http://jonmacey.blogspot.co.uk/2012/05/getting-started-with-egl-on-raspberry.html
+                
+                //adapted from http://jonmacey.blogspot.co.uk/2012/05/getting-started-with-egl-on-raspberry.html
                 Window() : display(), config( &display ), surface()  {
                 
                     bindAPI();
@@ -273,7 +273,7 @@ namespace ctl {
                 ~Window() {
                     swapBuffers();
                     State = eglMakeCurrent( display.display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT ); Error("Release Window");
-                    State = eglDestroySurface( display.display, surface.surface ); Error ("Destory Surface");
+                    State = eglDestroySurface( display.display, surface.surface ); Error ("Destroy Surface");
                     State = eglDestroyContext( display.display, context ); Error("Destroy Context");
                     State = eglReleaseThread(); Error("Release Thread");
                 }
@@ -297,9 +297,9 @@ namespace ctl {
                 
                 }
                 
-                virtual void initGL() = 0;
-                virtual void onDraw() = 0;
-                virtual void onFrame() = 0;
+               // virtual void initGL() = 0;
+               // virtual void onDraw() = 0;
+               // virtual void onFrame() = 0;
                 
 //                {
 //                    State = swapBuffers(); Error("SwapBuffers");

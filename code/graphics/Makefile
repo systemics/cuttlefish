@@ -42,6 +42,7 @@ LDFLAGS += -L$(PIROOT)usr/lib
 LDFLAGS += -L$(PIROOT)usr/local/lib
 LDFLAGS += -L$(PIROOT)opt/vc/lib 
 LDFLAGS += -L$(EXT_DIR)Gamma/build/lib
+LDFLAGS += -L$(EXT_DIR)vsr/build/lib
 #LDFLAGS += -L$(PIROOT)lib/arm-linux-gnueabihf
 #LDFLAGS += -L$(PIROOT)usr/lib/arm-linux-gnueabihf
 LDFLAGS += -lEGL
@@ -63,6 +64,7 @@ LDFLAGS += -lrt
 LDFLAGS += -lstdc++
 LDFLAGS += -lvchiq_arm
 LDFLAGS += -lvcos
+LDFLAGS += -lvsr
 
 USEVSR = 0
 VSRFLAGS = -I$(EXT_DIR)/vsr/ -I$(EXT_DIR)/gfx/
@@ -80,8 +82,8 @@ $(OBJ_DIR)%.o: $(OBJ_DIR)%.cpp %.h
 	@echo "compiling $< to $@"
 	$(CXX) $(CXXFLAGS) $(IPATH) -c $< -o $@ 
 
-# vsr:
-# 	@make --no-print-directory -C $@ #install DESTDIR=BUILDDIR = $(LIB_DIR) 
+vsr:
+	@make --no-print-directory -C $@ #install DESTDIR=BUILDDIR = $(LIB_DIR) 
 
 dir:
 	@mkdir -p $(BIN_DIR)
@@ -91,7 +93,7 @@ dir:
 .PRECIOUS: $(EXEC_TARGETS)
 $(EXEC_TARGETS) : title dir FORCE
 	@echo "cross compiling executable" $@
-	$(CXX) $(CXXFLAGS) $(IPATH) $(OBJ_FILES) $@ -o $(BIN_DIR)$(NAME) $(LDFLAGS) $(VSRFLAGS)
+	$(CXX) $(CXXFLAGS) $(IPATH) $(VSRFLAGS) $(OBJ_FILES) $@ -o $(BIN_DIR)$(NAME) $(LDFLAGS) 
 	#@make deploy
 
 sync:

@@ -1,7 +1,7 @@
 #include "ctl_appR2T.h"
-#include "vsr/vsr.h"
+#include "vsr/vsr_cga3D_op.h"
 #include "vsr/vsr_field.h"
-//#include "gfx/gfx_mbo.h"
+#include "gfx/gfx_mbo.h"
 
 #include "Gamma/Gamma.h"    // core functions
 #include "Gamma/Filter.h"

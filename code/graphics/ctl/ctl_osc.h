@@ -32,11 +32,16 @@ namespace ctl {
 			 	
 	       st = lo_server_thread_new("8082", 0); 
 
-		   lo_server_thread_start(st); 
+		     lo_server_thread_start(st); 
 		  
 		}
 	  
 	};
+
+  /* struct TouchHandler : OSCPacketHandler { */
+      
+  /*     TouchHandler() : OSCPacketHandler() */
+  /* }; */
 }
 
 

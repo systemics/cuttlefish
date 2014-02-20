@@ -1,12 +1,11 @@
 #include "ctl_app.h"
-#include "vsr/vsr_products.h" 
-#include "vsr/vsr_op.h"
+#include "vsr/vsr_cga3D_op.h"
 #include "vsr/vsr_render.h"
-#include "gfx/gfx_mbo.h"
 
 using namespace std;
 using namespace ctl; 
 using namespace vsr;
+using namespace vsr::cga3D;
 
 struct MyApp : public App {    
 	

@@ -50,7 +50,7 @@ namespace ctl {
 		  foo.getline(mac, 256); 
 		
 		  identifier = idOf[mac];  
-		  printf("MAC ADDRESS: %s HOST IDENTIFIER #: %d, %d", mac, identifier.row, identifier.col);
+		  printf("HOST MAC ADDRESS: %s HOST IDENTIFIER #: %d, %d\n", mac, identifier.row, identifier.col);
 		}
 	};
 } //ctl::

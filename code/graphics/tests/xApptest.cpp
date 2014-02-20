@@ -1,20 +1,43 @@
-#include "ctl_app.h"
-#include "gfx/gfx_mbo.h"
+/*
+ * =====================================================================================
+ *
+ *       Filename:  xApptest.cpp
+ *
+ *    Description: test of new app class 
+ *
+ *        Version:  1.0
+ *        Created:  02/17/2014 18:57:35
+ *       Revision:  none
+ *       Compiler:  gcc
+ *
+ *         Author:  Pablo Colapinto (), gmail -> wolftype
+ *   Organization:  
+ *
+ * =====================================================================================
+ */
+
+#include "ctl_apptest.h"
 
 using namespace std;
-using namespace ctl; 
+using namespace ctl;
 
 
 struct MyApp : public App {
         
-    //THIS IS THE APP SPECIFIC STUFF, 
+  //THIS IS THE APP SPECIFIC STUFF 
 	MBO * circle;  
 	
 	//INSTANTIATE THE APPLICATION WITH WIDTH AND HEIGHT
-	MyApp() : App(30, 20){ 
-		init();
+	MyApp() : App(30, 20) { 
+    
+    process = new gfx::MotionTrace( this->contextWidth, this->contextHeight, this);    
+    init();
 	}                                  
 	
+  virtual void doProcess(){
+    (*process)();
+  }
+
 	//INIITIALIZE ELEMENTS OF THE SCENE 
 	virtual void init(){
 		circle = new MBO( Mesh::Circle() );
@@ -45,23 +68,8 @@ struct MyApp : public App {
 	} 
 	
 }; 
+
         
+STARTANDRUN()
 
-
-bool running = true;
-void quit(int) {
-  running = false;
-}
-
-int main(){
-	
-	MyApp app; 
-  
-	while(running){
-		app.onFrame();
-		usleep(166);
-	}   
-	
-	  return 0; 
-}
 
