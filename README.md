@@ -32,7 +32,6 @@ with Cuttlefish. We use [Git][] to manage source code and [VirtualBox][] and
 ## Configure Hardware and Network
 
 
-[-------------------------------------------------------------------------]:
 [Git]: http://git-scm.com
 [Download/Install - Git]: http://git-scm.com/download
 [VirtualBox]:https://www.virtualbox.org

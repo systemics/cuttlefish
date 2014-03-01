@@ -3,7 +3,7 @@ xcuserdata
 doxygen_objdb_*
 .DS_Store
 .svn
-rpcc/.vagrant/
+.vagrant/
 *.a
 *.d
 *.dylib
