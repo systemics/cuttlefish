@@ -77,7 +77,7 @@ namespace ctl{
       }
 
 	    virtual void onSound( SoundData& io ){}
-      virtual void onFrame() { Renderer::onFrame(*this); }      ///< Pass in this app so Renderer can access EGL methods
+      virtual void onFrame() { Renderer::onFrame(); swapBuffers(); }      ///< Pass in this app so Renderer can access EGL methods
 
 
       ///  THIS IS THE FUNCTION TO OVERLOAD 
