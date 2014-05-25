@@ -7,3 +7,6 @@
 [submodule "ext/vsr"]
 	path = ext/vsr
 	url = git://github.com/wolftype/vsr2.0.git
+[submodule "ext/cuttlebone"]
+	path = ext/cuttlebone
+	url = git@spectrum.mat.ucsb.edu:cuttlebone.git
