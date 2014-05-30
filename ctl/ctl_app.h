@@ -73,7 +73,7 @@ namespace ctl{
       /// You can also overload this function for adding effects (blur, motion trace, etc)
       virtual void onFrame() { 
           update();          
-          Renderer::clear( surface.width, surface.height );
+          Renderer::clear();
           Renderer::render(); 
           Window::swapBuffers(); 
       }      
