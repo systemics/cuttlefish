@@ -1,0 +1,33 @@
+cmake_minimum_required(VERSION 2.8)
+project(cuttlefish)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -Wno-deprecated-declarations")
+set(CMAKE_CXX_FLAGS_DEBUG          "-O0 -g")
+set(CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE        "-O4 -DNDEBUG")
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
+
+find_package(Crypto REQUIRED)
+set(libraries ${libraries} ${CRYPTO_LIBRARIES})
+find_package(ZLIB REQUIRED)
+set(libraries ${libraries} ${ZLIB_LIBRARIES})
+include_directories(${ZLIB_INCLUDE_DIRS} )
+include_directories(${CRYPTO_INCLUDE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../ms_demos)
+
+if(UNIX AND NOT APPLE)
+  set(libraries ${libraries} rt pthread)
+endif()
+
+aux_source_directory(tests source_list)
+aux_source_directory(examples source_list)
+aux_source_directory(scratch source_list)
+foreach(source_file ${source_list})
+  string(REGEX REPLACE "/" "_" target ${source_file})
+  string(REGEX REPLACE ".cpp" "" target ${target})
+  add_executable(${target} ${source_file})
+  target_link_libraries(${target} ${libraries})
+endforeach(source_file)
