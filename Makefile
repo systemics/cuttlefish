@@ -15,7 +15,7 @@ BIN_DIR		= $(BUILD_DIR)bin/
 OBJ_DIR		= $(BUILD_DIR)obj/
 LIB_DIR		= $(BUILD_DIR)lib/
 PCH_DIR 	= $(BUILD_DIR)pch/
-EXT_DIR		= ../../ext/
+EXT_DIR		= ext/
 
 EXEC_TARGETS = tests/%.cpp tests/%.c  examples/%.cpp
 
@@ -36,6 +36,7 @@ IPATH += -I$(PIROOT)usr/local/include
 IPATH += -I$(PIROOT)opt/vc/include
 IPATH += -I$(PIROOT)opt/vc/include/interface/vcos/pthreads
 IPATH += -I$(PIROOT)opt/vc/include/interface/vmcs_host/linux
+IPATH += -I$(EXT_DIR)/vsr/ -I$(EXT_DIR)/gfx/
 
 LDFLAGS += -L$(PIROOT)lib
 LDFLAGS += -L$(PIROOT)usr/lib
@@ -66,9 +67,8 @@ LDFLAGS += -lvchiq_arm
 LDFLAGS += -lvcos
 LDFLAGS += -lvsr
 
-USEVSR = 0
-VSRFLAGS = -I$(EXT_DIR)/vsr/ -I$(EXT_DIR)/gfx/
-#-L$(EXT_DIR)/vsr/build/lib/ -lvsr -I$(EXT_DIR)/vsr/build/pch/ 
+#USEVSR = 0
+#VSRFLAGS = -I$(EXT_DIR)/vsr/ -I$(EXT_DIR)/gfx/ -lvsr 
 
 OBJ_FILES = src/ctl_sound.cpp src/RtAudio.cpp
 
@@ -82,8 +82,8 @@ $(OBJ_DIR)%.o: $(OBJ_DIR)%.cpp %.h
 	@echo "compiling $< to $@"
 	$(CXX) $(CXXFLAGS) $(IPATH) -c $< -o $@ 
 
-vsr:
-	@make --no-print-directory -C $@ #install DESTDIR=BUILDDIR = $(LIB_DIR) 
+vsr: FORCE
+	@make -C ext/vsr/ vsr RPI=1 GCC=1 #install DESTDIR=BUILDDIR = $(LIB_DIR) 
 
 dir:
 	@mkdir -p $(BIN_DIR)
@@ -93,7 +93,7 @@ dir:
 .PRECIOUS: $(EXEC_TARGETS)
 $(EXEC_TARGETS) : title dir FORCE
 	@echo "cross compiling executable" $@
-	$(CXX) $(CXXFLAGS) $(IPATH) $(VSRFLAGS) $(OBJ_FILES) $@ -o $(BIN_DIR)$(NAME) $(LDFLAGS) 
+	$(CXX) $(CXXFLAGS) $(IPATH) $(OBJ_FILES) $@ -o $(BIN_DIR)$(NAME) $(LDFLAGS) 
 	#@make deploy
 
 sync:

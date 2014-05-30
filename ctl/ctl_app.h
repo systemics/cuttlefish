@@ -34,14 +34,9 @@ namespace ctl{
 
       ///CONSTRUCTOR FOR SINGLE COMPUTER AND SCREEN
 	    App (float w, float h, float z=30.0) : Window(), Renderer(w,h,z)
-      {
- 
+      { 
         cout << "ID: " << identifier.row << " " << identifier.col << endl;
-        
-        /// Set pixel width and pixel height of renderer from window surface
-        contextWidth  = surface.width;
-        contextHeight = surface.height;  
-
+        Renderer::initGL(Renderer::GLES,Renderer::BUFFERED, surface.width, surface.height);
         addListener(GetTouch, "/touch", "iiii", this); 
 
       }
@@ -49,22 +44,16 @@ namespace ctl{
       ///CONSTRUCTOR FOR MULTIPLE COMPUTERS AND SCREENS
       App (Layout& l, float z = 30.0) : Window(), Renderer(l,z)
       {
-
         cout << "ID: " << identifier.row << " " << identifier.col << endl;
-
-        /// Set pixel width and pixel height of renderer from window surface
-        contextWidth  = surface.width;
-        contextHeight = surface.height;  
-
+         Renderer::initGL(Renderer::GLES,Renderer::BUFFERED, surface.width, surface.height);
         /// Set individual view frustums
         setView(z, true, identifier.row, identifier.col);
-
         addListener(GetTouch, "/touch", "iiii", this); 
 
       }
 
-      virtual void init(){};
-
+      virtual void init(){}
+      virtual void update(){}
 
       //TOUCH CALLBACK (could be encapsulated in a TouchHandler class)
       static int GetTouch( const char *path, const char *types, lo_arg **argv, int argc, void *data, void *user_data) { 
@@ -77,12 +66,17 @@ namespace ctl{
       }
 
 	    virtual void onSound( SoundData& io ){}
-      virtual void onFrame() { Renderer::onFrame(); swapBuffers(); }      ///< Pass in this app so Renderer can access EGL methods
-
 
       ///  THIS IS THE FUNCTION TO OVERLOAD 
       virtual void onDraw(){};
 
+      /// You can also overload this function for adding effects (blur, motion trace, etc)
+      virtual void onFrame() { 
+          update();          
+          Renderer::clear( surface.width, surface.height );
+          Renderer::render(); 
+          Window::swapBuffers(); 
+      }      
 
     };
 
