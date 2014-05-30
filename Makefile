@@ -36,7 +36,9 @@ IPATH += -I$(PIROOT)usr/local/include
 IPATH += -I$(PIROOT)opt/vc/include
 IPATH += -I$(PIROOT)opt/vc/include/interface/vcos/pthreads
 IPATH += -I$(PIROOT)opt/vc/include/interface/vmcs_host/linux
-IPATH += -I$(EXT_DIR)/vsr/ -I$(EXT_DIR)/gfx/
+IPATH += -I$(EXT_DIR)/vsr/
+IPATH += -I$(EXT_DIR)/gfx/
+IPATH += -I$(EXT_DIR)/cuttlebone/
 
 LDFLAGS += -L$(PIROOT)lib
 LDFLAGS += -L$(PIROOT)usr/lib
