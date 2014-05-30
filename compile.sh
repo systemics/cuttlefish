@@ -8,12 +8,9 @@ echo Directory is $DIRECTORY
 echo Filename is $FILENAME
 echo Target Name is $TARGET
 
-
 echo Compiling $1 to $TARGET
 make $1 NAME=$TARGET
-echo Deploying $TARGET to Host
 
-make copy NAME=$TARGET
-make many NAME=$TARGET
+
 
 #make deploy $1 HOST=pi@192.168.0.2 NAME=$TARGET
