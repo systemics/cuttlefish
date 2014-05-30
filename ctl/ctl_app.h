@@ -42,7 +42,7 @@ namespace ctl{
       }
 
       ///CONSTRUCTOR FOR MULTIPLE COMPUTERS AND SCREENS
-      App (Layout& l, float z = 30.0) : Window(), Renderer(l,z)
+      App (const Layout& l, float z = 30.0) : Window(), Renderer(l,z)
       {
         cout << "ID: " << identifier.row << " " << identifier.col << endl;
          Renderer::initGL(Renderer::GLES,Renderer::BUFFERED, surface.width, surface.height);
