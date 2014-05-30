@@ -26,7 +26,7 @@ struct MyApp : public App {
 		static float time = 0; time +=.01;
 		
     //change position of vertices
-		circle -> mesh.moveTo( sin(time) * width()/2.0, 0, 0 );   
+		circle -> mesh.moveTo( sin(time) * layout.screenWidth/2.0, 0, 0 );   
 		circle -> mesh.color( 1, fabs( sin(time) ), 1 );
     
     //send changes to buffer
