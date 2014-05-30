@@ -33,7 +33,7 @@ namespace ctl{
     struct App : public BCM, Host, Window, Renderer, OSCPacketHandler, Sound {
 
       ///CONSTRUCTOR FOR SINGLE COMPUTER AND SCREEN
-	    App (float w, float h, float z=30.0) : Window(), Renderer(w,h,z)
+      App (float w, float h, float z=30.0) : Window(), Renderer(w,h,z)
       { 
         cout << "ID: " << identifier.row << " " << identifier.col << endl;
         Renderer::initGL(Renderer::GLES,Renderer::BUFFERED, surface.width, surface.height);
@@ -65,7 +65,7 @@ namespace ctl{
         cout << n << endl;
       }
 
-	    virtual void onSound( SoundData& io ){}
+      virtual void onSound( SoundData& io ){}
 
       ///  THIS IS THE FUNCTION TO OVERLOAD 
       virtual void onDraw(){};
