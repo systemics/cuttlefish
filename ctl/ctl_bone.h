@@ -18,6 +18,8 @@ using namespace std;
 
 #define PORT (63057)
 
+namespace ctl {
+
 template <typename STATE, unsigned PACKET_SIZE = 1400>
 struct Simulator : Timer {
 
@@ -61,7 +63,7 @@ struct Simulator : Timer {
 
         if (popCount) {
           if (shouldLog)
-            LOG("sending packet %d", frame);
+            LOG("sent packet %d", frame);
           PacketMaker<STATE, Packet<PACKET_SIZE> > packetMaker(*state, frame);
           while (packetMaker.fill(p))
             broadcaster.send((unsigned char*)&p);
@@ -98,6 +100,7 @@ struct Simulator : Timer {
 template <typename STATE, unsigned PACKET_SIZE = 1400>
 struct Renderer {
 
+  virtual void firstRun() = 0;
   virtual void gotState(float dt, STATE& state, int popCount) = 0;
 
   bool shouldLog;
@@ -166,6 +169,8 @@ struct Renderer {
       while (waitingToStart)
         usleep(LITTLE_WAIT_TIME_US);
 
+      firstRun();
+
       while (!done) {
         int popCount = 0;
         while (receiveRender.pop(*renderState))
@@ -191,5 +196,7 @@ struct Renderer {
     render.join();
   }
 };
+
+} // namespace ctl
 
 #endif
