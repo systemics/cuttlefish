@@ -1,6 +1,6 @@
 #include "ctl_app.h"
 #include "vsr/vsr_cga3D_op.h"
-#include "vsr/vsr_frame.h"
+#include "vsr/vsr_cga3D_frame.h"
 #include "vsr/vsr_render.h"
 
 using namespace std;
@@ -22,8 +22,8 @@ struct MyApp : public App {
   //Initialize
   void init(){
     
-    frameA.set(-10,0,0);
-    frameB.set(10,0,0);
+    frameA.pos(-10,0,0);
+    frameB.pos(10,0,0);
     
   }  
   
@@ -38,7 +38,7 @@ struct MyApp : public App {
     
   }
   
-    //DRAW GEOMETRY TO SCREEN  
+  //DRAW GEOMETRY TO SCREEN  
   void onDraw(){   
     
     //Draw Frames
@@ -55,6 +55,8 @@ struct MyApp : public App {
 
       DRAW( Frame( Gen::mot(dll * t) * frameA.mot() ) );
     } 
+
+   
   } 
   
 }; 

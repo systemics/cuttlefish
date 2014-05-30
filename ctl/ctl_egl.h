@@ -252,7 +252,7 @@ namespace ctl {
                 Surface surface;
                 EGLContext context;
                 Config config;                
-                                 
+                                                  
                 EGLBoolean swapBuffers(){
                     return eglSwapBuffers( display.display, surface.surface );
                 }
@@ -296,15 +296,6 @@ namespace ctl {
                 bool onResize(){
                 
                 }
-                
-               // virtual void initGL() = 0;
-               // virtual void onDraw() = 0;
-               // virtual void onFrame() = 0;
-                
-//                {
-//                    State = swapBuffers(); Error("SwapBuffers");
-//                    onDraw();
-//                }
                 
         }; 
 
