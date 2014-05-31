@@ -4,9 +4,10 @@ HOST = 192.168.0.9
 #@192.168.2.2
 NAME = main
 
-CXX = arm-linux-gnueabihf-g++ -std=c++0x
+CXX = ../code/rpi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin/arm-linux-gnueabihf-g++ -std=c++0x
+# arm-linux-gnueabihf-g++ 
 AR = ar crs
-CXXFLAGS = -D __raspberry__ -U __linux__  -D __LINUX_ALSA__
+CXXFLAGS = -D __raspberry__ -D __LINUX_ALSA__
 
 SYNCITEMS = opt usr/include usr/lib lib code
 
@@ -39,6 +40,7 @@ IPATH += -I$(PIROOT)opt/vc/include/interface/vmcs_host/linux
 IPATH += -I$(EXT_DIR)/vsr/
 IPATH += -I$(EXT_DIR)/gfx/
 IPATH += -I$(EXT_DIR)/cuttlebone/
+IPATH += -I$(EXT_DIR)/Gamma/
 
 LDFLAGS += -L$(PIROOT)lib
 LDFLAGS += -L$(PIROOT)usr/lib
