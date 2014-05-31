@@ -26,7 +26,7 @@ struct MyApp : ctl::Simulator<Foo> {
 #include "ctl_egl.h"
 #include "gfx/gfx_renderer.h"  //<-- the encapsulated rendering engine
 
-struct MyApp : ctl::BCM, ctl::Host, ctl::Renderer<Foo>, gfx::Renderer {
+struct MyApp : ctl::BCM, ctl::Host, ctl::Renderer<Foo>, gfx::Renderer, ctl::Sound {
   ctl::EGL::Window* w;
   float v;
 
@@ -52,6 +52,16 @@ struct MyApp : ctl::BCM, ctl::Host, ctl::Renderer<Foo>, gfx::Renderer {
     gfx::Renderer::clear();
     gfx::Renderer::render();
     w->swapBuffers();
+  }
+
+  virtual void onSound( ctl::Sound::SoundData& io ){
+    LOG("got here");
+    for (int i = 0; i < io.n; ++i) {
+      float s = i / (float)io.n;
+      for (int j = 0; j < 2; j++) {
+        *io.outputBuffer++ = (short)(s * 32767.0);
+      }
+    }
   }
 };
 

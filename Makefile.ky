@@ -118,6 +118,12 @@ mpssh:
 mpssh-kill:
 	mpssh -s "pkill main"
 
+screens:
+	pscp -h screens.hosts build/bin/$(NAME) /tmp
+
+servers:
+	pscp -h servers.hosts build/bin/$(NAME) /tmp
+
 kill:
 	ssh -p $(PORT) $(HOST) "rm -f /tmp/$(NAME)"
 	ssh -p $(PORT) $(HOST) "pkill $(NAME)"
