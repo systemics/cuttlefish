@@ -29,10 +29,8 @@ struct MyApp : ctl::BCM, ctl::Host, ctl::Renderer<Foo>, gfx::Renderer {
   gfx::MBO* mboC;
 
   MyApp() : gfx::Renderer(gfx::Layout(4, 4), 30.0) {
-    // MyApp() : gfx::Renderer(30, 20) {
+    setView(30.0, true, identifier.row, identifier.col);
 
-    circle = new gfx::MBO(gfx::Mesh::Circle(6));
-    circle = new gfx::MBO(gfx::Mesh::Circle(6));
     circle = new gfx::MBO(gfx::Mesh::Circle(6));
   }
 
@@ -50,7 +48,7 @@ struct MyApp : ctl::BCM, ctl::Host, ctl::Renderer<Foo>, gfx::Renderer {
     circle->mesh.color(1, fabs(sin(state.time)), 1);
 
     // send changes to buffer
-    circle->update();
+    circle->update(); // XXX seems to break
 
     mboR =
         new gfx::MBO(gfx::Mesh::Num(identifier.row).translate(-1, 0, 0).moveTo(
