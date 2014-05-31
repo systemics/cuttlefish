@@ -39,7 +39,7 @@ struct Simulator : Timer {
   Simulator(const char* broadcastIp = "127.0.0.1", float timerRate = 1 / 60.0f)
       : broadcastIp(broadcastIp),
         timerRate(timerRate),
-        shouldLog(true),
+        shouldLog(false),
         done(false),
         waitingToStart(true),
         simulationState(new STATE) {}
