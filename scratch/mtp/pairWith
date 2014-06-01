@@ -1,0 +1,3 @@
+#!/bin/sh
+
+bluez-simple-agent hci0 $1 && bluez-test-device trusted $1 yes && bluez-test-input connect  $1

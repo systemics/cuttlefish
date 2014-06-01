@@ -1,0 +1,5 @@
+#!/bin/sh
+
+bluez-test-input disconnect $1 && echo DISCONNECT
+bluez-test-device remove $1 && echo REMOVE
+bluez-simple-agent hci0 $1 remove && echo REMOVE (agent)
