@@ -30,14 +30,14 @@ struct MyApp : ctl::BCM, ctl::Host, ctl::Renderer<Foo>, gfx::Renderer {
 
   MyApp() : gfx::Renderer(gfx::Layout(4, 4), 30.0) {
     setView(30.0, true, identifier.row, identifier.col);
-
-    circle = new gfx::MBO(gfx::Mesh::Circle(6));
   }
 
   virtual void firstRun() {
     w = new ctl::EGL::Window;
     initGL(gfx::Renderer::GLES, gfx::Renderer::BUFFERED, w->surface.width,
            w->surface.height);
+
+    circle = new gfx::MBO(gfx::Mesh::Circle(6));
   }
 
   virtual void gotState(float dt, Foo& state, int popCount) {
@@ -48,7 +48,7 @@ struct MyApp : ctl::BCM, ctl::Host, ctl::Renderer<Foo>, gfx::Renderer {
     circle->mesh.color(1, fabs(sin(state.time)), 1);
 
     // send changes to buffer
-    circle->update(); // XXX seems to break
+    circle->update();
 
     mboR =
         new gfx::MBO(gfx::Mesh::Num(identifier.row).translate(-1, 0, 0).moveTo(

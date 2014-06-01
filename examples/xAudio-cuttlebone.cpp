@@ -40,9 +40,12 @@ struct MyApp : ctl::BCM,
   gfx::MBO* mbo;
   float mix[2];  ///<-- Left/Right Sound Mix
 
-  MyApp() : gfx::Renderer(30, 20) {
+  MyApp() : gfx::Renderer(30, 20) { Sound::init(1024, 48000); }
 
-    Sound::init(1024, 48000);
+  virtual void firstRun() {
+    w = new ctl::EGL::Window;
+    initGL(gfx::Renderer::GLES, gfx::Renderer::BUFFERED, w->surface.width,
+           w->surface.height);
 
     gfx::Mesh mesh;
     mesh.add(-1, -1, 0).add();
@@ -51,12 +54,6 @@ struct MyApp : ctl::BCM,
     mesh.add(1, -1, 0).add();
 
     mbo = new gfx::MBO(mesh);
-  }
-
-  virtual void firstRun() {
-    w = new ctl::EGL::Window;
-    initGL(gfx::Renderer::GLES, gfx::Renderer::BUFFERED, w->surface.width,
-           w->surface.height);
   }
 
   virtual void gotState(float dt, Foo& state, int popCount) {
@@ -83,7 +80,7 @@ struct MyApp : ctl::BCM,
   }
 
   virtual void onDraw() {
-    //background.set(v, 1 - v, v * v * v, 1.0f);
+    // background.set(v, 1 - v, v * v * v, 1.0f);
     pipe.line(*mbo);
   }
 
