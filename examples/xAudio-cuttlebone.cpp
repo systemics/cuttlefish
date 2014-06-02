@@ -29,7 +29,7 @@ struct MyApp : ctl::Simulator<Foo> {
 
 struct MyApp : ctl::BCM,
                ctl::Host,
-               ctl::Renderer<Foo>,
+               ctl::Subscriber<Foo>,
                gfx::Renderer,
                ctl::Sound {
 

@@ -26,7 +26,7 @@ struct MyApp : ctl::Simulator<Foo> {
 #include "ctl_egl.h"
 #include "gfx/gfx_renderer.h"  //<-- the encapsulated rendering engine
 
-struct MyApp : ctl::BCM, ctl::Host, ctl::Renderer<Foo>, gfx::Renderer, ctl::Sound {
+struct MyApp : ctl::BCM, ctl::Host, ctl::Subscriber<Foo>, gfx::Renderer, ctl::Sound {
   ctl::EGL::Window* w;
   float v;
 

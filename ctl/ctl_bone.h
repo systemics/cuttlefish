@@ -98,7 +98,7 @@ struct Simulator : Timer {
 };
 
 template <typename STATE, unsigned PACKET_SIZE = 1400>
-struct Renderer {
+struct Subscriber {
 
   virtual void firstRun() = 0;
   virtual void gotState(float dt, STATE& state, int popCount) = 0;
@@ -111,7 +111,7 @@ struct Renderer {
   Queue<STATE> receiveRender;
   thread receive, render;
 
-  Renderer()
+  Subscriber()
       : shouldLog(false),
         done(false),
         waitingToStart(true),
