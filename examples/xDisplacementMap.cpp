@@ -120,8 +120,6 @@ struct MyProcess : public Process {
 
   void operator()(){
 
-
-
     // Render to Offscreen Texture!
     r2t();        
 
