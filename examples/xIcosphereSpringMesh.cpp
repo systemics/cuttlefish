@@ -86,11 +86,12 @@ using namespace ctl;
 
 #define SK (0.01f)
 #define NK (0.1f)
-#define D (0.97)
+#define D (0.93)
+//#define D (0.97)
 //.01, .1, .765
 
 struct MyApp : Simulator<Foo> {
-  MyApp() : Simulator<Foo>("192.168.7.255", 1 / 30.0f) {}
+  MyApp() : Simulator<Foo>("192.168.7.255") {}
 
   float d, sk, nk;
   Foo original;
@@ -157,25 +158,37 @@ using namespace gfx;
 
 struct MyApp : CuttleboneApp<Foo> {
 
-  MBO* circle;
+  MBO* lines;
 
   MyApp() : CuttleboneApp<Foo>(Layout(4, 4), 30.0) {}
 
-  virtual void setup() { circle = new MBO(Mesh::Circle(0.1f)); }
+  virtual void setup() {
+
+    Foo dummyFoo;
+    vector<vector<unsigned short> > dummyNeighbors;
+    vector<unsigned short> triangleIndex;
+    vector<unsigned short> lineIndex;
+
+    load(ICOSPHERE_FILE, dummyFoo, triangleIndex, lineIndex, dummyNeighbors);
+
+    Mesh ico;
+    for (int i = 0; i < lineIndex.size(); i++) ico.add(lineIndex[i]);
+    for (int i = 0; i < N_VERTICES; i++) ico.add(Vec3f(0, 0, 0));
+
+    lines = new MBO(ico);
+  }
 
   virtual void update(float dt, Foo& state, int popCount) {
+    for (int i = 0; i < N_VERTICES; i++) {
+      Vec3f p(renderState->position[i].x, renderState->position[i].y,
+              renderState->position[i].z - 0.5);
+      p *= 119;
+      lines->mesh[i].Pos = p;
+    }
+    lines->update();
   }
 
-  virtual void onDraw() {
-    pipe.begin(*circle);
-    for (int i = 0; i < N_VERTICES; i++) {
-      Vec3f p(renderState->position[i].x, renderState->position[i].y, renderState->position[i].z - 1);
-      p *= 57.0;
-      modelview(gfx::XMat::trans(p));
-      pipe.draw(*circle);
-    }
-    pipe.end(*circle);
-  }
+  virtual void onDraw() { pipe.line(*lines); }
 
   virtual void onSound(Sound::SoundData& io) {}
 };
