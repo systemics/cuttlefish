@@ -14,33 +14,22 @@ struct MyApp : ctl::Simulator<Foo> {
 
 #else
 
-#include "ctl_bcm.h"
-#include "ctl_host.h"
-#include "ctl_sound.h"
-#include "ctl_egl.h"
-#include "gfx/gfx_renderer.h"  //<-- the encapsulated rendering engine
+#include "ctl_app.h"
 
-struct MyApp : ctl::BCM, ctl::Host, ctl::Subscriber<Foo>, gfx::Renderer {
+using namespace ctl;
+using namespace gfx;
 
-  ctl::EGL::Window* w;
+struct MyApp : CuttleboneApp<Foo> {
 
-  gfx::MBO* circle;
-  gfx::MBO* mboR;
-  gfx::MBO* mboC;
+  MBO* circle;
+  MBO* mboR;
+  MBO* mboC;
 
-  MyApp() : gfx::Renderer(gfx::Layout(4, 4), 30.0) {
-    setView(30.0, true, identifier.row, identifier.col);
-  }
+  MyApp() : CuttleboneApp<Foo>(Layout(4, 4), 30.0) {}
 
-  virtual void firstRun() {
-    w = new ctl::EGL::Window;
-    initGL(gfx::Renderer::GLES, gfx::Renderer::BUFFERED, w->surface.width,
-           w->surface.height);
+  virtual void setup() { circle = new MBO(Mesh::Circle(6)); }
 
-    circle = new gfx::MBO(gfx::Mesh::Circle(6));
-  }
-
-  virtual void gotState(float dt, Foo& state, int popCount) {
+  virtual void update(float dt, Foo& state, int popCount) {
 
     // change position of vertices
     circle->mesh.moveTo(sin(state.time) * layout.totalWidth() / 2.0,
@@ -50,17 +39,13 @@ struct MyApp : ctl::BCM, ctl::Host, ctl::Subscriber<Foo>, gfx::Renderer {
     // send changes to buffer
     circle->update();
 
-    mboR =
-        new gfx::MBO(gfx::Mesh::Num(identifier.row).translate(-1, 0, 0).moveTo(
-            layout.speakerL + gfx::Vec3f(3, 0, 0)));
-    mboC =
-        new gfx::MBO(gfx::Mesh::Num(identifier.col).translate(1, 0, 0).moveTo(
-            layout.speakerL + gfx::Vec3f(layout.screenWidth - 3, 0, 0)));
+    mboR = new MBO(Mesh::Num(identifier.row).translate(-1, 0, 0).moveTo(
+        layout.speakerL + Vec3f(3, 0, 0)));
+    mboC = new MBO(Mesh::Num(identifier.col).translate(1, 0, 0).moveTo(
+        layout.speakerL + Vec3f(layout.screenWidth - 3, 0, 0)));
 
     // background color
     background.set(fabs(sin(state.time)) * .2, fabs(cos(state.time)) * 1, 1, 1);
-
-    this->onFrame();
   }
 
   virtual void onDraw() {
@@ -69,11 +54,7 @@ struct MyApp : ctl::BCM, ctl::Host, ctl::Subscriber<Foo>, gfx::Renderer {
     pipe.line(*mboC);
   }
 
-  virtual void onFrame() {
-    gfx::Renderer::clear();
-    gfx::Renderer::render();
-    w->swapBuffers();
-  }
+  virtual void onSound(SoundData& io) {}
 };
 
 #endif

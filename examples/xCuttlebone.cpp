@@ -20,49 +20,28 @@ struct MyApp : ctl::Simulator<Foo> {
 
 #else
 
-#include "ctl_bcm.h"
-#include "ctl_host.h"
-#include "ctl_sound.h"
-#include "ctl_egl.h"
-#include "gfx/gfx_renderer.h"  //<-- the encapsulated rendering engine
+#include "ctl_app.h"
 
-struct MyApp : ctl::BCM, ctl::Host, ctl::Subscriber<Foo>, gfx::Renderer, ctl::Sound {
-  ctl::EGL::Window* w;
+using namespace ctl;
+using namespace gfx;
+
+struct MyApp : CuttleboneApp<Foo> {
+
   float v;
 
-  MyApp() : gfx::Renderer(30, 20) {
-    //
-    // shouldLog = true;
+  MyApp() : CuttleboneApp<Foo>(Layout(4, 4), 30.0) {
+    // Sound::init(1024, 48000);
   }
 
-  virtual void firstRun() {
-    w = new ctl::EGL::Window;
-    initGL(gfx::Renderer::GLES, gfx::Renderer::BUFFERED, w->surface.width,
-           w->surface.height);
-  }
+  virtual void setup() {}
 
-  virtual void gotState(float dt, Foo& state, int popCount) {
+  virtual void update(float dt, Foo& state, int popCount) {
     v = state.value - int(state.value);
-    this->onFrame();
   }
 
   virtual void onDraw() { background.set(v, 1 - v, v * v * v, 1.0f); }
 
-  virtual void onFrame() {
-    gfx::Renderer::clear();
-    gfx::Renderer::render();
-    w->swapBuffers();
-  }
-
-  virtual void onSound( ctl::Sound::SoundData& io ){
-    LOG("got here");
-    for (int i = 0; i < io.n; ++i) {
-      float s = i / (float)io.n;
-      for (int j = 0; j < 2; j++) {
-        *io.outputBuffer++ = (short)(s * 32767.0);
-      }
-    }
-  }
+  virtual void onSound(Sound::SoundData& io) {}
 };
 
 #endif

@@ -197,6 +197,6 @@ struct Subscriber {
   }
 };
 
-} // namespace ctl
+}  // namespace ctl
 
 #endif

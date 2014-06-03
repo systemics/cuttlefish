@@ -20,75 +20,58 @@ struct MyApp : ctl::Simulator<Foo> {
 
 #else
 
-#include "ctl_bcm.h"
-#include "ctl_host.h"
-#include "ctl_sound.h"
-#include "ctl_egl.h"
-#include "gfx/gfx_renderer.h"  //<-- the encapsulated rendering engine
+#include "ctl_app.h"
 #include "Gamma/Gamma.h"
 
-struct MyApp : ctl::BCM,
-               ctl::Host,
-               ctl::Subscriber<Foo>,
-               gfx::Renderer,
-               ctl::Sound {
+using namespace ctl;
+using namespace gam;
+using namespace gfx;
 
-  ctl::EGL::Window* w;
+struct MyApp : CuttleboneApp<Foo> {
 
-  float v;
+  float f;
 
-  gfx::MBO* mbo;
+  MBO* mbo;
   float mix[2];  ///<-- Left/Right Sound Mix
 
-  MyApp() : gfx::Renderer(30, 20) { Sound::init(1024, 48000); }
+  MyApp() : CuttleboneApp<Foo>(Layout(4, 4), 30.0) { Sound::init(1024, 48000); }
 
-  virtual void firstRun() {
-    w = new ctl::EGL::Window;
-    initGL(gfx::Renderer::GLES, gfx::Renderer::BUFFERED, w->surface.width,
-           w->surface.height);
-
-    gfx::Mesh mesh;
+  virtual void setup() {
+    Mesh mesh;
     mesh.add(-1, -1, 0).add();
     mesh.add(-1, 1, 0).add();
     mesh.add(1, 1, 0).add();
     mesh.add(1, -1, 0).add();
 
-    mbo = new gfx::MBO(mesh);
+    mbo = new MBO(mesh);
   }
 
-  virtual void gotState(float dt, Foo& state, int popCount) {
-    v = state.time - int(state.time);
+  virtual void update(float dt, Foo& state, int popCount) {
+    f = state.time - int(state.time);
+    background.set(f, 1 - f, f * f * f, 1.0f);
 
-    gfx::Vec3f v(cos(state.time) * layout.screenWidth / 2.0, 0, 0);
+    Vec3f v(cos(state.time) * layout.screenWidth / 2.0, 0, 0);
     mbo->mesh.translateA(v.x, 0, 0);
     mbo->update();
 
-    mix[0] = lw(v);
-    mix[1] = rw(v);
-
-    this->onFrame();
+    float t = cos(state.time);
+    t = t * t * t * t * t;
+    mix[0] = t > 0 ? t : 0;
+    mix[1] = t < 0 ? -t : 0;
   }
 
-  float lw(const gfx::Vec3f& v) {
-    float sqd = (v - layout.speakerL).sq();  // squared distance
-    return CLAMP(1.0 / (fabs(1.0 - sqd) + .001), 0, 1);
-  }
+  // Broken with "Layout(4, 4)"
+  //  float lw(const Vec3f& v) {
+  //    float sqd = (v - layout.speakerL).sq();  // squared distance
+  //    return CLAMP(1.0 / (fabs(1.0 - sqd) + .001), 0, 1);
+  //  }
+  //
+  //  float rw(const Vec3f& v) {
+  //    float sqd = (v - layout.speakerR).sq();  // squared distance
+  //    return CLAMP(1.0 / (fabs(1.0 - sqd) + .001), 0, 1);
+  //  }
 
-  float rw(const gfx::Vec3f& v) {
-    float sqd = (v - layout.speakerR).sq();  // squared distance
-    return CLAMP(1.0 / (fabs(1.0 - sqd) + .001), 0, 1);
-  }
-
-  virtual void onDraw() {
-    // background.set(v, 1 - v, v * v * v, 1.0f);
-    pipe.line(*mbo);
-  }
-
-  virtual void onFrame() {
-    gfx::Renderer::clear();
-    gfx::Renderer::render();
-    w->swapBuffers();
-  }
+  virtual void onDraw() { pipe.line(*mbo); }
 
   virtual void onSound(SoundData& io) {
     for (int i = 0; i < io.n; ++i) {
