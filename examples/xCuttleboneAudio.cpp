@@ -36,7 +36,11 @@ struct MyApp : CuttleboneApp<Foo> {
     mix[1] = t < 0 ? -t : 0;
   }
 
-  virtual void onDraw() {}
+  virtual void onDraw() {
+    // fyi, you can access current state like this:
+    //
+    // LOG("time is %f", renderState->time);
+  }
 
   virtual void onSound(SoundData& io) {
     for (int i = 0; i < io.n; ++i) {
