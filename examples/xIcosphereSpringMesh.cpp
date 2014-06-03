@@ -65,6 +65,9 @@ struct MyApp : Simulator<Foo> {
   }
 
   virtual void update(float dt, Foo& state) {
+
+    state.time += dt;
+
     static float period = 0;
     static int simCount = 0;
     if (period > 1.0) {
@@ -118,7 +121,7 @@ struct MyApp : CuttleboneApp<Foo> {
 
   MBO* lines;
 
-  MyApp() : CuttleboneApp<Foo>(Layout(4, 4), 30.0) {}
+  MyApp() : CuttleboneApp<Foo>(Layout(4, 4), 30.0) { Sound::init(1024, 48000); }
 
   virtual void setup() {
 
