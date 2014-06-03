@@ -1,13 +1,16 @@
-#define ICOSPHERE_FILE "/home/pi/icosphere_2.txt"
-#define N_VERTICES (162)
+#define SERVER_PATH "/Users/ky/code/cuttlefish/"
+#define CLIENT_PATH "/home/pi/"
 
-//#define ICOSPHERE_FILE "/home/pi/icosphere_3.txt"
+//#define ICOSPHERE_FILE "icosphere_2.txt"
+//#define N_VERTICES (162)
+
+//#define ICOSPHERE_FILE "icosphere_3.txt"
 //#define N_VERTICES (642)
 
-//#define ICOSPHERE_FILE "/home/pi/icosphere_4.txt"
-//#define N_VERTICES (2562)
+#define ICOSPHERE_FILE "icosphere_4.txt"
+#define N_VERTICES (2562)
 
-//#define ICOSPHERE_FILE "/icosphere_5.txt"
+//#define ICOSPHERE_FILE "icosphere_5.txt"
 //#define N_VERTICES (10242)
 
 #include "gfx/gfx_matrix.h"
@@ -43,7 +46,7 @@ using namespace gfx;
 //.01, .1, .765
 
 struct MyApp : Simulator<Foo> {
-  MyApp() : Simulator<Foo>("192.168.7.255") {}
+  MyApp() : Simulator<Foo>("192.168.7.255", 1 / 30.0f) {}
 
   float d, sk, nk;
   Foo original;
@@ -53,7 +56,10 @@ struct MyApp : Simulator<Foo> {
   virtual void setup(Foo& state) {
     memset(&state, 0, sizeof(state));
     vector<unsigned short> tri, lin;
-    load(ICOSPHERE_FILE, state, tri, lin, neighbor);
+    if (!load(SERVER_PATH ICOSPHERE_FILE, state, tri, lin, neighbor)) {
+      LOG("ERROR: failed to load %s", SERVER_PATH ICOSPHERE_FILE);
+      exit(1);
+    }
     memcpy(&original, &state, sizeof(Foo));
     memset(&velocity, 0, sizeof(Vec3f) * N_VERTICES);
   }
@@ -121,7 +127,11 @@ struct MyApp : CuttleboneApp<Foo> {
     vector<unsigned short> triangleIndex;
     vector<unsigned short> lineIndex;
 
-    load(ICOSPHERE_FILE, dummyFoo, triangleIndex, lineIndex, dummyNeighbors);
+    if (!load(CLIENT_PATH ICOSPHERE_FILE, dummyFoo, triangleIndex, lineIndex,
+              dummyNeighbors)) {
+      LOG("ERROR: failed to load %s", CLIENT_PATH ICOSPHERE_FILE);
+      exit(1);
+    }
 
     Mesh ico;
     for (int i = 0; i < lineIndex.size(); i++) ico.add(lineIndex[i]);
@@ -131,9 +141,19 @@ struct MyApp : CuttleboneApp<Foo> {
   }
 
   virtual void update(float dt, Foo& state, int popCount) {
+    static float period = 0;
+    static int count = 0;
+    if (period > 1.0) {
+      period -= 1.0;
+      LOG("Ren: %d", count);
+      count = 0;
+    }
+    period += dt;
+    count++;
+
     for (int i = 0; i < N_VERTICES; i++) {
-      Vec3f p(renderState->position[i].x * 150, renderState->position[i].y * 150,
-              renderState->position[i].z);
+      Vec3f p(renderState->position[i].x * 150,
+              renderState->position[i].y * 150, renderState->position[i].z);
       lines->mesh[i].Pos = p;
     }
     lines->update();
