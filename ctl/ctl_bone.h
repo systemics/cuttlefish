@@ -77,7 +77,7 @@ struct Simulator : Timer {
     setup(*simulationState);
 
     waitingToStart = false;
-    Timer::start(1 / 60.0f);
+    Timer::start(timerRate);
 
     getchar();
 
