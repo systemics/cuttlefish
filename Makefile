@@ -9,6 +9,10 @@ CXX = ../code/rpi/tools/arm-bcm2708/gcc-linaro-arm-linux-gnueabihf-raspbian/bin/
 AR = ar crs
 CXXFLAGS = -D __raspberry__ -D __LINUX_ALSA__
 
+ifeq (1,${SIMBUILD})
+CXXFLAGS += -D SIM
+endif
+
 SYNCITEMS = opt usr/include usr/lib lib code
 
 BUILD_DIR 	= build/
