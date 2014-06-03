@@ -14,27 +14,29 @@ struct MyApp : ctl::Simulator<Foo> {
 
 #else
 
-#include "ctl_bcm.h"
-#include "ctl_host.h"
-#include "ctl_sound.h"
-#include "ctl_egl.h"
-#include "gfx/gfx_renderer.h"  //<-- the encapsulated rendering engine
+#include "ctl_app.h"
 #include "Gamma/Gamma.h"
 
-struct MyApp : ctl::BCM, ctl::Host, ctl::Renderer<Foo>, ctl::Sound {
+using namespace ctl;
+using namespace gfx;
+using namespace gam;
+
+struct MyApp : CuttleboneApp<Foo> {
 
   float mix[2];  ///<-- Left/Right Sound Mix
 
-  MyApp() { Sound::init(1024, 48000); }
+  MyApp() : CuttleboneApp<Foo>(Layout(4, 4), 30.0) { Sound::init(1024, 48000); }
 
-  virtual void firstRun() {}
+  virtual void setup() {}
 
-  virtual void gotState(float dt, Foo& state, int popCount) {
+  virtual void update(float dt, Foo& state, int popCount) {
     float t = cos(state.time);
     t = t * t * t * t * t;
     mix[0] = t > 0 ? t : 0;
     mix[1] = t < 0 ? -t : 0;
   }
+
+  virtual void onDraw() {}
 
   virtual void onSound(SoundData& io) {
     for (int i = 0; i < io.n; ++i) {
