@@ -10,60 +10,11 @@
 //#define ICOSPHERE_FILE "/icosphere_5.txt"
 //#define N_VERTICES (10242)
 
-//#include "gfx/gfx_matrix.h" // Vec3f
-
-struct Vertex {
-  float x, y, z;
-  Vertex& operator=(const Vertex& that) {
-    this->x = that.x;
-    this->y = that.y;
-    this->z = that.z;
-    return *this;
-  }
-  Vertex& operator+=(const Vertex& that) {
-    this->x += that.x;
-    this->y += that.y;
-    this->z += that.z;
-    return *this;
-  }
-  Vertex& operator-=(const Vertex& that) {
-    this->x -= that.x;
-    this->y -= that.y;
-    this->z -= that.z;
-    return *this;
-  }
-  Vertex& operator*=(const float that) {
-    this->x *= that;
-    this->y *= that;
-    this->z *= that;
-    return *this;
-  }
-  Vertex& operator/=(const float that) {
-    this->x /= that;
-    this->y /= that;
-    this->z /= that;
-    return *this;
-  }
-};
-
-Vertex operator+(const Vertex& a, const Vertex& b) {
-  Vertex v{a.x + b.x, a.y + b.y, a.z + b.z};
-  return v;
-}
-
-Vertex operator-(const Vertex& a, const Vertex& b) {
-  Vertex v{a.x - b.x, a.y - b.y, a.z - b.z};
-  return v;
-}
-
-Vertex operator*(const Vertex& a, const float b) {
-  Vertex v{a.x* b, a.y* b, a.z* b};
-  return v;
-}
+#include "gfx/gfx_matrix.h"
 
 struct Foo {
   float time;
-  Vertex position[N_VERTICES];
+  gfx::Vec3f position[N_VERTICES];
 };
 
 #include <cstdlib>
@@ -83,6 +34,7 @@ bool load(string fileName, Foo& state, vector<unsigned short>& triangleIndex,
 #include "ctl_bone.h"
 
 using namespace ctl;
+using namespace gfx;
 
 #define SK (0.01f)
 #define NK (0.1f)
@@ -95,7 +47,7 @@ struct MyApp : Simulator<Foo> {
 
   float d, sk, nk;
   Foo original;
-  Vertex velocity[N_VERTICES];
+  Vec3f velocity[N_VERTICES];
   vector<vector<unsigned short> > neighbor;
 
   virtual void setup(Foo& state) {
@@ -103,7 +55,7 @@ struct MyApp : Simulator<Foo> {
     vector<unsigned short> tri, lin;
     load(ICOSPHERE_FILE, state, tri, lin, neighbor);
     memcpy(&original, &state, sizeof(Foo));
-    memset(&velocity, 0, sizeof(Vertex) * N_VERTICES);
+    memset(&velocity, 0, sizeof(Vec3f) * N_VERTICES);
   }
 
   virtual void update(float dt, Foo& state) {
@@ -120,22 +72,22 @@ struct MyApp : Simulator<Foo> {
     static int n = 0;
 
     if ((n % 300) == 0) {
-      Vertex v{r(), r(), r()};
+      Vec3f v{r(), r(), r()};
       v *= 4.0f;
-      int randomVertex = rand() % N_VERTICES;
-      state.position[randomVertex] += v;
+      int randomVec3f = rand() % N_VERTICES;
+      state.position[randomVec3f] += v;
       v *= 0.7f;
-      for (auto n : neighbor[randomVertex]) state.position[n] += v;
+      for (auto n : neighbor[randomVec3f]) state.position[n] += v;
       LOG("poke!");
     }
     n++;
 
     for (int i = 0; i < N_VERTICES; i++) {
-      Vertex& v = state.position[i];
-      Vertex force = (v - original.position[i]) * -SK;
+      Vec3f& v = state.position[i];
+      Vec3f force = (v - original.position[i]) * -SK;
 
       for (int k = 0; k < neighbor[i].size(); k++) {
-        Vertex& n = state.position[neighbor[i][k]];
+        Vec3f& n = state.position[neighbor[i][k]];
         force += (v - n) * -NK;
       }
 
@@ -180,9 +132,8 @@ struct MyApp : CuttleboneApp<Foo> {
 
   virtual void update(float dt, Foo& state, int popCount) {
     for (int i = 0; i < N_VERTICES; i++) {
-      Vec3f p(renderState->position[i].x, renderState->position[i].y,
-              renderState->position[i].z - 0.5);
-      p *= 119;
+      Vec3f p(renderState->position[i].x * 150, renderState->position[i].y * 150,
+              renderState->position[i].z);
       lines->mesh[i].Pos = p;
     }
     lines->update();
