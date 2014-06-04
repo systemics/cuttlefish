@@ -25,7 +25,7 @@
 struct Foo {
   float time;
   gfx::Vec3f position[N_VERTICES];
-  gfx::Vec2f touch[N_VERTICES];
+  gfx::Vec2f touch[MAX_TOUCH];
   int touchCount;
 };
 
@@ -51,7 +51,7 @@ using namespace gfx;
 
 #define SK (0.01f)
 #define NK (0.1f)
-#define D (0.93)
+#define D (0.765)
 //#define D (0.97)
 //.01, .1, .765
 
@@ -100,7 +100,7 @@ struct MyApp : Simulator<Foo>, Touch {
 
     static int n = 0;
 
-    if ((n % 300) == 0) {
+    if ((n % 150) == 0) {
       Vec3f v{r(), r(), r()};
       v *= 4.0f;
       int randomVec3f = rand() % N_VERTICES;
