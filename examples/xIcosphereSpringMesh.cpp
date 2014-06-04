@@ -20,9 +20,13 @@
 
 #include "gfx/gfx_matrix.h"
 
+#define MAX_TOUCH (10)
+
 struct Foo {
   float time;
   gfx::Vec3f position[N_VERTICES];
+  gfx::Vec2f touch[N_VERTICES];
+  int touchCount;
 };
 
 #include <cstdlib>
@@ -40,6 +44,7 @@ bool load(string fileName, Foo& state, vector<unsigned short>& triangleIndex,
 #if SIM
 
 #include "ctl_bone.h"
+#include "ctl_touch.h"
 
 using namespace ctl;
 using namespace gfx;
@@ -50,7 +55,7 @@ using namespace gfx;
 //#define D (0.97)
 //.01, .1, .765
 
-struct MyApp : Simulator<Foo> {
+struct MyApp : Simulator<Foo>, Touch {
   MyApp() : Simulator<Foo>("192.168.7.255", 1 / 30.0f) {}
 
   float d, sk, nk;
@@ -59,6 +64,8 @@ struct MyApp : Simulator<Foo> {
   vector<vector<unsigned short> > neighbor;
 
   virtual void setup(Foo& state) {
+    Touch::setup("/dev/input/event2");
+
     memset(&state, 0, sizeof(state));
     vector<unsigned short> tri, lin;
     if (!load(SERVER_PATH ICOSPHERE_FILE, state, tri, lin, neighbor)) {
@@ -70,6 +77,15 @@ struct MyApp : Simulator<Foo> {
   }
 
   virtual void update(float dt, Foo& state) {
+
+    pollTouches();
+    int k = 0;
+    for (auto& e : touchPoint)
+      if (e.id != 0)
+        state.touch[k++] = Vec2f(e.x / 3200.0f, e.y / -2600.0f);
+    state.touchCount = k;
+    for (int i = 0; i < state.touchCount; ++i)
+      LOG("%d x:%f y:%f", i, state.touch[0].x, state.touch[0].y);
 
     state.time += dt;
 
