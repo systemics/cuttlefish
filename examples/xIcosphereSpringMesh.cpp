@@ -2,8 +2,8 @@
 //#define SERVER_PATH "/Users/ky/code/cuttlefish/"
 #define CLIENT_PATH "/home/pi/"
 
-#define SOUND_FILE "czonic.wav"
-//#define SOUND_FILE "distort.wav"
+//#define SOUND_FILE "czonic.wav"
+#define SOUND_FILE "distort.wav"
 //#define SOUND_FILE "FLANNEL1.wav"
 
 //#define ICOSPHERE_FILE "icosphere_2.txt"
@@ -81,8 +81,7 @@ struct MyApp : Simulator<Foo>, Touch {
     pollTouches();
     int k = 0;
     for (auto& e : touchPoint)
-      if (e.id != 0)
-        state.touch[k++] = Vec2f(e.x / 3200.0f, e.y / -2600.0f);
+      if (e.id != 0) state.touch[k++] = Vec2f(e.x / 3200.0f, e.y / -2600.0f);
     state.touchCount = k;
     for (int i = 0; i < state.touchCount; ++i)
       LOG("%d x:%f y:%f", i, state.touch[0].x, state.touch[0].y);
@@ -126,8 +125,6 @@ struct MyApp : Simulator<Foo>, Touch {
     }
 
     for (int i = 0; i < N_VERTICES; i++) state.position[i] += velocity[i];
-    /*
-    */
   }
 };
 
@@ -147,12 +144,14 @@ struct MyApp : CuttleboneApp<Foo> {
   MBO* lines;
   SineD<float> bonk;
   SamplePlayer<float, ipl::Cubic, tap::Wrap> play;
+  float gain;
 
   MyApp() : CuttleboneApp<Foo>(Layout(4, 4), 30.0) {
     Sound::init(256, 48000);
     Sync::master().spu(48000);
-    //bonk.set(440.0f, 0.0f, 0.0f);
-    if (! play.load(CLIENT_PATH SOUND_FILE)) {
+    gain = 0;
+    // bonk.set(440.0f, 0.0f, 0.0f);
+    if (!play.load(CLIENT_PATH SOUND_FILE)) {
       LOG("ERROR: failed to load %s", CLIENT_PATH SOUND_FILE);
       exit(1);
     }
@@ -190,6 +189,11 @@ struct MyApp : CuttleboneApp<Foo> {
     period += dt;
     count++;
 
+    if (renderState->touchCount) {
+      gain = renderState->touch[0].y / 2 + 0.5;
+      play.rate(renderState->touch[0].x);
+    }
+
     for (int i = 0; i < N_VERTICES; i++) {
       Vec3f p(renderState->position[i].x * 150,
               renderState->position[i].y * 150, renderState->position[i].z);
@@ -204,7 +208,7 @@ struct MyApp : CuttleboneApp<Foo> {
     for (int i = 0; i < io.n; ++i) {
       float s = play();
       for (int j = 0; j < 2; j++) {
-        *io.outputBuffer++ = (short)(s * 32767.0);
+        *io.outputBuffer++ = (short)(s * 32767.0) * gain;
       }
     }
   }
