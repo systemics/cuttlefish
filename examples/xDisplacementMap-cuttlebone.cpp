@@ -17,9 +17,16 @@
 
 #include "temp/gfx_displacement.h"
 
+/* struct Foo { */
+/*   float time; */
+/*   gfx::Vec3f position[N_VERTICES]; */
+/* }; */
+
 struct Foo {
   float time;
   gfx::Vec3f position[N_VERTICES];
+  gfx::Vec2f touch[N_VERTICES];
+  int touchCount;
 };
 
 #include <cstdlib>
@@ -118,7 +125,8 @@ using namespace gfx;
 
 struct MyApp : CuttleboneApp<Foo> {
 
-  MBO* lines;
+  MBO* icombo;
+//  MBO* lines;
 
   DisplacementProcess * process;
 
@@ -138,10 +146,18 @@ struct MyApp : CuttleboneApp<Foo> {
     }
 
     Mesh ico;
-    for (int i = 0; i < lineIndex.size(); i++) ico.add(lineIndex[i]);
-    for (int i = 0; i < N_VERTICES; i++) ico.add(Vec3f(0, 0, 0));
+//    for (int i = 0; i < lineIndex.size(); i++) ico.add(lineIndex[i]);
+    for (int i = 0; i < triangleIndex.size(); i++) ico.add(triangleIndex[i]);
 
-    lines = new MBO(ico);
+    for (int i = 0; i < N_VERTICES; i++) {
+      Vertex v( Vec3f(0, 0, 0) );
+      v.Col =  Vec4f((float)i/N_VERTICES, .3, 1-(float)i/N_VERTICES, .3 );
+      ico.add(v);
+    }
+
+    ico.mode( GL::T );
+  //  lines = new MBO(ico);
+    icombo = new MBO(ico);
 
     process = new DisplacementProcess( w-> surface.width/2, w->surface.height/2, this );
 
@@ -159,23 +175,23 @@ struct MyApp : CuttleboneApp<Foo> {
     count++;
 
     for (int i = 0; i < N_VERTICES; i++) {
-      Vec3f p(renderState->position[i].x * 150,
-              renderState->position[i].y * 150, renderState->position[i].z);
-      lines->mesh[i].Pos = p;
+      Vec3f p(renderState->position[i].x * 100,
+              renderState->position[i].y * 100, renderState->position[i].z);
+      icombo->mesh[i].Pos = p;
     }
-    lines->update();
+    icombo->update();
 
     //GFX PROCESS
-    process -> blur.ux = sin(renderState->time) * .02;
-    process -> blur.uy = cos(renderState->time) * .02;
-    process -> blur.amt = fabs(sin(renderState->time)) * .5;
+    process -> blur.ux = sin(renderState->time) * .01;
+    process -> blur.uy = cos(renderState->time) * .01;
+    process -> blur.amt = .25 + fabs(sin(renderState->time)) * .25;
     process -> dispmap.amt = sin(renderState->time * .02)  * .5;
 
   }
 
   virtual void onDraw() { 
     
-    pipe.line(*lines); 
+    pipe.line(*icombo); 
   
   }
 
