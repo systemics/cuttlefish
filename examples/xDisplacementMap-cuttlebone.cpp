@@ -120,7 +120,7 @@ struct MyApp : CuttleboneApp<Foo> {
 
   MBO* lines;
 
-  DisplacmentProcess * process;
+  DisplacementProcess * process;
 
   MyApp() : CuttleboneApp<Foo>(Layout(4, 4), 30.0) {}
 
@@ -143,6 +143,8 @@ struct MyApp : CuttleboneApp<Foo> {
 
     lines = new MBO(ico);
 
+    process = new DisplacementProcess( w-> surface.width/2, w->surface.height/2, this );
+
   }
 
   virtual void update(float dt, Foo& state, int popCount) {
@@ -164,10 +166,10 @@ struct MyApp : CuttleboneApp<Foo> {
     lines->update();
 
     //GFX PROCESS
-    process -> blur.ux = sin(time);
-    process -> blur.uy = cos(time);
-    process -> blur.amt = fabs(sin(time));
-    process -> dispmap.amt = sin(time);
+    process -> blur.ux = sin(renderState->time) * .02;
+    process -> blur.uy = cos(renderState->time) * .02;
+    process -> blur.amt = fabs(sin(renderState->time)) * .5;
+    process -> dispmap.amt = sin(renderState->time * .02)  * .5;
 
   }
 
@@ -178,7 +180,6 @@ struct MyApp : CuttleboneApp<Foo> {
   }
 
   virtual void onFrame(){
-     update();          
      Renderer::clear();
     
      (*process)();
