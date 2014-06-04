@@ -1,5 +1,10 @@
-#define SERVER_PATH "/Users/ky/code/cuttlefish/"
+#define SERVER_PATH "/home/ky/"
+//#define SERVER_PATH "/Users/ky/code/cuttlefish/"
 #define CLIENT_PATH "/home/pi/"
+
+//#define SOUND_FILE "czonic.wav"
+#define SOUND_FILE "distort.wav"
+//#define SOUND_FILE "FLANNEL1.wav"
 
 //#define ICOSPHERE_FILE "icosphere_2.txt"
 //#define N_VERTICES (162)
@@ -15,17 +20,12 @@
 
 #include "gfx/gfx_matrix.h"
 
-#include "temp/gfx_displacement.h"
-
-/* struct Foo { */
-/*   float time; */
-/*   gfx::Vec3f position[N_VERTICES]; */
-/* }; */
+#define MAX_TOUCH (10)
 
 struct Foo {
   float time;
   gfx::Vec3f position[N_VERTICES];
-  gfx::Vec2f touch[N_VERTICES];
+  gfx::Vec2f touch[MAX_TOUCH];
   int touchCount;
 };
 
@@ -119,6 +119,7 @@ struct MyApp : Simulator<Foo> {
 #else
 
 #include "ctl_app.h"
+#include "temp/gfx_displacement.h"
 
 using namespace ctl;
 using namespace gfx;
@@ -182,10 +183,10 @@ struct MyApp : CuttleboneApp<Foo> {
     icombo->update();
 
     //GFX PROCESS
-    process -> blur.ux = sin(renderState->time) * .01;
-    process -> blur.uy = cos(renderState->time) * .01;
-    process -> blur.amt = .25 + fabs(sin(renderState->time)) * .25;
-    process -> dispmap.amt = sin(renderState->time * .02)  * .5;
+    process -> blur.ux = .01;//cos(renderState->time) * 
+    process -> blur.uy = .01;//sis(renderState->time) * 
+    process -> blur.amt = .25;// + fabs(sin(renderState->time)) * .25;
+    process -> dispmap.amt = 1.5;
 
   }
 

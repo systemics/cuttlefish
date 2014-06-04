@@ -126,6 +126,10 @@ kill:
 	ssh -p $(PORT) $(HOST) "rm -f /tmp/$(NAME)"
 	ssh -p $(PORT) $(HOST) "pkill $(NAME)"
 
+copyone:
+	ssh -p $(PORT) $(HOST) "rm -f /tmp/$(NAME)"
+	scp -P $(PORT) $(BIN_DIR)$(NAME) $(HOST):/tmp
+
 deploy:
 	ssh -p $(PORT) $(HOST) "rm -f /tmp/$(NAME)"
 	scp -P $(PORT) $(BIN_DIR)$(NAME) $(HOST):/tmp

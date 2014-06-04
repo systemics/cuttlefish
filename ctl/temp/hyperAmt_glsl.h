@@ -1,9 +1,10 @@
+
 /*
  * =====================================================================================
  *
  *       Filename:  hypershader.h
  *
- *    Description: see also gfx_hypershader.h
+ *    Description: see also gfx_hypershader.h  this one uses amt uniform (not underlying texture coordinate)
  *        Version:  1.0
  *        Created:  06/03/2014 20:10:46
  *       Revision:  none
@@ -14,9 +15,14 @@
  *
  * =====================================================================================
  */
+
+
+#ifndef  hyperAmt_glsl_INC
+#define  hyperAmt_glsl_INC
+
 #include "gfx/gfx_glsl.h"
 
-string hyper = R"( 
+string hyperAmt = R"( 
 
 attribute vec3 position;
 attribute vec3 normal;
@@ -30,7 +36,7 @@ uniform mat4 normalMatrix;        // Normal Matrix (inverse transpose of mvm)
 uniform vec3 lightPosition;
 uniform sampler2D sampleTexture;
 
-//uniform float amt;
+uniform float amt;
 
 varying lowp vec2 texco;
 varying vec4 colorDst;
@@ -132,14 +138,13 @@ vec3 transform( vec4 v, vec3 biv){
 }  
 
 vec3 doVertex(vec4 p, vec2 tex){
-  vec3 t = vec3(texture2D(sampleTexture, tex).rgb);
+  vec3 t = vec3(amt,0,0);//texture2D(sampleTexture, tex).rgb);
   return transform(p,t) + position; 
 }
 
 void main(void){
    
   //float test = amt;
-
   colorDst = vec4(1,0,0,1);//vec4(position,1);//sourceColor;// + doColor();       
   texco = texCoord;
   vec3 tn = normal + position;   //FORCE COMPILATION OF THESE TERMS!!
@@ -153,4 +158,5 @@ void main(void){
 
 )";
 
+#endif   /* ----- #ifndef hyperAmt_glsl_INC  ----- */
 

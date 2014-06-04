@@ -57,7 +57,7 @@ struct Displacement : public Process {
    }
 
    virtual void initShader(){
-    this->program = new ShaderProgram( DisplacementVertES, DefaultFragES, 0);
+    this->program = new ShaderProgram( DisplacementVertES, TFragES, 0);
     this->bindAll();
    } 
 
@@ -122,14 +122,14 @@ struct DisplacementProcess : public Process {
     glViewport(0, 0, renderer -> contextWidth, renderer -> contextHeight ); 
     //renderer -> clear();
 
-    slab();
+    // slab();
 
     //blur();
 
-     /* slab.texture->bind(); */
-     /*    glLineWidth(5); */
-     /*    dispmap(); */
-     /* slab.texture->unbind(); */
+     slab.texture->bind();
+        glLineWidth(1);
+        dispmap();
+     slab.texture->unbind();
 
     r2t.swap();   // Swap textures
     rp2t.swap();  
