@@ -1,4 +1,5 @@
-#define SERVER_PATH "/Users/ky/code/cuttlefish/"
+#define SERVER_PATH "/home/ky/"
+//#define SERVER_PATH "/Users/ky/code/cuttlefish/"
 #define CLIENT_PATH "/home/pi/"
 
 #define SOUND_FILE "czonic.wav"

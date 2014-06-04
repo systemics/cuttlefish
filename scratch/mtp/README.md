@@ -1,6 +1,5 @@
 # notes #
 
-
 # install dependencies #
 
     sudo -s
@@ -150,3 +149,15 @@ Properties:
   Property type 0 (INPUT_PROP_POINTER)
   Property type 2 (INPUT_PROP_BUTTONPAD)
 Testing ... (interrupt to exit)
+
+# stuff you probably don't need to do #
+
+## kernel
+
+i had to compile kernel modules for the jetson...
+
+
+## input system setup
+
+[input system](http://sourceforge.net/apps/mediawiki/gizmod/index.php?title=HOWTO_-_Setting_Input_Device_Permissions_-_Creating_a_udev_Rule)
+

@@ -47,8 +47,10 @@ struct Touch {
   TouchPoint rawTouch[N_SLOTS];
   TouchPoint touchPoint[N_SLOTS];
 
-  Touch() {
-    assert((fd = open("/dev/input/event0", O_RDONLY | O_NONBLOCK)) >= 0);
+  // Touch() used to do this...
+  //
+  void setup(const char* eventFile = "/dev/input/event0") {
+    assert((fd = open(eventFile, O_RDONLY | O_NONBLOCK)) >= 0);
 
     memset(bit, 0, sizeof(bit));
     ioctl(fd, EVIOCGBIT(0, EV_MAX), bit[0]);
