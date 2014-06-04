@@ -1,6 +1,10 @@
 #define SERVER_PATH "/Users/ky/code/cuttlefish/"
 #define CLIENT_PATH "/home/pi/"
 
+#define SOUND_FILE "czonic.wav"
+//#define SOUND_FILE "distort.wav"
+//#define SOUND_FILE "FLANNEL1.wav"
+
 //#define ICOSPHERE_FILE "icosphere_2.txt"
 //#define N_VERTICES (162)
 
@@ -113,15 +117,29 @@ struct MyApp : Simulator<Foo> {
 #else
 
 #include "ctl_app.h"
+#include "Gamma/Gamma.h"
+#include "Gamma/Oscillator.h"
+#include "Gamma/SamplePlayer.h"
 
 using namespace ctl;
 using namespace gfx;
+using namespace gam;
 
 struct MyApp : CuttleboneApp<Foo> {
 
   MBO* lines;
+  SineD<float> bonk;
+  SamplePlayer<float, ipl::Cubic, tap::Wrap> play;
 
-  MyApp() : CuttleboneApp<Foo>(Layout(4, 4), 30.0) { Sound::init(1024, 48000); }
+  MyApp() : CuttleboneApp<Foo>(Layout(4, 4), 30.0) {
+    Sound::init(256, 48000);
+    Sync::master().spu(48000);
+    //bonk.set(440.0f, 0.0f, 0.0f);
+    if (! play.load(CLIENT_PATH SOUND_FILE)) {
+      LOG("ERROR: failed to load %s", CLIENT_PATH SOUND_FILE);
+      exit(1);
+    }
+  }
 
   virtual void setup() {
 
@@ -150,6 +168,7 @@ struct MyApp : CuttleboneApp<Foo> {
       period -= 1.0;
       LOG("Ren: %d", count);
       count = 0;
+      bonk.set(440.0f, 0.8f, 0.5f);
     }
     period += dt;
     count++;
@@ -164,7 +183,14 @@ struct MyApp : CuttleboneApp<Foo> {
 
   virtual void onDraw() { pipe.line(*lines); }
 
-  virtual void onSound(Sound::SoundData& io) {}
+  virtual void onSound(Sound::SoundData& io) {
+    for (int i = 0; i < io.n; ++i) {
+      float s = play();
+      for (int j = 0; j < 2; j++) {
+        *io.outputBuffer++ = (short)(s * 32767.0);
+      }
+    }
+  }
 };
 
 #endif
