@@ -37,6 +37,7 @@ uniform vec3 lightPosition;
 uniform sampler2D sampleTexture;
 
 uniform float amt;
+uniform vec3 vpos;
 
 varying lowp vec2 texco;
 varying vec4 colorDst;
@@ -63,7 +64,7 @@ vec4 doColor(){
     //Specular Coefficient (not used here)
     float sf = max(0.0, dot(L,H) );
         
-    return vec4((sourceColor * df).xyz , 1 );
+    return vec4((sourceColor * df).xyz , 1.0 );
 }
  
 
@@ -138,18 +139,18 @@ vec3 transform( vec4 v, vec3 biv){
 }  
 
 vec3 doVertex(vec4 p, vec2 tex){
-  vec3 t = vec3(amt,0,0);//texture2D(sampleTexture, tex).rgb);
-  return transform(p,t) + position; 
+  vec3 t = vec3(amt,0,amt/2.0);//texture2D(sampleTexture, tex).rgb);
+  return transform(p,t) + vpos;//ition; 
 }
 
 void main(void){
    
   //float test = amt;
-  colorDst = vec4(1,0,0,1);//vec4(position,1);//sourceColor;// + doColor();       
+  colorDst = vec4(1.0,0,0,1.0);    //vec4(position,1);//sourceColor;// + doColor();       
   texco = texCoord;
   vec3 tn = normal + position;   //FORCE COMPILATION OF THESE TERMS!!
      
-  vec4 colorFalse = doColor();   
+  vec4 colorfalse = doColor();   
                        
   gl_PointSize = 5.0;
   gl_Position = projection * modelView * vec4(doVertex(sourceColor,texco),1.0);

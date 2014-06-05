@@ -7,7 +7,7 @@
 #include "vsr/vsr_stat.h"
 
 #define MAX_TOUCH (3)
-#define NUMAGENTS (30)
+#define NUMAGENTS (60)
 
 #define MULTIPLY (4)
 #define WIDTH (16 * MULTIPLY)
@@ -187,7 +187,6 @@ struct MyApp : Simulator<Foo>, Touch {
       int numNeighbors = 3;
       for (auto& fa : frame){
 
-
         vector<Frame> nearest;
         vector<Frame> toonear;
 
@@ -221,8 +220,8 @@ struct MyApp : Simulator<Foo>, Touch {
 
 
         if (!toonear.empty()){
-           db += fa.xz() * 2;
-           dx += fa.z() * 10; 
+           db += fa.xz() ;
+           dx += fa.z() * 20; 
         } else {
 
          for (auto& neigh : nearest){
@@ -411,13 +410,13 @@ struct MyApp : CuttleboneApp<Foo> {
       mbo->mesh[i].Col = Vec4f((flicker ? 0 : 1), v, (flicker ? 1 : 0), (flicker ? 1 : .3));
     
     }
+    mbo->update();
 
     //Particles
     for (int i = 0; i<NUMAGENTS; ++i){
       rot[i] = Rot( state.rot[i][0], state.rot[i][1], state.rot[i][2], state.rot[i][3]);
       pos[i] = vsr::Vec( state.pos[i][0], state.pos[i][1], state.pos[i][2]);
     }
-    mbo->update();
 
     // UPDATE SHADER PARAMETERS
     process->blur.ux = .01;
@@ -439,8 +438,9 @@ struct MyApp : CuttleboneApp<Foo> {
     pipe.begin( *simplexMBO );
 
       for (int i = 0; i<NUMAGENTS; ++i){
-        particleRender -> bindModelView( mvm * vsr::Xf::mat(pos[i]) );
-        particleRender -> program -> uniform("amt", val );
+       // particleRender -> bindModelView( mvm * vsr::Xf::mat(pos[i]) );
+        particleRender -> program -> uniform("vpos", pos[i][0], pos[i][1], pos[i][2] );
+        particleRender -> program -> uniform("amt", val);//rot[i][0], rot[i][1], rot[i][2] );
         pipe.draw(*simplexMBO);
       }
 
@@ -463,10 +463,9 @@ struct MyApp : CuttleboneApp<Foo> {
         drawAgents();
     particleRender -> unbind();
 
-     pipe.bind(scene.xf);
+    pipe.bind(scene.xf);
       onDraw();
     pipe.unbind();
-
 
     w->swapBuffers();
   }
