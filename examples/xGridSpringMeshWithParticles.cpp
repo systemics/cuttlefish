@@ -216,8 +216,8 @@ struct MyApp : Simulator<Foo>, Touch {
         
         Biv db; // Amount to orient
         Vec dx; // Amount to move
-       
-        for (int i = 0; i < MAX_TOUCH; ++i){
+      
+        for (int i = 0; i < state.touchCount; ++i){
 
           Point mouse = Ro::null( 
             state.touch[i][0] * 43,
@@ -231,7 +231,7 @@ struct MyApp : Simulator<Foo>, Touch {
           LOG("%f %f",dist,famt);
           Vec tv( fa.pos() - mouse );
           tv[2] = 0;
-          dx += tv * famt * 50;
+          dx += tv * famt * 40;
         }
 
         if (!toonear.empty()){
