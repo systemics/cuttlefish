@@ -191,17 +191,20 @@ struct MyApp : Simulator<Foo>, Touch {
     //PARTICLES
     
     
-      float acc = .05;
+      //swarm -- find nearest neighbors in z direction (within halfspace of xyplane)
+      float acc = .02;
       float rotAcc = .02; 
 
+     // Line line = mouse ^ Vec::z ^ Inf(1);
+      
       int numNeighbors = 3;
       for (auto& fa : frame){
 
-       // float famt = 1.0 / (.01 + Ro::sqd( fa.pos(), force ) );
 
         vector<Frame> nearest;
         vector<Frame> toonear;
-
+        float thresh = spacing;
+        float min = .75;
         for (auto& fb : frame){
           float halfplane = (fb.pos() <= fa.dxy())[0];
           if ( halfplane > 0 ){
@@ -214,33 +217,44 @@ struct MyApp : Simulator<Foo>, Touch {
         
         Biv db; // Amount to orient
         Vec dx; // Amount to move
+       
+        for (int i = 0; i < MAXTOUCH; ++i){
+
+          Point mouse = Ro::null( 
+            state.touch[i][0] * layout.totalWidth()/2.0, 
+            state.touch[i][1]* layout.totalWidth()/2.0, 0);
+
+          float dist = Ro::sqd(fa.pos(), mouse);
+          float famt = 1.0/(.01 + (dist*dist) );
+          Vec tv( fa.pos() - mouse );
+          tv[2] = 0;
+          dx += tv * famt * 10;
+        }
 
         if (!toonear.empty()){
-          fa.db() = fa.xz() * .01; 
+           db += fa.xz();
+           dx += fa.z(); 
         } else {
 
          for (auto& neigh : nearest){
+           gfx::Glyph::Line( fa.pos(), neigh.pos() );          
            db += Gen::log( neigh.rot() ) / nearest.size();
            dx += Vec( neigh.pos() - fa.pos() ) / nearest.size();
          }
 
-         /* for (int ti = 0; ti<MAXTOUCH; ++ti){ */
-         /*   vec2f = */ 
-         /*   dx += Vec( fa.pos() - ); */
-         /*  } */
-
-         fa.db() = db * rotAcc;
-         fa.dx() = dx * acc;
-
          if (nearest.empty()){
-           fa.db() = fa.xz() * .01;
-           fa.dx() = fa.z() * acc;
+           db += fa.xz() * .1;
+           dx += fa.z() * .1;
          }
         }
 
-        fa.move(); fa.spin();
+         dx += -Vec(fa.pos()) * .01;
 
-      }   
+         fa.db() = db * rotAcc; 
+         fa.dx() = dx * acc;
+      
+          fa.move(); fa.spin();
+      }
 
       for (int i=0;i<NUMAGENTS;++i){
         state.pos[i].set( frame[i].pos()[0], frame[i].pos()[1], frame[i].pos()[2] );
