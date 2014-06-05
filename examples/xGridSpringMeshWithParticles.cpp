@@ -222,7 +222,9 @@ struct MyApp : Simulator<Foo>, Touch {
 
           Point mouse = Ro::null( 
             state.touch[i][0] * layout.totalWidth()/2.0, 
-            state.touch[i][1]* layout.totalWidth()/2.0, 0);
+            state.touch[i][1] * layout.totalWidth()/2.0, 0);
+
+          mouse.print();
 
           float dist = Ro::sqd(fa.pos(), mouse);
           float famt = 1.0/(.01 + (dist*dist) );
