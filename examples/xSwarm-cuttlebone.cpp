@@ -65,9 +65,7 @@ struct MyApp : ctl::Simulator<Foo> {
       f.pos() = Ro::null( v * range );
       f.rot() = Gen::rot( Biv(  Rand::Num(), Rand::Num(), Rand::Num() ) );
       f.scale() = .5;
-    }
-
-    
+    }   
   }
   
   virtual void update(float dt, Foo& state) {

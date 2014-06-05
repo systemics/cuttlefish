@@ -191,56 +191,56 @@ struct MyApp : Simulator<Foo>, Touch {
     //PARTICLES
     
     
-    /*   float acc = .05; */
-    /*   float rotAcc = .02; */ 
+      float acc = .05;
+      float rotAcc = .02; 
 
-    /*   int numNeighbors = 3; */
-    /*   for (auto& fa : frame){ */
+      int numNeighbors = 3;
+      for (auto& fa : frame){
 
-    /*    // float famt = 1.0 / (.01 + Ro::sqd( fa.pos(), force ) ); */
+       // float famt = 1.0 / (.01 + Ro::sqd( fa.pos(), force ) );
 
-    /*     vector<Frame> nearest; */
-    /*     vector<Frame> toonear; */
+        vector<Frame> nearest;
+        vector<Frame> toonear;
 
-    /*     for (auto& fb : frame){ */
-    /*       float halfplane = (fb.pos() <= fa.dxy())[0]; */
-    /*       if ( halfplane > 0 ){ */
-    /*         float dist = Ro::sqd( fa.bound(), fb.bound() ); */
-    /*         if (dist < thresh) nearest.push_back(fb); */
-    /*         if (dist < min) toonear.push_back(fb); */
-    /*         if (nearest.size() == numNeighbors) break; */
-    /*      } */
-    /*     } */
+        for (auto& fb : frame){
+          float halfplane = (fb.pos() <= fa.dxy())[0];
+          if ( halfplane > 0 ){
+            float dist = Ro::sqd( fa.bound(), fb.bound() );
+            if (dist < thresh) nearest.push_back(fb);
+            if (dist < min) toonear.push_back(fb);
+            if (nearest.size() == numNeighbors) break;
+         }
+        }
         
-    /*     Biv db; // Amount to orient */
-    /*     Vec dx; // Amount to move */
+        Biv db; // Amount to orient
+        Vec dx; // Amount to move
 
-    /*     if (!toonear.empty()){ */
-    /*       fa.db() = fa.xz() * .01; */ 
-    /*     } else { */
+        if (!toonear.empty()){
+          fa.db() = fa.xz() * .01; 
+        } else {
 
-    /*      for (auto& neigh : nearest){ */
-    /*        db += Gen::log( neigh.rot() ) / nearest.size(); */
-    /*        dx += Vec( neigh.pos() - fa.pos() ) / nearest.size(); */
-    /*      } */
+         for (auto& neigh : nearest){
+           db += Gen::log( neigh.rot() ) / nearest.size();
+           dx += Vec( neigh.pos() - fa.pos() ) / nearest.size();
+         }
 
-    /*      /1* for (int ti = 0; ti<MAXTOUCH; ++ti){ *1/ */
-    /*      /1*   vec2f = *1/ */ 
-    /*      /1*   dx += Vec( fa.pos() - ); *1/ */
-    /*      /1*  } *1/ */
+         /* for (int ti = 0; ti<MAXTOUCH; ++ti){ */
+         /*   vec2f = */ 
+         /*   dx += Vec( fa.pos() - ); */
+         /*  } */
 
-    /*      fa.db() = db * rotAcc; */
-    /*      fa.dx() = dx * acc; */
+         fa.db() = db * rotAcc;
+         fa.dx() = dx * acc;
 
-    /*      if (nearest.empty()){ */
-    /*        fa.db() = fa.xz() * .01; */
-    /*        fa.dx() = fa.z() * acc; */
-    /*      } */
-    /*     } */
+         if (nearest.empty()){
+           fa.db() = fa.xz() * .01;
+           fa.dx() = fa.z() * acc;
+         }
+        }
 
-    /*     fa.move(); fa.spin(); */
+        fa.move(); fa.spin();
 
-    /*   } */   
+      }   
 
       for (int i=0;i<NUMAGENTS;++i){
         state.pos[i].set( frame[i].pos()[0], frame[i].pos()[1], frame[i].pos()[2] );
@@ -406,12 +406,10 @@ struct MyApp : CuttleboneApp<Foo> {
       onDraw();
     pipe.unbind();
 
-    process -> bind();   
-    process -> bind( scene.xf );      
-        drawAgents();
-    process -> unbind();
-
-
+//    process -> bind();   
+    /* process -> bind( scene.xf ); */      
+    /*     drawAgents(); */
+    /* process -> unbind(); */
 
     w->swapBuffers();
   }
