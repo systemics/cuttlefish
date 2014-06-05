@@ -13,7 +13,7 @@
 #define MULTIPLY (4)
 #define WIDTH (16 * MULTIPLY)
 #define HEIGHT (9 * MULTIPLY)
-#define N_VERTICES (WIDTH * HEIGHT)
+#define N_VERTICES (WIDTH* HEIGHT)
 
 struct Foo {
   float time;
@@ -25,12 +25,12 @@ struct Foo {
 #include <vector>
 using namespace std;
 
+auto indexOf = [](unsigned y, unsigned x) { return y * WIDTH + x; };
+
 void generateGridSpringMesh(int width, int height, Foo& state,
                             vector<unsigned short>& triangleIndex,
                             vector<unsigned short>& lineIndex,
                             vector<vector<unsigned short>>& neighbor);
-
-float r() { return 2.0f * rand() / RAND_MAX - 1.0f; }
 
 #if SIM
 
@@ -72,6 +72,12 @@ struct MyApp : Simulator<Foo>, Touch {
 
   virtual void update(float dt, Foo& state) {
 
+    // Time
+    //
+    state.time += dt;
+
+    // Touches and Interaction
+    //
     pollTouches();
     int k = 0;
     for (auto& e : touchPoint)
@@ -80,8 +86,6 @@ struct MyApp : Simulator<Foo>, Touch {
         if (k >= MAX_TOUCH) break;
       }
     state.touchCount = k;
-
-    auto indexOf = [](unsigned y, unsigned x) { return y * WIDTH + x; };
 
     for (int i = 0; i < state.touchCount; ++i) {
       unsigned r = (unsigned)((state.touch[i].y + 1.0f) / 2 * HEIGHT);
@@ -95,8 +99,8 @@ struct MyApp : Simulator<Foo>, Touch {
       LOG("poke!");
     }
 
-    state.time += dt;
-
+    // Simulation Rate Info
+    //
     static float period = 0;
     static int simCount = 0;
     if (period > 1.0) {
@@ -107,21 +111,25 @@ struct MyApp : Simulator<Foo>, Touch {
     period += dt;
     simCount++;
 
+    // Automatic Poking
+    /*
+        auto r = []() { return 2.0f * rand() / RAND_MAX - 1.0f; };
 
-/*
-    static int n = 0;
-    if ((n % 100) == 0) {
-      Vec3f v{r(), r(), r()};
-      v *= 4.0f;
-      int randomVec3f = rand() % N_VERTICES;
-      state.position[randomVec3f] += v;
-      v *= 1.7f;
-      for (auto n : neighbor[randomVec3f]) state.position[n] += v;
-      LOG("poke!");
-    }
-    n++;
-    */
+        static int n = 0;
+        if ((n % 100) == 0) {
+          Vec3f v{r(), r(), r()};
+          v *= 4.0f;
+          int randomVec3f = rand() % N_VERTICES;
+          state.position[randomVec3f] += v;
+          v *= 1.7f;
+          for (auto n : neighbor[randomVec3f]) state.position[n] += v;
+          LOG("poke!");
+        }
+        n++;
+        */
 
+    // PHYSICS
+    //
     for (int i = 0; i < N_VERTICES; i++) {
       Vec3f& v = state.position[i];
       Vec3f force = (v - stationary[i]) * -SK;
@@ -136,8 +144,6 @@ struct MyApp : Simulator<Foo>, Touch {
     }
 
     for (int i = 0; i < N_VERTICES; i++) state.position[i] += velocity[i];
-
-    //LOG("%f %f %f", state.position[100].x, state.position[100].y, state.position[100].z);
   }
 };
 
@@ -155,7 +161,6 @@ using namespace gam;
 struct MyApp : CuttleboneApp<Foo> {
 
   MBO* mbo;
-  SineD<float> bonk;
   SamplePlayer<float, ipl::Cubic, tap::Wrap> play;
   float gain;
 
@@ -163,7 +168,6 @@ struct MyApp : CuttleboneApp<Foo> {
     Sound::init(256, 48000);
     Sync::master().spu(48000);
     gain = 0;
-    // bonk.set(440.0f, 0.0f, 0.0f);
     if (!play.load(CLIENT_PATH SOUND_FILE)) {
       LOG("ERROR: failed to load %s", CLIENT_PATH SOUND_FILE);
       exit(1);
@@ -181,8 +185,10 @@ struct MyApp : CuttleboneApp<Foo> {
                            neighbor);
 
     Mesh mesh;
-    mesh.mode(GL::L);
-    for (int i = 0; i < lineIndex.size(); i++) mesh.add(lineIndex[i]);
+    mesh.mode(GL::T);
+    // mesh.mode(GL::L);
+    for (int i = 0; i < triangleIndex.size(); i++) mesh.add(triangleIndex[i]);
+    // for (int i = 0; i < lineIndex.size(); i++) mesh.add(lineIndex[i]);
     for (int i = 0; i < N_VERTICES; i++) mesh.add(Vec3f(0, 0, 0));
 
     mbo = new MBO(mesh);
@@ -195,21 +201,20 @@ struct MyApp : CuttleboneApp<Foo> {
       period -= 1.0;
       LOG("Ren: %d", count);
       count = 0;
-      bonk.set(440.0f, 0.8f, 0.5f);
+      LOG("displacemt is %f", renderState->position[1250].z);
     }
     period += dt;
     count++;
 
-    if (renderState->touchCount) {
-      gain = renderState->touch[0].y / 2 + 0.5;
-      gain = 0; //XXX
-      play.rate(renderState->touch[0].x);
-    }
+    gain = renderState->position[1250].z;
 
-    for (int i = 0; i < N_VERTICES; i++)
+    for (int i = 0; i < N_VERTICES; i++) {
       mbo->mesh[i].Pos =
           Vec3f(renderState->position[i].x, renderState->position[i].y,
                 renderState->position[i].z);
+      float v = renderState->position[i].z;
+      mbo->mesh[i].Col = Vec4f(v, 1 - v, v * v * v, 1.0f);
+    }
     mbo->update();
   }
 
@@ -239,12 +244,11 @@ void generateGridSpringMesh(int width, int height, Foo& state,
 
   neighbor.resize(width * height);
 
-  auto indexOf = [=](unsigned y, unsigned x) { return y * width + x; };
-
   for (int r = 0; r < height; r++)
     for (int c = 0; c < width; c++)
       state.position[indexOf(r, c)] =
-          Vec3f(1.15 * (86.0f * c / width - 42.0f), 1.2 * (56.0f * r / height - 28.0f), 0.0f);
+          Vec3f(1.15 * (86.0f * c / width - 42.0f),
+                1.2 * (56.0f * r / height - 28.0f), 0.0f);
 
   for (int r = 0; r < height; r++)
     for (int c = 0; c < width; c++) {
@@ -255,6 +259,17 @@ void generateGridSpringMesh(int width, int height, Foo& state,
       if (c < width - 1) target.push_back(indexOf(r, c + 1));
     }
 
+  for (int r = 0; r < height - 1; r++) {
+    for (int c = 0; c < width - 1; c++) {
+      triangleIndex.push_back(indexOf(r, c));
+      triangleIndex.push_back(indexOf(r + 1, c));
+      triangleIndex.push_back(indexOf(r, c + 1));
+      triangleIndex.push_back(indexOf(r + 1, c));
+      triangleIndex.push_back(indexOf(r, c + 1));
+      triangleIndex.push_back(indexOf(r + 1, c + 1));
+    }
+  }
+
   for (int r = 0; r < height - 1; r++)
     for (int c = 0; c < width - 1; c++) {
       lineIndex.push_back(indexOf(r, c));
@@ -262,18 +277,6 @@ void generateGridSpringMesh(int width, int height, Foo& state,
       lineIndex.push_back(indexOf(r, c));
       lineIndex.push_back(indexOf(r + 1, c));
     }
-
-//  // GL_LINES
-//  for (int r = 0; r < height - 1; r++)
-//    for (int c = 0; c < width - 1; c++) {
-//      lineIndex.push_back(indexOf(r, c));
-//      lineIndex.push_back(indexOf(r, c + 1));
-//    }
-//  for (int c = 0; c < width - 1; c++)
-//    for (int r = 0; r < height - 1; r++) {
-//      lineIndex.push_back(indexOf(r, c));
-//      lineIndex.push_back(indexOf(r + 1, c));
-//    }
 
   /*
   for (int r = 0; r < height; r++)
