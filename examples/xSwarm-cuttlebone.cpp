@@ -84,7 +84,7 @@ struct MyApp : ctl::Simulator<Foo> {
       int numNeighbors = 3;
       for (auto& fa : frame){
 
-        float famt = 1.0 / (.01 + Ro::sqd( fa, force ) );
+        float famt = 1.0 / (.01 + Ro::sqd( fa.pos(), force ) );
 
         vector<Frame> nearest;
         vector<Frame> toonear;
