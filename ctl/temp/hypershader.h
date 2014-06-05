@@ -133,7 +133,7 @@ vec3 transform( vec4 v, vec3 biv){
 
 vec3 doVertex(vec4 p, vec2 tex){
   vec3 t = vec3(texture2D(sampleTexture, tex).rgb);
-  return transform(p, vec3(t.rg,amt) ) + position; 
+  return transform(p, vec3(t.gb,amt) ) + position; 
 }
 
 void main(void){

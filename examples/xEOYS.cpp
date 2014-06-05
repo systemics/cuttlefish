@@ -13,7 +13,7 @@
 #include "vsr/vsr_stat.h"
 
 #define MAX_TOUCH (3)
-#define NUMAGENTS (10)
+#define NUMAGENTS (20)
 
 #define MULTIPLY (4)
 #define WIDTH (16 * MULTIPLY)
@@ -94,7 +94,7 @@ struct MyApp : Simulator<Foo>, Touch {
 
     Rand::Seed();
     for (auto& f : frame ){
-      Vec v( Rand::Num(-1,1) , Rand::Num(-1,1), 0);//Rand::Num(-1,1));
+      Vec v( Rand::Num(-1,1) , Rand::Num(-1,1), Rand::Num(-1,1));
       f.pos() = Ro::null( v * range );
       f.rot() = Gen::rot( Biv(  Rand::Num(), Rand::Num(), Rand::Num() ) );
       f.scale() = .5;
@@ -214,20 +214,17 @@ struct MyApp : Simulator<Foo>, Touch {
             state.touch[i][0] * 43,
             state.touch[i][1] * 29, 0);
 
-         // cout << state.touch[i][0] << " " << state.touch[i][0] << endl;
-         // mouse.print();
-
           float dist = Ro::sqd(fa.pos(), mouse);
           float famt = 1.0/(.01 + (dist) );
           LOG("%f %f",dist,famt);
           Vec tv( fa.pos() - mouse );
           tv[2] = 0;
-          dx += tv * famt * 40;
+          dx += tv * famt * 30;
         }
 
         if (!toonear.empty()){
-           db += fa.xz();
-           dx += fa.z(); 
+           db += fa.xz() * 2;
+           dx += fa.z() * 3; 
         } else {
 
          for (auto& neigh : nearest){
@@ -239,14 +236,15 @@ struct MyApp : Simulator<Foo>, Touch {
            db += fa.xz() * .1;
            dx += fa.z() * .1;
          }
+
         }
 
          dx += -Vec(fa.pos()) * .01;
 
          fa.db() = db * rotAcc; 
-         fa.dx() = dx * acc;
-      
-          fa.move(); fa.spin();
+         fa.dx() = dx * acc;    
+
+         fa.move(); fa.spin();
       }
 
       for (int i=0;i<NUMAGENTS;++i){
@@ -355,7 +353,7 @@ struct MyApp : CuttleboneApp<Foo> {
 
     particleRender = new HyperSimplex(0,0,this);
 
-       process = new HyperProcess( w-> surface.width/4, w->surface.height/4, this);
+       process = new HyperProcess( w-> surface.width/2, w->surface.height/2, this);
 //    process = new DisplacementProcess(w->surface.width / 2, w->surface.height / 2, this);
   }
 
@@ -438,17 +436,19 @@ struct MyApp : CuttleboneApp<Foo> {
     scene.updateMatrices();
     mvm = scene.xf.modelViewMatrixf();
 
-   pipe.bind(scene.xf);
-      onDraw();
-   pipe.unbind();
-
   //  (*process)();
+
 
   //    onDraw();
 //    process -> bind();   
-    /* particleRender -> bind( scene.xf ); */      
-    /*     drawAgents(); */
-    /* particleRender -> unbind(); */
+    particleRender -> bind( scene.xf );      
+        drawAgents();
+    particleRender -> unbind();
+
+     pipe.bind(scene.xf);
+      onDraw();
+    pipe.unbind();
+
 
     w->swapBuffers();
   }
