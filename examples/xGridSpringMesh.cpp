@@ -10,9 +10,10 @@
 
 #define MAX_TOUCH (10)
 
-#define WIDTH (16)
-#define HEIGHT (9)
-#define N_VERTICES (WIDTH* HEIGHT)
+#define MULTIPLY (4)
+#define WIDTH (16 * MULTIPLY)
+#define HEIGHT (9 * MULTIPLY)
+#define N_VERTICES (WIDTH * HEIGHT)
 
 struct Foo {
   float time;
@@ -166,6 +167,7 @@ struct MyApp : CuttleboneApp<Foo> {
                            neighbor);
 
     Mesh mesh;
+    mesh.mode(GL::L);
     for (int i = 0; i < lineIndex.size(); i++) mesh.add(lineIndex[i]);
     for (int i = 0; i < N_VERTICES; i++) mesh.add(Vec3f(0, 0, 0));
 
@@ -190,8 +192,9 @@ struct MyApp : CuttleboneApp<Foo> {
     }
 
     for (int i = 0; i < N_VERTICES; i++)
-      mbo->mesh[i].Pos = Vec3f(renderState->position[i].x
-              renderState->position[i].y, renderState->position[i].z);
+      mbo->mesh[i].Pos =
+          Vec3f(renderState->position[i].x, renderState->position[i].y,
+                renderState->position[i].z);
     mbo->update();
   }
 
@@ -245,6 +248,17 @@ void generateGridSpringMesh(int width, int height, Foo& state,
       lineIndex.push_back(indexOf(r + 1, c));
     }
 
+//  // GL_LINES
+//  for (int r = 0; r < height - 1; r++)
+//    for (int c = 0; c < width - 1; c++) {
+//      lineIndex.push_back(indexOf(r, c));
+//      lineIndex.push_back(indexOf(r, c + 1));
+//    }
+//  for (int c = 0; c < width - 1; c++)
+//    for (int r = 0; r < height - 1; r++) {
+//      lineIndex.push_back(indexOf(r, c));
+//      lineIndex.push_back(indexOf(r + 1, c));
+//    }
 
   /*
   for (int r = 0; r < height; r++)
