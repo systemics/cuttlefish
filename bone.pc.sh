@@ -10,9 +10,9 @@ echo RenderTarget Name is $RENDERTARGET
 echo SIMTarget Name is $SIMTARGET
 
 #if [ $2 lt 2 ]; then
-echo Compiling $1 as $SIMTARGET to SIMULATOR
-make $1 NAME=$SIMTARGET SIMBUILD=1 
-make copyone HOST=pi@192.168.7.2 NAME=$SIMTARGET
+#echo Compiling $1 as $SIMTARGET to SIMULATOR
+#make $1 NAME=$SIMTARGET SIMBUILD=1 
+#make copyone HOST=pi@192.168.7.2 NAME=$SIMTARGET
 
 #fi
 #if [ $2 lt 3 ]; then

@@ -25,7 +25,7 @@
 #include "vsr/vsr_cga3D_frame.h"
 #include "vsr/vsr_stat.h"
 
-#define NUMAGENTS 60
+#define NUMAGENTS 30
 
 struct Foo {
   float value;
@@ -41,6 +41,7 @@ using namespace gfx;
 struct MyApp : ctl::Simulator<Foo> {
 
   vector<Frame> frame;
+  //vector<Frame> nearest;
 
   float range,thresh,min;
 
@@ -70,14 +71,20 @@ struct MyApp : ctl::Simulator<Foo> {
   }
   
   virtual void update(float dt, Foo& state) {
+
      
       state.value += 0.01f;
 
-      float acc = .02;
+      Point force = Ro::null( Vec( cos(state.value), sin(state.value), 0 ) * 30 );
+
+
+      float acc = .05;
       float rotAcc = .02; 
 
       int numNeighbors = 3;
       for (auto& fa : frame){
+
+        float famt = 1.0 / (.01 + Ro::sqd( fa.pos(), force ) );
 
         vector<Frame> nearest;
         vector<Frame> toonear;
@@ -85,7 +92,7 @@ struct MyApp : ctl::Simulator<Foo> {
         for (auto& fb : frame){
           float halfplane = (fb.pos() <= fa.dxy())[0];
           if ( halfplane > 0 ){
-            float dist = Ro::dist( fa.bound(), fb.bound() );
+            float dist = Ro::sqd( fa.bound(), fb.bound() );
             if (dist < thresh) nearest.push_back(fb);
             if (dist < min) toonear.push_back(fb);
             if (nearest.size() == numNeighbors) break;
@@ -104,8 +111,10 @@ struct MyApp : ctl::Simulator<Foo> {
            dx += Vec( neigh.pos() - fa.pos() ) / nearest.size();
          }
 
+         dx += Vec( fa.pos() - force ) * famt;
+
          fa.db() = db * rotAcc;
-         fa.dx() = fa.z() * acc;//dx * acc;
+         fa.dx() = dx * acc;
 
          if (nearest.empty()){
            fa.db() = fa.xz() * .01;
