@@ -122,14 +122,14 @@ struct DisplacementProcess : public Process {
     glViewport(0, 0, renderer -> contextWidth, renderer -> contextHeight ); 
     //renderer -> clear();
 
-    // slab();
+     slab();
 
     //blur();
 
-      slab.texture->bind(); */
-         glLineWidth(1); */
-         dispmap(); */
-      slab.texture->unbind(); */
+      /* slab.texture->bind(); */ 
+      /*    glLineWidth(1); */ 
+      /*    dispmap(); */ 
+      /* slab.texture->unbind(); */ 
 
     r2t.swap();   // Swap textures
     rp2t.swap();  
