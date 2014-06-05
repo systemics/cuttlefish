@@ -179,6 +179,8 @@ struct MyApp : CuttleboneApp<Foo> {
 
   virtual void setup() {
 
+    Rand::Seed();
+
     // SPRINGMESH
     Foo state;
     vector<vector<unsigned short>> neighbor;
