@@ -182,7 +182,7 @@ struct MyApp : Simulator<Foo>, Touch {
     
       //swarm -- find nearest neighbors in z direction (within halfspace of xyplane)
       float acc = .02;
-      float rotAcc = .02; a
+      float rotAcc = .02; 
 
       float thresh = 20;
       float min = 2.75;
