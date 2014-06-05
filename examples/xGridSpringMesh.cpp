@@ -8,7 +8,7 @@
 
 #include "gfx/gfx_matrix.h"
 
-#define MAX_TOUCH (10)
+#define MAX_TOUCH (3)
 
 #define MULTIPLY (4)
 #define WIDTH (16 * MULTIPLY)
@@ -44,7 +44,7 @@ using namespace gfx;
 
 #define SK (0.02f)
 #define NK (0.05f)
-#define D (0.95)
+#define D (0.97)
 //#define SK (0.02f)
 //#define NK (0.05f)
 //#define D (0.98)
@@ -163,23 +163,25 @@ using namespace gam;
 struct MyApp : CuttleboneApp<Foo> {
 
   MBO* mbo;
-  SamplePlayer<float, ipl::Cubic, tap::Wrap> play[MAX_TOUCH];
+  SamplePlayer<float, ipl::Linear, tap::Wrap> play[MAX_TOUCH];
   float gain[MAX_TOUCH];
 
   MyApp() : CuttleboneApp<Foo>(Layout(4, 4), 30.0) {
-    Sound::init(256, 48000);
-    Sync::master().spu(48000);
     for (auto& e : gain) e = 0;
 
-    if (!play[0].load(CLIENT_PATH SOUND_FILE)) {
-      LOG("ERROR: failed to load %s", CLIENT_PATH SOUND_FILE);
-      exit(1);
-    }
-    for (int i = 1; i < MAX_TOUCH; i++)
-      play[i].buffer(play[0], play[0].frameRate(), play[0].channels());
+    for (int i = 0; i < MAX_TOUCH; i++)
+      if (!play[i].load(CLIENT_PATH SOUND_FILE)) {
+        LOG("ERROR: failed to load %s", CLIENT_PATH SOUND_FILE);
+        exit(1);
+      }
   }
 
   virtual void setup() {
+
+    // XXX
+    // put this stuff after any audio loading
+    Sync::master().spu(48000);
+    Sound::init(256, 48000);
 
     Foo state;
     vector<vector<unsigned short>> neighbor;
@@ -190,10 +192,13 @@ struct MyApp : CuttleboneApp<Foo> {
                            neighbor);
 
     Mesh mesh;
+
     mesh.mode(GL::T);
-    // mesh.mode(GL::L);
     for (int i = 0; i < triangleIndex.size(); i++) mesh.add(triangleIndex[i]);
+
+    // mesh.mode(GL::L);
     // for (int i = 0; i < lineIndex.size(); i++) mesh.add(lineIndex[i]);
+
     for (int i = 0; i < N_VERTICES; i++) mesh.add(Vec3f(0, 0, 0));
 
     mbo = new MBO(mesh);
@@ -204,21 +209,20 @@ struct MyApp : CuttleboneApp<Foo> {
     static int count = 0;
     if (period > 1.0) {
       period -= 1.0;
-      LOG("Ren: %d", count);
+      LOG("Ren: %d - %d %d %d", count, renderState->index[0],
+          renderState->index[1], renderState->index[2]);
       count = 0;
     }
     period += dt;
     count++;
 
-    for (int i = 0; i < state.touchCount; i++)
+    for (int i = 0; i < MAX_TOUCH; i++)
       gain[i] = renderState->position[renderState->index[i]].z;
 
     for (int i = 0; i < N_VERTICES; i++) {
-      mbo->mesh[i].Pos =
-          Vec3f(renderState->position[i].x, renderState->position[i].y,
-                renderState->position[i].z);
+      mbo->mesh[i].Pos = renderState->position[i];
       float v = renderState->position[i].z;
-      mbo->mesh[i].Col = Vec4f(v, 1 - v, v * v * v, 1.0f);
+      mbo->mesh[i].Col = Vec4f(1 - v, 1 - (v * v), v * v * v, 0.3f);
     }
     mbo->update();
   }
@@ -227,9 +231,10 @@ struct MyApp : CuttleboneApp<Foo> {
 
   virtual void onSound(Sound::SoundData& io) {
     for (int i = 0; i < io.n; ++i) {
-      float s = play[0]();
+      float s = 0;
+      for (int k = 0; k < MAX_TOUCH; k++) s += play[k]() * gain[k];
       for (int j = 0; j < 2; j++) {
-        *io.outputBuffer++ = (short)(s * 32767.0) * gain[0];
+        *io.outputBuffer++ = (short)(s * 32767.0);
       }
     }
   }
