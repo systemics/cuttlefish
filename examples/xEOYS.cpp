@@ -189,7 +189,7 @@ struct MyApp : CuttleboneApp<Foo> {
                            neighbor);
 
     Mesh mesh;
-    mesh.mode(GL::T);
+    mesh.mode(GL::L);
     // mesh.mode(GL::L);
     for (int i = 0; i < triangleIndex.size(); i++) mesh.add(triangleIndex[i]);
     // for (int i = 0; i < lineIndex.size(); i++) mesh.add(lineIndex[i]);
@@ -218,10 +218,11 @@ struct MyApp : CuttleboneApp<Foo> {
 
     //UPDATE MESH
     for (int i = 0; i < N_VERTICES; i++) {
-      float t = (float) i/N_VERTICES * RAND::Num(-.8,.8);
+      float t = (float) i/N_VERTICES * Rand::Num();
       mbo->mesh[i].Pos = renderState->position[i];
       float v = renderState->position[i].z;
-      mbo->mesh[i].Col = Vec4f(v * t, 1 - v, t, .5f);
+      bool flicker = Rand::Prob(v)
+      mbo->mesh[i].Col = Vec4f( .2, 1-v, v * (flicker ? t : 1), flicker ? 1.0f : .8 );
     }
     mbo->update();
 
