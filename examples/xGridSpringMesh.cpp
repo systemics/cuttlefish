@@ -34,7 +34,7 @@ float r() { return 2.0f * rand() / RAND_MAX - 1.0f; }
 #if SIM
 
 #include "ctl_bone.h"
-#include "ctl_touch.h"
+//#include "ctl_touch.h"
 #include <string.h>
 
 using namespace ctl;
@@ -42,11 +42,11 @@ using namespace gfx;
 
 #define SK (0.01f)
 #define NK (0.1f)
-#define D (0.93)
+#define D (0.7)
 //#define D (0.97)
 //.01, .1, .765
 
-struct MyApp : Simulator<Foo>, Touch {
+struct MyApp : Simulator<Foo> {  // , Touch {
   MyApp() : Simulator<Foo>("192.168.7.255", 1 / 30.0f) {}
 
   float d, sk, nk;
@@ -56,8 +56,6 @@ struct MyApp : Simulator<Foo>, Touch {
 
   virtual void setup(Foo& state) {
     //    Touch::setup("/dev/input/event2");
-
-    LOG("setup()");
 
     memset(&state, 0, sizeof(state));
     memset(&stationary, 0, sizeof(Vec3f) * N_VERTICES);
@@ -98,7 +96,7 @@ struct MyApp : Simulator<Foo>, Touch {
 
     static int n = 0;
 
-    if ((n % 300) == 0) {
+    if ((n % 100) == 0) {
       Vec3f v{r(), r(), r()};
       v *= 4.0f;
       int randomVec3f = rand() % N_VERTICES;
@@ -123,6 +121,8 @@ struct MyApp : Simulator<Foo>, Touch {
     }
 
     for (int i = 0; i < N_VERTICES; i++) state.position[i] += velocity[i];
+
+    LOG("%f %f %f", state.position[100].x, state.position[100].y, state.position[100].z);
   }
 };
 
@@ -212,9 +212,8 @@ struct MyApp : CuttleboneApp<Foo> {
 #endif
 
 int main() {
-  LOG("got here");
-
-  MyApp().start();
+  MyApp app;
+  app.start();
 }
 
 void generateGridSpringMesh(int width, int height, Foo& state,
@@ -222,96 +221,41 @@ void generateGridSpringMesh(int width, int height, Foo& state,
                             vector<unsigned short>& lineIndex,
                             vector<vector<unsigned short>>& neighbor) {
 
-#define indexOf(x, y) (x* height + y)
+  neighbor.resize(width * height);
 
-  for (int c = 0; c < width; c++) {
-    for (int r = 0; r < height; r++) {
+  auto indexOf = [=](unsigned y, unsigned x) { return y * width + x; };
+
+  for (int r = 0; r < height; r++)
+    for (int c = 0; c < width; c++)
       state.position[indexOf(r, c)] =
           Vec3f(86.0f * c / width - 42.0f, 56.0f * r / height - 28.0f, 0.0f);
-    }
-  }
 
-  // 4 neighbors
-  for (int c = 1; c < width - 1; c++) {
-    for (int r = 1; r < height - 1; r++) {
+  for (int r = 0; r < height; r++)
+    for (int c = 0; c < width; c++) {
       vector<unsigned short>& target(neighbor[indexOf(r, c)]);
-      target.push_back(indexOf(r - 1, c));
-      target.push_back(indexOf(r, c - 1));
-      target.push_back(indexOf(r + 1, c));
-      target.push_back(indexOf(r, c + 1));
+      if (r > 0) target.push_back(indexOf(r - 1, c));
+      if (c > 0) target.push_back(indexOf(r, c - 1));
+      if (r < height - 1) target.push_back(indexOf(r + 1, c));
+      if (c < width - 1) target.push_back(indexOf(r, c + 1));
     }
-  }
 
-  // 3 neighbors
-  for (int c = 1; c < width - 1; c++) {
-    int r = 0;
-    vector<unsigned short>& target(neighbor[indexOf(r, c)]);
-    // target.push_back(indexOf(r - 1, c));
-    target.push_back(indexOf(r, c - 1));
-    target.push_back(indexOf(r + 1, c));
-    target.push_back(indexOf(r, c + 1));
-  }
+  for (int r = 0; r < height - 1; r++)
+    for (int c = 0; c < width - 1; c++) {
+      lineIndex.push_back(indexOf(r, c));
+      lineIndex.push_back(indexOf(r, c + 1));
+      lineIndex.push_back(indexOf(r, c));
+      lineIndex.push_back(indexOf(r + 1, c));
+    }
 
-  for (int c = 1; c < width - 1; c++) {
-    int r = height - 1;
-    vector<unsigned short>& target(neighbor[indexOf(r, c)]);
-    target.push_back(indexOf(r - 1, c));
-    target.push_back(indexOf(r, c - 1));
-    // target.push_back(indexOf(r + 1, c));
-    target.push_back(indexOf(r, c + 1));
-  }
 
-  for (int r = 1; r < height - 1; r++) {
-    int c = 0;
-    vector<unsigned short>& target(neighbor[indexOf(r, c)]);
-    target.push_back(indexOf(r - 1, c));
-    // target.push_back(indexOf(r, c - 1));
-    target.push_back(indexOf(r + 1, c));
-    target.push_back(indexOf(r, c + 1));
-  }
-
-  for (int r = 1; r < height - 1; r++) {
-    int c = width - 1;
-    vector<unsigned short>& target(neighbor[indexOf(r, c)]);
-    target.push_back(indexOf(r - 1, c));
-    target.push_back(indexOf(r, c - 1));
-    target.push_back(indexOf(r + 1, c));
-    // target.push_back(indexOf(r, c + 1));
-  }
-
-  {
-    int r = 0, c = 0;
-    vector<unsigned short>& target(neighbor[indexOf(r, c)]);
-    // target.push_back(indexOf(r - 1, c));
-    // target.push_back(indexOf(r, c - 1));
-    target.push_back(indexOf(r + 1, c));
-    target.push_back(indexOf(r, c + 1));
-  }
-
-  {
-    int r = width - 1, c = 0;
-    vector<unsigned short>& target(neighbor[indexOf(r, c)]);
-    target.push_back(indexOf(r - 1, c));
-    // target.push_back(indexOf(r, c - 1));
-    // target.push_back(indexOf(r + 1, c));
-    target.push_back(indexOf(r, c + 1));
-  }
-
-  {
-    int r = 0, c = height - 1;
-    vector<unsigned short>& target(neighbor[indexOf(r, c)]);
-    // target.push_back(indexOf(r - 1, c));
-    target.push_back(indexOf(r, c - 1));
-    target.push_back(indexOf(r + 1, c));
-    // target.push_back(indexOf(r, c + 1));
-  }
-
-  {
-    int r = width - 1, c = height - 1;
-    vector<unsigned short>& target(neighbor[indexOf(r, c)]);
-    target.push_back(indexOf(r - 1, c));
-    target.push_back(indexOf(r, c - 1));
-    // target.push_back(indexOf(r + 1, c));
-    // target.push_back(indexOf(r, c + 1));
-  }
+  /*
+  for (int r = 0; r < height; r++)
+    for (int c = 0; c < width; c++) {
+      printf("%d %d %d (%f, %f, %f) ", indexOf(r, c), r, c,
+             state.position[indexOf(r, c)].x, state.position[indexOf(r, c)].y,
+             state.position[indexOf(r, c)].z);
+      for (auto e : neighbor[indexOf(r, c)]) printf("%d ", e);
+      printf("\n");
+    }
+    */
 }
