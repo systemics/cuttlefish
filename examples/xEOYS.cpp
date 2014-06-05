@@ -13,7 +13,6 @@
 #include "vsr/vsr_stat.h"
 
 #define MAX_TOUCH (3)
-#define MAX_TOUCH (10)
 #define NUMAGENTS (20)
 
 #define MULTIPLY (4)
