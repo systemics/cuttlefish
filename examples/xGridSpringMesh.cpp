@@ -139,7 +139,7 @@ using namespace gam;
 
 struct MyApp : CuttleboneApp<Foo> {
 
-  MBO* lines;
+  MBO* mbo;
   SineD<float> bonk;
   SamplePlayer<float, ipl::Cubic, tap::Wrap> play;
   float gain;
@@ -165,11 +165,11 @@ struct MyApp : CuttleboneApp<Foo> {
     generateGridSpringMesh(WIDTH, HEIGHT, state, triangleIndex, lineIndex,
                            neighbor);
 
-    Mesh ico;
-    for (int i = 0; i < lineIndex.size(); i++) ico.add(lineIndex[i]);
-    for (int i = 0; i < N_VERTICES; i++) ico.add(Vec3f(0, 0, 0));
+    Mesh mesh;
+    for (int i = 0; i < lineIndex.size(); i++) mesh.add(lineIndex[i]);
+    for (int i = 0; i < N_VERTICES; i++) mesh.add(Vec3f(0, 0, 0));
 
-    lines = new MBO(ico);
+    mbo = new MBO(mesh);
   }
 
   virtual void update(float dt, Foo& state, int popCount) {
@@ -189,15 +189,13 @@ struct MyApp : CuttleboneApp<Foo> {
       play.rate(renderState->touch[0].x);
     }
 
-    for (int i = 0; i < N_VERTICES; i++) {
-      Vec3f p(renderState->position[i].x * 150,
-              renderState->position[i].y * 150, renderState->position[i].z);
-      lines->mesh[i].Pos = p;
-    }
-    lines->update();
+    for (int i = 0; i < N_VERTICES; i++)
+      mbo->mesh[i].Pos = Vec3f(renderState->position[i].x
+              renderState->position[i].y, renderState->position[i].z);
+    mbo->update();
   }
 
-  virtual void onDraw() { pipe.line(*lines); }
+  virtual void onDraw() { pipe.line(*mbo); }
 
   virtual void onSound(Sound::SoundData& io) {
     for (int i = 0; i < io.n; ++i) {
