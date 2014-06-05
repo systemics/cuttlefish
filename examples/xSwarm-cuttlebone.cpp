@@ -55,8 +55,8 @@ struct MyApp : ctl::Simulator<Foo> {
 
     frame = vector<Frame>(NUMAGENTS);
 
-    range = 16;
-    thresh = 1.5;
+    range = 8;
+    thresh = 2.5;
     min = .75;
 
     Rand::Seed();
