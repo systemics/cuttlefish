@@ -69,8 +69,8 @@ struct MyApp : Simulator<Foo>, Touch {
 
   //PARTICLES
   vector<Frame> frame;
-  float range,thresh,min;
-
+  float range;
+  
 
   virtual void setup(Foo& state) {
     Touch::setup("/dev/input/event2");
@@ -89,8 +89,6 @@ struct MyApp : Simulator<Foo>, Touch {
     frame = vector<Frame>(NUMAGENTS);
 
     range = 8;
-    thresh = 2.5;
-    min = .75;
 
     Rand::Seed();
     for (auto& f : frame ){
@@ -184,7 +182,11 @@ struct MyApp : Simulator<Foo>, Touch {
     
       //swarm -- find nearest neighbors in z direction (within halfspace of xyplane)
       float acc = .02;
-      float rotAcc = .02; 
+      float rotAcc = .02; a
+
+      float thresh = 20;
+      float min = 2.75;
+
 
      // Line line = mouse ^ Vec::z ^ Inf(1);
       
@@ -220,11 +222,13 @@ struct MyApp : Simulator<Foo>, Touch {
           Vec tv( fa.pos() - mouse );
           tv[2] = 0;
           dx += tv * famt * 30;
+
         }
+
 
         if (!toonear.empty()){
            db += fa.xz() * 2;
-           dx += fa.z() * 3; 
+           dx += fa.z() * 10; 
         } else {
 
          for (auto& neigh : nearest){
@@ -234,7 +238,7 @@ struct MyApp : Simulator<Foo>, Touch {
 
          if (nearest.empty()){
            db += fa.xz() * .1;
-           dx += fa.z() * .1;
+           dx += fa.z() * 2;
          }
 
         }
