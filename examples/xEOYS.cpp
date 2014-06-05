@@ -253,6 +253,21 @@ struct MyApp : Simulator<Foo>, Touch {
       }
 
 
+    for (auto& f : frame){
+      float x = f.vec()[0] / 44.0;
+      float y = f.vec()[1] / 30.0;
+      unsigned r = (unsigned)((y + 1.0f) / 2 * HEIGHT);
+      unsigned c = (unsigned)((x + 1.0f) / 2 * WIDTH);
+      Vec3f g = f.dx();
+      if (r < 0) r = 0;
+      if (c < 0) c = 0;
+      if (r > HEIGHT - 1) r = HEIGHT - 1;
+      if (c > WIDTH - 1) c = WIDTH - 1;
+      int z = indexOf(r, c);
+      Vec3f v(g.x * 2, g.y * 2, 0.4f);
+      state.position[z] += v;
+      //for (auto n : neighbor[z]) state.position[n] += v;
+    }
   }
 };
 
