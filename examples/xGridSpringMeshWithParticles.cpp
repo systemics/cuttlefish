@@ -203,8 +203,7 @@ struct MyApp : Simulator<Foo>, Touch {
 
         vector<Frame> nearest;
         vector<Frame> toonear;
-        float thresh = spacing;
-        float min = .75;
+
         for (auto& fb : frame){
           float halfplane = (fb.pos() <= fa.dxy())[0];
           if ( halfplane > 0 ){
@@ -218,19 +217,17 @@ struct MyApp : Simulator<Foo>, Touch {
         Biv db; // Amount to orient
         Vec dx; // Amount to move
        
-        for (int i = 0; i < MAXTOUCH; ++i){
+        for (int i = 0; i < MAX_TOUCH; ++i){
 
           Point mouse = Ro::null( 
-            state.touch[i][0] * layout.totalWidth()/2.0, 
-            state.touch[i][1] * layout.totalWidth()/2.0, 0);
-
-          mouse.print();
+            state.touch[i][0] * 43,
+            state.touch[i][1] * 43, 0);
 
           float dist = Ro::sqd(fa.pos(), mouse);
           float famt = 1.0/(.01 + (dist*dist) );
           Vec tv( fa.pos() - mouse );
           tv[2] = 0;
-          dx += tv * famt * 50;
+          dx += tv * famt * 10;
         }
 
         if (!toonear.empty()){
@@ -239,7 +236,6 @@ struct MyApp : Simulator<Foo>, Touch {
         } else {
 
          for (auto& neigh : nearest){
-           gfx::Glyph::Line( fa.pos(), neigh.pos() );          
            db += Gen::log( neigh.rot() ) / nearest.size();
            dx += Vec( neigh.pos() - fa.pos() ) / nearest.size();
          }
