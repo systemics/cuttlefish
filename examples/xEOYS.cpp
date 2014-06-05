@@ -1,15 +1,16 @@
-
 #define SERVER_PATH "/home/ky/"
 //#define SERVER_PATH "/Users/ky/code/cuttlefish/"
 #define CLIENT_PATH "/home/pi/"
 
 //#define SOUND_FILE "czonic.wav"
-#define SOUND_FILE "distort.wav"
+//#define SOUND_FILE "5SNCLOCKS.aif"
+#define SOUND_FILE "sound.wav"
+//#define SOUND_FILE "distort.wav"
 //#define SOUND_FILE "FLANNEL1.wav"
 
 #include "gfx/gfx_matrix.h"
 
-#define MAX_TOUCH (10)
+#define MAX_TOUCH (3)
 
 #define MULTIPLY (4)
 #define WIDTH (16 * MULTIPLY)
@@ -20,6 +21,7 @@ struct Foo {
   float time;
   gfx::Vec3f position[N_VERTICES];
   gfx::Vec2f touch[MAX_TOUCH];
+  unsigned index[MAX_TOUCH];
   int touchCount;
 };
 
@@ -44,7 +46,7 @@ using namespace gfx;
 
 #define SK (0.02f)
 #define NK (0.05f)
-#define D (0.95)
+#define D (0.97)
 //#define SK (0.02f)
 //#define NK (0.05f)
 //#define D (0.98)
@@ -92,7 +94,8 @@ struct MyApp : Simulator<Foo>, Touch {
       unsigned r = (unsigned)((state.touch[i].y + 1.0f) / 2 * HEIGHT);
       unsigned c = (unsigned)((state.touch[i].x + 1.0f) / 2 * WIDTH);
       int z = indexOf(r, c);
-      LOG("r:%u c:%u x:%f y:%f", r, c, state.touch[i].x, state.touch[i].y);
+      state.index[i] = z;
+      // LOG("r:%u c:%u x:%f y:%f", r, c, state.touch[i].x, state.touch[i].y);
 
       Vec3f v(0.0f, 0.0f, -1.0f);
       state.position[z] += v;
@@ -158,7 +161,6 @@ struct MyApp : Simulator<Foo>, Touch {
 #include "temp/gfx_hyper.h"
 #include "temp/gfx_displacement.h"
 
-
 using namespace ctl;
 using namespace gfx;
 using namespace gam;
@@ -167,25 +169,28 @@ using namespace vsr;
 struct MyApp : CuttleboneApp<Foo> {
 
   MBO* mbo;
-  SamplePlayer<float, ipl::Cubic, tap::Wrap> play;
-  float gain;
+  SamplePlayer<float, ipl::Linear, tap::Wrap> play[MAX_TOUCH];
+  float gain[MAX_TOUCH];
 
- //  HyperProcess * process;
-   DisplacementProcess * process;
+  //  HyperProcess * process;
+  DisplacementProcess* process;
 
   MyApp() : CuttleboneApp<Foo>(Layout(4, 4), 30.0) {
-    Sound::init(256, 48000);
-    Sync::master().spu(48000);
-    gain = 0;
-    if (!play.load(CLIENT_PATH SOUND_FILE)) {
-      LOG("ERROR: failed to load %s", CLIENT_PATH SOUND_FILE);
-      exit(1);
-    }
+    for (auto& e : gain) e = 0;
+
+    for (int i = 0; i < MAX_TOUCH; i++)
+      if (!play[i].load(CLIENT_PATH SOUND_FILE)) {
+        LOG("ERROR: failed to load %s", CLIENT_PATH SOUND_FILE);
+        exit(1);
+      }
   }
-  
 
   virtual void setup() {
 
+    // XXX
+    // put this stuff after any audio loading
+    Sync::master().spu(48000);
+    Sound::init(256, 48000);
     Rand::Seed();
 
     // SPRINGMESH
@@ -204,70 +209,75 @@ struct MyApp : CuttleboneApp<Foo> {
     // for (int i = 0; i < lineIndex.size(); i++) mesh.add(lineIndex[i]);
     for (int i = 0; i < N_VERTICES; i++) mesh.add(Vec3f(0, 0, 0));
 
-    mbo = new MBO(mesh, GL::DYNAMIC );
+    mbo = new MBO(mesh, GL::DYNAMIC);
 
-//    process = new HyperProcess( w-> surface.width/2, w->surface.height/2, this);
-   process = new DisplacementProcess( w-> surface.width/2, w->surface.height/2, this);
-
+    //    process = new HyperProcess( w-> surface.width/2, w->surface.height/2,
+    // this);
+    process = new DisplacementProcess(w->surface.width / 2,
+                                      w->surface.height / 2, this);
   }
 
   virtual void update(float dt, Foo& state, int popCount) {
 
-    //TIMING
+    // TIMING
     static float period = 0;
     static int count = 0;
     if (period > 1.0) {
       period -= 1.0;
       LOG("Ren: %d", count);
       count = 0;
-      LOG("displacemt is %f", renderState->position[1250].z);
     }
     period += dt;
     count++;
 
-    //AUDIO GAIN SET BY DISPLACEMENT
-    gain = renderState->position[1250].z;
+    for (int i = 0; i < MAX_TOUCH; i++) {
+      static float xLast;
+      Vec3f& v = renderState->position[renderState->index[i]];
+      float rate = v.x - xLast;
+      rate /= 30;
+      gain[i] = fabs(v.z) / 5;
+      gain[i] = sqrt(gain[i]);
+      play[i].rate(rate);
+      LOG("%f %f", v.z, v.x - xLast);
+      xLast = v.x;
+    }
 
-    //UPDATE MESH
+    // UPDATE MESH
     for (int i = 0; i < N_VERTICES; i++) {
-    
-      float t = (float) i/N_VERTICES * Rand::Num();
+
+      float t = (float)i / N_VERTICES * Rand::Num();
       mbo->mesh[i].Pos = renderState->position[i];
       float v = renderState->position[i].z;
       bool flicker = Stat::Prob(v);
-      mbo->mesh[i].Col = Vec4f(0,0,1, (flicker ? 1 : 0) );
-      
+      mbo->mesh[i].Col = Vec4f(0, 0, 1, (flicker ? 1 : 0));
+
       //.2, 1-v, v * (flicker ? t : 1), flicker ? 1.0f : .8 );
     }
-     mbo->update();
+    mbo->update();
 
-    //UPDATE SHADER PARAMETERS
-     process -> blur.ux = .01;
-     process -> blur.uy = .01;
-     process -> blur.amt = .25;
-
+    // UPDATE SHADER PARAMETERS
+    process->blur.ux = .01;
+    process->blur.uy = .01;
+    process->blur.amt = .25;
   }
 
-  virtual void onDraw() { 
-    pipe.line(*mbo); 
+  virtual void onDraw() { pipe.line(*mbo); }
+
+  virtual void onFrame() {
+    Renderer::clear();
+
+    (*process)();
+    // Renderer::render();
+
+    w->swapBuffers();
   }
-
-
-  virtual void onFrame(){
-     Renderer::clear();
-    
-     (*process)();
-     //Renderer::render(); 
-    
-     w -> swapBuffers(); 
-  }
-
 
   virtual void onSound(Sound::SoundData& io) {
     for (int i = 0; i < io.n; ++i) {
-      float s = play();
+      float s = 0;
+      for (int k = 0; k < MAX_TOUCH; k++) s += play[k]() * gain[k];
       for (int j = 0; j < 2; j++) {
-        *io.outputBuffer++ = (short)(s * 32767.0) * gain;
+        *io.outputBuffer++ = (short)(s * 32767.0);
       }
     }
   }
