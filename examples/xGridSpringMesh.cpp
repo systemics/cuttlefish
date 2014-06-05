@@ -122,7 +122,7 @@ struct MyApp : Simulator<Foo> {  // , Touch {
 
     for (int i = 0; i < N_VERTICES; i++) state.position[i] += velocity[i];
 
-    LOG("%f %f %f", state.position[100].x, state.position[100].y, state.position[100].z);
+    //LOG("%f %f %f", state.position[100].x, state.position[100].y, state.position[100].z);
   }
 };
 
