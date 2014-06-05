@@ -25,7 +25,7 @@
 #include "vsr/vsr_cga3D_frame.h"
 #include "vsr/vsr_stat.h"
 
-#define NUMAGENTS 60
+#define NUMAGENTS 120
 
 struct Foo {
   float value;
