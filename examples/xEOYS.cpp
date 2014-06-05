@@ -9,19 +9,25 @@
 //#define SOUND_FILE "FLANNEL1.wav"
 
 #include "gfx/gfx_matrix.h"
+#include "vsr/vsr_cga3D_frame.h"
+#include "vsr/vsr_stat.h"
 
 #define MAX_TOUCH (3)
+#define MAX_TOUCH (10)
+#define NUMAGENTS (20)
 
 #define MULTIPLY (4)
 #define WIDTH (16 * MULTIPLY)
 #define HEIGHT (9 * MULTIPLY)
-#define N_VERTICES (WIDTH* HEIGHT)
+#define N_VERTICES (WIDTH * HEIGHT)
 
 struct Foo {
   float time;
   gfx::Vec3f position[N_VERTICES];
   gfx::Vec2f touch[MAX_TOUCH];
   unsigned index[MAX_TOUCH];
+  gfx::Vec3f pos[NUMAGENTS];
+  gfx::Vec4f rot[NUMAGENTS];
   int touchCount;
 };
 
@@ -43,6 +49,7 @@ void generateGridSpringMesh(int width, int height, Foo& state,
 
 using namespace ctl;
 using namespace gfx;
+using namespace vsr;
 
 #define SK (0.02f)
 #define NK (0.05f)
@@ -55,14 +62,21 @@ using namespace gfx;
 struct MyApp : Simulator<Foo>, Touch {
   MyApp() : Simulator<Foo>("192.168.7.255" /* , 1 / 30.f */) {}
 
+  //SPRINGMESH
   float d, sk, nk;
   Vec3f stationary[N_VERTICES];
   Vec3f velocity[N_VERTICES];
   vector<vector<unsigned short>> neighbor;
 
+  //PARTICLES
+  vector<Frame> frame;
+  float range,thresh,min;
+
+
   virtual void setup(Foo& state) {
     Touch::setup("/dev/input/event2");
 
+    //SPRINGMESH
     memset(&state, 0, sizeof(state));
     memset(&stationary, 0, sizeof(Vec3f) * N_VERTICES);
     memset(&velocity, 0, sizeof(Vec3f) * N_VERTICES);
@@ -71,6 +85,21 @@ struct MyApp : Simulator<Foo>, Touch {
     generateGridSpringMesh(WIDTH, HEIGHT, state, triangleIndex, lineIndex,
                            neighbor);
     memcpy(&stationary, state.position, sizeof(Vec3f) * N_VERTICES);
+
+    //PARTICLES
+    frame = vector<Frame>(NUMAGENTS);
+
+    range = 8;
+    thresh = 2.5;
+    min = .75;
+
+    Rand::Seed();
+    for (auto& f : frame ){
+      Vec v( Rand::Num(-1,1) , Rand::Num(-1,1), 0);//Rand::Num(-1,1));
+      f.pos() = Ro::null( v * range );
+      f.rot() = Gen::rot( Biv(  Rand::Num(), Rand::Num(), Rand::Num() ) );
+      f.scale() = .5;
+    }   
   }
 
   virtual void update(float dt, Foo& state) {
@@ -148,6 +177,87 @@ struct MyApp : Simulator<Foo>, Touch {
     }
 
     for (int i = 0; i < N_VERTICES; i++) state.position[i] += velocity[i];
+
+    //LOG("%f %f %f", state.position[100].x, state.position[100].y, state.position[100].z);
+    //
+    //PARTICLES
+    
+    
+      //swarm -- find nearest neighbors in z direction (within halfspace of xyplane)
+      float acc = .02;
+      float rotAcc = .02; 
+
+     // Line line = mouse ^ Vec::z ^ Inf(1);
+      
+      int numNeighbors = 3;
+      for (auto& fa : frame){
+
+
+        vector<Frame> nearest;
+        vector<Frame> toonear;
+
+        for (auto& fb : frame){
+          float halfplane = (fb.pos() <= fa.dxy())[0];
+          if ( halfplane > 0 ){
+            float dist = Ro::sqd( fa.bound(), fb.bound() );
+            if (dist < thresh) nearest.push_back(fb);
+            if (dist < min) toonear.push_back(fb);
+            if (nearest.size() == numNeighbors) break;
+         }
+        }
+        
+        Biv db; // Amount to orient
+        Vec dx; // Amount to move
+      
+        for (int i = 0; i < state.touchCount; ++i){
+
+          Point mouse = Ro::null( 
+            state.touch[i][0] * 43,
+            state.touch[i][1] * 29, 0);
+
+         // cout << state.touch[i][0] << " " << state.touch[i][0] << endl;
+         // mouse.print();
+
+          float dist = Ro::sqd(fa.pos(), mouse);
+          float famt = 1.0/(.01 + (dist) );
+          LOG("%f %f",dist,famt);
+          Vec tv( fa.pos() - mouse );
+          tv[2] = 0;
+          dx += tv * famt * 40;
+        }
+
+        if (!toonear.empty()){
+           db += fa.xz();
+           dx += fa.z(); 
+        } else {
+
+         for (auto& neigh : nearest){
+           db += Gen::log( neigh.rot() ) / nearest.size();
+           dx += Vec( neigh.pos() - fa.pos() ) / nearest.size();
+         }
+
+         if (nearest.empty()){
+           db += fa.xz() * .1;
+           dx += fa.z() * .1;
+         }
+        }
+
+         dx += -Vec(fa.pos()) * .01;
+
+         fa.db() = db * rotAcc; 
+         fa.dx() = dx * acc;
+      
+          fa.move(); fa.spin();
+      }
+
+      for (int i=0;i<NUMAGENTS;++i){
+        state.pos[i].set( frame[i].pos()[0], frame[i].pos()[1], frame[i].pos()[2] );
+        state.rot[i].set( 
+          frame[i].rot()[0], frame[i].rot()[1], 
+          frame[i].rot()[2], frame[i].rot()[3] );
+      }
+
+
   }
 };
 
@@ -158,6 +268,10 @@ struct MyApp : Simulator<Foo>, Touch {
 #include "Gamma/Oscillator.h"
 #include "Gamma/SamplePlayer.h"
 #include "vsr/vsr_stat.h"
+
+#include "vsr/vsr_simplex.h"
+#include "gfx/gfx_process.h"
+#include "temp/hyperAmt_glsl.h"
 #include "temp/gfx_hyper.h"
 #include "temp/gfx_displacement.h"
 
@@ -174,6 +288,19 @@ struct MyApp : CuttleboneApp<Foo> {
 
   //  HyperProcess * process;
   DisplacementProcess* process;
+
+  //PARTICLES
+  float v;
+
+  MBO * simplexMBO;
+  HyperSimplex * particleRender;
+
+  Simplex<4> simplex;
+
+  //Frame frame[NUMAGENTS];
+  Rot rot[NUMAGENTS];
+  vsr::Vec pos[NUMAGENTS];
+
 
   MyApp() : CuttleboneApp<Foo>(Layout(4, 4), 30.0) {
     for (auto& e : gain) e = 0;
@@ -210,6 +337,24 @@ struct MyApp : CuttleboneApp<Foo> {
     for (int i = 0; i < N_VERTICES; i++) mesh.add(Vec3f(0, 0, 0));
 
     mbo = new MBO(mesh, GL::DYNAMIC);
+
+    //Particles
+     Mesh particlemesh;
+    for (auto& i : simplex.verts ){
+      Vertex v(0,0,0);
+      v.Norm = Vec3f(i[0],i[1],i[2]);
+      v.Col = Vec4f(i[0],i[1],i[2],i[3]);
+      particlemesh.add(v);
+    }
+
+    for (auto& i : simplex.edges ){
+      particlemesh.add( i.a).add(i.b);//.add(i.c);
+    }
+
+    particlemesh.mode( GL::LS );
+    simplexMBO = new MBO( particlemesh );
+
+    particleRender = new HyperSimplex(0,0,this);
 
     //    process = new HyperProcess( w-> surface.width/2, w->surface.height/2,
     // this);
@@ -252,6 +397,10 @@ struct MyApp : CuttleboneApp<Foo> {
       mbo->mesh[i].Col = Vec4f(0, 0, 1, (flicker ? 1 : 0));
 
       //.2, 1-v, v * (flicker ? t : 1), flicker ? 1.0f : .8 );
+    //Particles
+    for (int i = 0; i<NUMAGENTS; ++i){
+      rot[i] = Rot( state.rot[i][0], state.rot[i][1], state.rot[i][2], state.rot[i][3]);
+      pos[i] = vsr::Vec( state.pos[i][0], state.pos[i][1], state.pos[i][2]);
     }
     mbo->update();
 
@@ -261,13 +410,44 @@ struct MyApp : CuttleboneApp<Foo> {
     process->blur.amt = .25;
   }
 
-  virtual void onDraw() { pipe.line(*mbo); }
+  virtual void onDraw() {
+  
+     pipe.line(*mbo); 
+  
+  }
 
-  virtual void onFrame() {
+  void drawAgents(){
+    static float val = 0.0;
+    val += .1;
+
+    pipe.begin( *simplexMBO );
+
+      for (int i = 0; i<NUMAGENTS; ++i){
+        particleRender -> bindModelView( mvm * vsr::Xf::mat(pos[i]) );
+        particleRender -> program -> uniform("amt", val );
+        pipe.draw(*simplexMBO);
+      }
+
+    pipe.end( *simplexMBO );
+    
+  }
+
+  virtual void onFrame(){
     Renderer::clear();
 
+    scene.updateMatrices();
+    mvm = scene.xf.modelViewMatrixf();
+
+//    pipe.bind(scene.xf);
+//      onDraw();
+ //   pipe.unbind();
+
     (*process)();
-    // Renderer::render();
+
+//    process -> bind();   
+    particleRender -> bind( scene.xf );      
+        drawAgents();
+    particleRender -> unbind();
 
     w->swapBuffers();
   }
