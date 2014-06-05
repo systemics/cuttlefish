@@ -35,7 +35,7 @@ float r() { return 2.0f * rand() / RAND_MAX - 1.0f; }
 #if SIM
 
 #include "ctl_bone.h"
-//#include "ctl_touch.h"
+#include "ctl_touch.h"
 #include <string.h>
 
 using namespace ctl;
@@ -49,8 +49,8 @@ using namespace gfx;
 //#define D (0.98)
 //.01, .1, .765
 
-struct MyApp : Simulator<Foo> {  // , Touch {
-  MyApp() : Simulator<Foo>("192.168.7.255") {} //, 1 / 30.0f) {}
+struct MyApp : Simulator<Foo>, Touch {
+  MyApp() : Simulator<Foo>("192.168.7.255" /* , 1 / 30.f */) {}
 
   float d, sk, nk;
   Vec3f stationary[N_VERTICES];
@@ -58,7 +58,7 @@ struct MyApp : Simulator<Foo> {  // , Touch {
   vector<vector<unsigned short>> neighbor;
 
   virtual void setup(Foo& state) {
-    //    Touch::setup("/dev/input/event2");
+    Touch::setup("/dev/input/event2");
 
     memset(&state, 0, sizeof(state));
     memset(&stationary, 0, sizeof(Vec3f) * N_VERTICES);
@@ -72,18 +72,28 @@ struct MyApp : Simulator<Foo> {  // , Touch {
 
   virtual void update(float dt, Foo& state) {
 
-    /*
-        pollTouches();
-        int k = 0;
-        for (auto& e : touchPoint)
-          if (e.id != 0) {
-            state.touch[k++] = Vec2f(e.x / 3200.0f, e.y / -2600.0f);
-            if (k >= MAX_TOUCH) break;
-          }
-        state.touchCount = k;
-        for (int i = 0; i < state.touchCount; ++i)
-          LOG("%d x:%f y:%f", i, state.touch[0].x, state.touch[0].y);
-    */
+    pollTouches();
+    int k = 0;
+    for (auto& e : touchPoint)
+      if (e.id != 0) {
+        state.touch[k++] = Vec2f(e.x / 3200.0f, e.y / -2600.0f);
+        if (k >= MAX_TOUCH) break;
+      }
+    state.touchCount = k;
+
+    auto indexOf = [](unsigned y, unsigned x) { return y * WIDTH + x; };
+
+    for (int i = 0; i < state.touchCount; ++i) {
+      unsigned r = (unsigned)((state.touch[0].y + 1.0f) / 2 * HEIGHT);
+      unsigned c = (unsigned)((state.touch[0].x + 1.0f) / 2 * WIDTH);
+      int z = indexOf(r, c);
+      LOG("r:%u c:%u x:%f y:%f", r, c, state.touch[i].x, state.touch[i].y);
+
+      Vec3f v(0.0f, 0.0f, -1.0f);
+      state.position[z] += v;
+      for (auto n : neighbor[z]) state.position[n] += v;
+      LOG("poke!");
+    }
 
     state.time += dt;
 
@@ -97,8 +107,9 @@ struct MyApp : Simulator<Foo> {  // , Touch {
     period += dt;
     simCount++;
 
-    static int n = 0;
 
+/*
+    static int n = 0;
     if ((n % 100) == 0) {
       Vec3f v{r(), r(), r()};
       v *= 4.0f;
@@ -109,6 +120,7 @@ struct MyApp : Simulator<Foo> {  // , Touch {
       LOG("poke!");
     }
     n++;
+    */
 
     for (int i = 0; i < N_VERTICES; i++) {
       Vec3f& v = state.position[i];
@@ -190,6 +202,7 @@ struct MyApp : CuttleboneApp<Foo> {
 
     if (renderState->touchCount) {
       gain = renderState->touch[0].y / 2 + 0.5;
+      gain = 0; //XXX
       play.rate(renderState->touch[0].x);
     }
 
