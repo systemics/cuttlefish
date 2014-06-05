@@ -3,7 +3,9 @@
 #define CLIENT_PATH "/home/pi/"
 
 //#define SOUND_FILE "czonic.wav"
-#define SOUND_FILE "distort.wav"
+//#define SOUND_FILE "5SNCLOCKS.aif"
+#define SOUND_FILE "sound.wav"
+//#define SOUND_FILE "distort.wav"
 //#define SOUND_FILE "FLANNEL1.wav"
 
 #include "gfx/gfx_matrix.h"
@@ -216,8 +218,17 @@ struct MyApp : CuttleboneApp<Foo> {
     period += dt;
     count++;
 
-    for (int i = 0; i < MAX_TOUCH; i++)
-      gain[i] = renderState->position[renderState->index[i]].z;
+    for (int i = 0; i < MAX_TOUCH; i++) {
+      static float xLast;
+      Vec3f& v = renderState->position[renderState->index[i]];
+      float rate = v.x - xLast;
+      rate /= 30;
+      gain[i] = fabs(v.z) / 5;
+      gain[i] = sqrt(gain[i]);
+      play[i].rate(rate);
+      LOG("%f %f", v.z, v.x - xLast);
+      xLast = v.x;
+    }
 
     for (int i = 0; i < N_VERTICES; i++) {
       mbo->mesh[i].Pos = renderState->position[i];
