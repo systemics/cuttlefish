@@ -230,7 +230,7 @@ struct MyApp : Simulator<Foo>, Touch {
           float famt = 1.0/(.1 + (dist*dist) );
           Vec tv( fa.pos() - mouse );
           tv[2] = 0;
-          dx += tv * famt * 50;
+          dx += tv * famt * 100;
         }
 
         if (!toonear.empty()){
