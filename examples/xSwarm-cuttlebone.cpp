@@ -25,7 +25,7 @@
 #include "vsr/vsr_cga3D_frame.h"
 #include "vsr/vsr_stat.h"
 
-#define NUMAGENTS 120
+#define NUMAGENTS 60
 
 struct Foo {
   float value;
@@ -60,8 +60,8 @@ struct MyApp : ctl::Simulator<Foo> {
 
     Rand::Seed();
     for (auto& f : frame ){
-      Vec v( Rand::Num(), Rand::Num(), Rand::Num());
-      f.pos() = Ro::null(v * range );
+      Vec v( Rand::Num(-1,1) , Rand::Num(-1,1), Rand::Num(-1,1));
+      f.pos() = Ro::null( v * range );
       f.rot() = Gen::rot( Biv(  Rand::Num(), Rand::Num(), Rand::Num() ) );
       f.scale() = .5;
     }
