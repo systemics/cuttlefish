@@ -93,7 +93,7 @@ struct DisplacementProcess : public Process {
   bool bDrawDispMap;
 
   DisplacementProcess(int w, int h, Renderer * r) : 
-  Process(w,h,r), r2t(w,h,r), rp2t(w,h), dispmap(215,145,.1,r), 
+  Process(w,h,r), r2t(w,h,r), rp2t(w,h), dispmap(108,73,.2,r), 
   blur(w,h), slab(w,h), bDrawDispMap(false)
   { init(); } 
 
@@ -122,7 +122,7 @@ struct DisplacementProcess : public Process {
     glViewport(0, 0, renderer -> contextWidth, renderer -> contextHeight ); 
     //renderer -> clear();
 
-     slab();
+    // slab();
 
     //blur();
 

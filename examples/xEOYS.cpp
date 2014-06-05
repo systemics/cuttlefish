@@ -59,7 +59,7 @@ using namespace vsr;
 //.01, .1, .765
 
 struct MyApp : Simulator<Foo>, Touch {
-  MyApp() : Simulator<Foo>("192.168.7.255" , 1 / 30.f ) {}
+  MyApp() : Simulator<Foo>("192.168.7.255" /*, 1 / 30.f */) {}
 
   //SPRINGMESH
   float d, sk, nk;
@@ -329,7 +329,7 @@ struct MyApp : CuttleboneApp<Foo> {
                            neighbor);
 
     Mesh mesh;
-    mesh.mode(GL::L);
+    mesh.mode(GL::T);
     // mesh.mode(GL::L);
     for (int i = 0; i < triangleIndex.size(); i++) mesh.add(triangleIndex[i]);
     // for (int i = 0; i < lineIndex.size(); i++) mesh.add(lineIndex[i]);
@@ -409,7 +409,7 @@ struct MyApp : CuttleboneApp<Foo> {
     process->blur.ux = .01;
     process->blur.uy = .01;
     process->blur.amt = .5;
-    process->dispmap.amt = 3.0;
+    process->dispmap.amt = .5;
   }
 
   virtual void onDraw() {
@@ -440,12 +440,13 @@ struct MyApp : CuttleboneApp<Foo> {
     scene.updateMatrices();
     mvm = scene.xf.modelViewMatrixf();
 
-//    pipe.bind(scene.xf);
-//      onDraw();
- //   pipe.unbind();
+    pipe.bind(scene.xf);
+      onDraw();
+    pipe.unbind();
 
-    (*process)();
+  //  (*process)();
 
+  //    onDraw();
 //    process -> bind();   
     /* particleRender -> bind( scene.xf ); */      
     /*     drawAgents(); */
