@@ -111,7 +111,7 @@ struct MyApp : Simulator<Foo>, Touch {
 
     Rand::Seed();
     for (auto& f : frame ){
-      Vec v( Rand::Num(-1,1) , Rand::Num(-1,1), Rand::Num(-1,1));
+      Vec v( Rand::Num(-1,1) , Rand::Num(-1,1), 0);//Rand::Num(-1,1));
       f.pos() = Ro::null( v * range );
       f.rot() = Gen::rot( Biv(  Rand::Num(), Rand::Num(), Rand::Num() ) );
       f.scale() = .5;
@@ -227,7 +227,7 @@ struct MyApp : Simulator<Foo>, Touch {
          // mouse.print();
 
           float dist = Ro::sqd(fa.pos(), mouse);
-          float famt = 10.0/(.1 + (sqrt(dist)) );
+          float famt = 1.0/(1 + (sqrt(dist)) );
           Vec tv( fa.pos() - mouse );
           tv[2] = 0;
           dx += tv * famt * 100;
