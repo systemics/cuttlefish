@@ -223,11 +223,11 @@ struct MyApp : Simulator<Foo>, Touch {
             state.touch[i][0] * 43,
             state.touch[i][1] * 43, 0);
 
-          cout << state.touch[i][0] << " " << state.touch[i][0] << endl;
+         // cout << state.touch[i][0] << " " << state.touch[i][0] << endl;
          // mouse.print();
 
           float dist = Ro::sqd(fa.pos(), mouse);
-          float famt = 1.0/(.01 + (dist*dist) );
+          float famt = 1.0/(.1 + (dist*dist) );
           Vec tv( fa.pos() - mouse );
           tv[2] = 0;
           dx += tv * famt * 10;
