@@ -41,14 +41,16 @@ float r() { return 2.0f * rand() / RAND_MAX - 1.0f; }
 using namespace ctl;
 using namespace gfx;
 
-#define SK (0.01f)
-#define NK (0.1f)
-#define D (0.7)
-//#define D (0.97)
+#define SK (0.02f)
+#define NK (0.05f)
+#define D (0.95)
+//#define SK (0.02f)
+//#define NK (0.05f)
+//#define D (0.98)
 //.01, .1, .765
 
 struct MyApp : Simulator<Foo> {  // , Touch {
-  MyApp() : Simulator<Foo>("192.168.7.255", 1 / 30.0f) {}
+  MyApp() : Simulator<Foo>("192.168.7.255") {} //, 1 / 30.0f) {}
 
   float d, sk, nk;
   Vec3f stationary[N_VERTICES];
@@ -102,7 +104,7 @@ struct MyApp : Simulator<Foo> {  // , Touch {
       v *= 4.0f;
       int randomVec3f = rand() % N_VERTICES;
       state.position[randomVec3f] += v;
-      v *= 0.7f;
+      v *= 1.7f;
       for (auto n : neighbor[randomVec3f]) state.position[n] += v;
       LOG("poke!");
     }
@@ -229,7 +231,7 @@ void generateGridSpringMesh(int width, int height, Foo& state,
   for (int r = 0; r < height; r++)
     for (int c = 0; c < width; c++)
       state.position[indexOf(r, c)] =
-          Vec3f(86.0f * c / width - 42.0f, 56.0f * r / height - 28.0f, 0.0f);
+          Vec3f(1.15 * (86.0f * c / width - 42.0f), 1.2 * (56.0f * r / height - 28.0f), 0.0f);
 
   for (int r = 0; r < height; r++)
     for (int c = 0; c < width; c++) {
