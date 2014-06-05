@@ -7,7 +7,7 @@
 #include "vsr/vsr_stat.h"
 
 #define MAX_TOUCH (3)
-#define NUMAGENTS (60)
+#define NUMAGENTS (40)
 
 #define MULTIPLY (4)
 #define WIDTH (16 * MULTIPLY)
@@ -407,7 +407,7 @@ struct MyApp : CuttleboneApp<Foo> {
       float v = renderState->position[i].z;
       bool flicker = Stat::Prob(v);
       bool flicker2 = Stat::Prob(v/2.0);
-      mbo->mesh[i].Col = Vec4f((flicker ? 0 : 1), v, (flicker ? 1 : 0), (flicker ? 1 : .3));
+      mbo->mesh[i].Col = Vec4f((flicker ? 0 : 1), v*2, (flicker ? 1 : 0), (flicker ? 1 : .3));
     
     }
     mbo->update();
@@ -440,8 +440,18 @@ struct MyApp : CuttleboneApp<Foo> {
       for (int i = 0; i<NUMAGENTS; ++i){
        // particleRender -> bindModelView( mvm * vsr::Xf::mat(pos[i]) );
         particleRender -> program -> uniform("vpos", pos[i][0], pos[i][1], pos[i][2] );
-        particleRender -> program -> uniform("amt", val);//rot[i][0], rot[i][1], rot[i][2] );
+        particleRender -> program -> uniform("amt", val);
+        particleRender -> program -> uniform("vcol", .2);
+        
+        //rot[i][0], rot[i][1], rot[i][2] );
+        simplexMBO -> mesh.mode(GL::LS);
         pipe.draw(*simplexMBO);
+
+        particleRender -> program -> uniform("vcol", .8);
+
+        simplexMBO -> mesh.mode(GL::T);
+        pipe.draw(*simplexMBO);
+
       }
 
     pipe.end( *simplexMBO );
@@ -453,6 +463,8 @@ struct MyApp : CuttleboneApp<Foo> {
 
     scene.updateMatrices();
     mvm = scene.xf.modelViewMatrixf();
+
+    glLineWidth(2);
 
   //  (*process)();
 
