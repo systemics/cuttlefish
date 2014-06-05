@@ -37,7 +37,6 @@ uniform vec3 lightPosition;
 uniform sampler2D sampleTexture;
 
 uniform float amt;
-uniform float vcol;
 uniform vec3 vpos;
 
 varying lowp vec2 texco;
@@ -147,7 +146,7 @@ vec3 doVertex(vec4 p, vec2 tex){
 void main(void){
    
   //float test = amt;
-  colorDst = vec4(1.0 - vcol,vcol,0,1.0);    //vec4(position,1);//sourceColor;// + doColor();       
+  colorDst = vec4(1.0,0,0,1.0);    //vec4(position,1);//sourceColor;// + doColor();       
   texco = texCoord;
   vec3 tn = normal + position;   //FORCE COMPILATION OF THESE TERMS!!
      
