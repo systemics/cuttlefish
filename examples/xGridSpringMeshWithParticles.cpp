@@ -221,16 +221,17 @@ struct MyApp : Simulator<Foo>, Touch {
 
           Point mouse = Ro::null( 
             state.touch[i][0] * 43,
-            state.touch[i][1] * 43, 0);
+            state.touch[i][1] * 29, 0);
 
          // cout << state.touch[i][0] << " " << state.touch[i][0] << endl;
          // mouse.print();
 
           float dist = Ro::sqd(fa.pos(), mouse);
           float famt = 1.0/(1 + (sqrt(dist)) );
+         // LOG("%f %f",dist,famt);
           Vec tv( fa.pos() - mouse );
           tv[2] = 0;
-         // dx += tv * famt * 100;
+          dx += tv * famt * 100;
         }
 
         if (!toonear.empty()){
