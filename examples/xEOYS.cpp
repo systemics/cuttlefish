@@ -285,8 +285,8 @@ struct MyApp : CuttleboneApp<Foo> {
   SamplePlayer<float, ipl::Linear, tap::Wrap> play[MAX_TOUCH];
   float gain[MAX_TOUCH];
 
-  // HyperProcess * process;
-  DisplacementProcess* process;
+   HyperProcess * process;
+  //DisplacementProcess* process;
 
   //PARTICLES
   float v;
@@ -329,7 +329,7 @@ struct MyApp : CuttleboneApp<Foo> {
                            neighbor);
 
     Mesh mesh;
-    mesh.mode(GL::T);
+    mesh.mode(GL::L);
     // mesh.mode(GL::L);
     for (int i = 0; i < triangleIndex.size(); i++) mesh.add(triangleIndex[i]);
     // for (int i = 0; i < lineIndex.size(); i++) mesh.add(lineIndex[i]);
@@ -355,10 +355,8 @@ struct MyApp : CuttleboneApp<Foo> {
 
     particleRender = new HyperSimplex(0,0,this);
 
-//        process = new HyperProcess( w-> surface.width/2, w->surface.height/2,
-    // this);
-    process = new DisplacementProcess(w->surface.width / 2,
-                                      w->surface.height / 2, this);
+       process = new HyperProcess( w-> surface.width/4, w->surface.height/4, this);
+//    process = new DisplacementProcess(w->surface.width / 2, w->surface.height / 2, this);
   }
 
   virtual void update(float dt, Foo& state, int popCount) {
@@ -394,7 +392,7 @@ struct MyApp : CuttleboneApp<Foo> {
       float v = renderState->position[i].z;
       bool flicker = Stat::Prob(v);
       bool flicker2 = Stat::Prob(v/2.0);
-      mbo->mesh[i].Col = Vec4f((flicker ? 0 : 1), v, (flicker ? 1 : 0), 1);//(flicker ? 1 : 0));
+      mbo->mesh[i].Col = Vec4f((flicker ? 0 : 1), v, (flicker ? 1 : 0), (flicker ? 1 : .3));
     
     }
 
@@ -409,13 +407,13 @@ struct MyApp : CuttleboneApp<Foo> {
     process->blur.ux = .01;
     process->blur.uy = .01;
     process->blur.amt = .5;
-    process->dispmap.amt = .5;
+    //process->dispmap.amt = .5;
+    //
+    process -> hypmap.amt = state.time;
   }
 
   virtual void onDraw() {
-  
      pipe.line(*mbo); 
-  
   }
 
   void drawAgents(){
@@ -440,9 +438,9 @@ struct MyApp : CuttleboneApp<Foo> {
     scene.updateMatrices();
     mvm = scene.xf.modelViewMatrixf();
 
-    pipe.bind(scene.xf);
+   pipe.bind(scene.xf);
       onDraw();
-    pipe.unbind();
+   pipe.unbind();
 
   //  (*process)();
 

@@ -30,7 +30,7 @@ uniform mat4 normalMatrix;        // Normal Matrix (inverse transpose of mvm)
 uniform vec3 lightPosition;
 uniform sampler2D sampleTexture;
 
-//uniform float amt;
+uniform float amt;
 
 varying lowp vec2 texco;
 varying vec4 colorDst;
@@ -133,7 +133,7 @@ vec3 transform( vec4 v, vec3 biv){
 
 vec3 doVertex(vec4 p, vec2 tex){
   vec3 t = vec3(texture2D(sampleTexture, tex).rgb);
-  return transform(p,t) + position; 
+  return transform(p, vec3(t.rg,amt) ) + position; 
 }
 
 void main(void){

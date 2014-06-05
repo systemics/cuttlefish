@@ -143,7 +143,7 @@ struct Hyper : public Process {
    } 
 
    virtual void update(){
-    //  this->program->uniform("amt",amt);
+      this->program->uniform("amt",amt);
    }
 
   virtual void operator()(){
