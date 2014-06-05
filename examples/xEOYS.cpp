@@ -155,6 +155,9 @@ struct MyApp : Simulator<Foo>, Touch {
 #include "Gamma/Oscillator.h"
 #include "Gamma/SamplePlayer.h"
 #include "vsr/vsr_stat.h"
+#include "temp/gfx_hyper.h"
+#include "temp/gfx_displacement.h"
+
 
 using namespace ctl;
 using namespace gfx;
@@ -167,6 +170,9 @@ struct MyApp : CuttleboneApp<Foo> {
   SamplePlayer<float, ipl::Cubic, tap::Wrap> play;
   float gain;
 
+ //  HyperProcess * process;
+   DisplacementProcess * process;
+
   MyApp() : CuttleboneApp<Foo>(Layout(4, 4), 30.0) {
     Sound::init(256, 48000);
     Sync::master().spu(48000);
@@ -176,6 +182,7 @@ struct MyApp : CuttleboneApp<Foo> {
       exit(1);
     }
   }
+  
 
   virtual void setup() {
 
@@ -199,6 +206,9 @@ struct MyApp : CuttleboneApp<Foo> {
 
     mbo = new MBO(mesh, GL::DYNAMIC );
 
+//    process = new HyperProcess( w-> surface.width/2, w->surface.height/2, this);
+   process = new DisplacementProcess( w-> surface.width/2, w->surface.height/2, this);
+
   }
 
   virtual void update(float dt, Foo& state, int popCount) {
@@ -220,15 +230,21 @@ struct MyApp : CuttleboneApp<Foo> {
 
     //UPDATE MESH
     for (int i = 0; i < N_VERTICES; i++) {
+    
       float t = (float) i/N_VERTICES * Rand::Num();
       mbo->mesh[i].Pos = renderState->position[i];
       float v = renderState->position[i].z;
-      bool flicker = Rand::Prob(v)
-      mbo->mesh[i].Col = Vec4f( .2, 1-v, v * (flicker ? t : 1), flicker ? 1.0f : .8 );
+      bool flicker = Stat::Prob(v);
+      mbo->mesh[i].Col = Vec4f(0,0,1, (flicker ? 1 : 0) );
+      
+      //.2, 1-v, v * (flicker ? t : 1), flicker ? 1.0f : .8 );
     }
-    mbo->update();
+     mbo->update();
 
-    
+    //UPDATE SHADER PARAMETERS
+     process -> blur.ux = .01;
+     process -> blur.uy = .01;
+     process -> blur.amt = .25;
 
   }
 
@@ -237,14 +253,14 @@ struct MyApp : CuttleboneApp<Foo> {
   }
 
 
-  /* virtual void onFrame(){ */
-  /*    Renderer::clear(); */
+  virtual void onFrame(){
+     Renderer::clear();
     
-  /*    (*process)(); */
-  /*    //Renderer::render(); */ 
+     (*process)();
+     //Renderer::render(); 
     
-  /*    w -> swapBuffers(); */ 
-  /* } */
+     w -> swapBuffers(); 
+  }
 
 
   virtual void onSound(Sound::SoundData& io) {
