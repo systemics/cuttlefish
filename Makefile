@@ -62,6 +62,12 @@ LDFLAGS += -lpthread
 #LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libjack.a
 LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libasound.so
 LDFLAGS += -lGamma
+LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libsndfile.a
+LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libFLAC.so
+LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libvorbis.so
+LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libvorbisenc.so
+LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libogg.so
+
 #LDFLAGS += -lsndfile1
 #LDFLAGS += -lasound
 #LDFLAGS += -ljack

@@ -31,7 +31,7 @@
 #include "vsr/vsr_stat.h"
 
 #define MAX_TOUCH (10)
-#define NUMAGENTS (30)
+#define NUMAGENTS (10)
 
 #define MULTIPLY (4)
 #define WIDTH (16 * MULTIPLY)
