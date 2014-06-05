@@ -238,7 +238,7 @@ struct MyApp : CuttleboneApp<Foo> {
       gain[i] = fabs(v.z) / 5;
       gain[i] = sqrt(gain[i]);
       play[i].rate(rate);
-      LOG("%f %f", v.z, v.x - xLast);
+      //LOG("%f %f", v.z, v.x - xLast);
       xLast = v.x;
     }
 
