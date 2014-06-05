@@ -2,12 +2,6 @@
 //#define SERVER_PATH "/Users/ky/code/cuttlefish/"
 #define CLIENT_PATH "/home/pi/"
 
-//#define SOUND_FILE "czonic.wav"
-//#define SOUND_FILE "5SNCLOCKS.aif"
-#define SOUND_FILE "sound.wav"
-//#define SOUND_FILE "distort.wav"
-//#define SOUND_FILE "FLANNEL1.wav"
-
 #include "gfx/gfx_matrix.h"
 #include "vsr/vsr_cga3D_frame.h"
 #include "vsr/vsr_stat.h"
@@ -306,11 +300,16 @@ struct MyApp : CuttleboneApp<Foo> {
   MyApp() : CuttleboneApp<Foo>(Layout(4, 4), 30.0) {
     for (auto& e : gain) e = 0;
 
-    for (int i = 0; i < MAX_TOUCH; i++)
-      if (!play[i].load(CLIENT_PATH SOUND_FILE)) {
-        LOG("ERROR: failed to load %s", CLIENT_PATH SOUND_FILE);
-        exit(1);
+    for (int i = 0; i < MAX_TOUCH; i++) {
+      char foo[] = "sound|.wav";
+      foo[5] = '0' + i;
+      string fileName(CLIENT_PATH);
+      fileName += foo;
+
+      if (!play[i].load(fileName.c_str())) {
+        LOG("ERROR: failed to load %s", fileName.c_str());
       }
+    }
   }
 
   virtual void setup() {
