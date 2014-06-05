@@ -13,7 +13,7 @@
 #include "vsr/vsr_stat.h"
 
 #define MAX_TOUCH (3)
-#define NUMAGENTS (20)
+#define NUMAGENTS (10)
 
 #define MULTIPLY (4)
 #define WIDTH (16 * MULTIPLY)
@@ -393,9 +393,10 @@ struct MyApp : CuttleboneApp<Foo> {
       mbo->mesh[i].Pos = renderState->position[i];
       float v = renderState->position[i].z;
       bool flicker = Stat::Prob(v);
-      mbo->mesh[i].Col = Vec4f(0, 0, 1, (flicker ? 1 : 0));
+      mbo->mesh[i].Col = Vec4f((flicker ? 0 : v), 0, 1, (flicker ? 1 : 0));
+    
+    }
 
-      //.2, 1-v, v * (flicker ? t : 1), flicker ? 1.0f : .8 );
     //Particles
     for (int i = 0; i<NUMAGENTS; ++i){
       rot[i] = Rot( state.rot[i][0], state.rot[i][1], state.rot[i][2], state.rot[i][3]);
@@ -406,7 +407,7 @@ struct MyApp : CuttleboneApp<Foo> {
     // UPDATE SHADER PARAMETERS
     process->blur.ux = .01;
     process->blur.uy = .01;
-    process->blur.amt = .25;
+    process->blur.amt = .5;
   }
 
   virtual void onDraw() {
@@ -444,12 +445,15 @@ struct MyApp : CuttleboneApp<Foo> {
     (*process)();
 
 //    process -> bind();   
-    particleRender -> bind( scene.xf );      
-        drawAgents();
-    particleRender -> unbind();
+    /* particleRender -> bind( scene.xf ); */      
+    /*     drawAgents(); */
+    /* particleRender -> unbind(); */
 
     w->swapBuffers();
   }
+
+
+
 
   virtual void onSound(Sound::SoundData& io) {
     for (int i = 0; i < io.n; ++i) {
