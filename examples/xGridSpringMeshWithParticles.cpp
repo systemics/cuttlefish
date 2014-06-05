@@ -197,7 +197,7 @@ struct MyApp : Simulator<Foo>, Touch {
       int numNeighbors = 3;
       for (auto& fa : frame){
 
-        float famt = 1.0 / (.01 + Ro::sqd( fa.pos(), force ) );
+       // float famt = 1.0 / (.01 + Ro::sqd( fa.pos(), force ) );
 
         vector<Frame> nearest;
         vector<Frame> toonear;
@@ -268,6 +268,7 @@ struct MyApp : Simulator<Foo>, Touch {
 using namespace ctl;
 using namespace gfx;
 using namespace gam;
+using namespace vsr;
 
 struct MyApp : CuttleboneApp<Foo> {
 
@@ -287,7 +288,7 @@ struct MyApp : CuttleboneApp<Foo> {
 
   //Frame frame[NUMAGENTS];
   Rot rot[NUMAGENTS];
-  Vec pos[NUMAGENTS];
+  vsr::Vec pos[NUMAGENTS];
 
 
   MyApp() : CuttleboneApp<Foo>(Layout(4, 4), 30.0) {
@@ -320,20 +321,20 @@ struct MyApp : CuttleboneApp<Foo> {
     mbo = new MBO(mesh);
 
     //Particles
-     Mesh mesh;
+     Mesh particlemesh;
     for (auto& i : simplex.verts ){
       Vertex v(0,0,0);
       v.Norm = Vec3f(i[0],i[1],i[2]);
       v.Col = Vec4f(i[0],i[1],i[2],i[3]);
-      mesh.add(v);
+      particlemesh.add(v);
     }
 
     for (auto& i : simplex.edges ){
-      mesh.add( i.a).add(i.b);//.add(i.c);
+      particlemesh.add( i.a).add(i.b);//.add(i.c);
     }
 
-    mesh.mode( GL::LS );
-    simplexMBO = new MBO( mesh );
+    particlemesh.mode( GL::LS );
+    simplexMBO = new MBO( particlemesh );
 
     process = new HyperSimplex(0,0,this);
 
@@ -368,7 +369,7 @@ struct MyApp : CuttleboneApp<Foo> {
     //Particles
     for (int i = 0; i<NUMAGENTS; ++i){
       rot[i] = Rot( state.rot[i][0], state.rot[i][1], state.rot[i][2], state.rot[i][3]);
-      pos[i] = Vec( state.pos[i][0], state.pos[i][1], state.pos[i][2]);
+      pos[i] = vsr::Vec( state.pos[i][0], state.pos[i][1], state.pos[i][2]);
     }
 
   }
@@ -401,9 +402,9 @@ struct MyApp : CuttleboneApp<Foo> {
     scene.updateMatrices();
     mvm = scene.xf.modelViewMatrixf();
 
-    this -> bind(scene.xf);
+    pipe.bind(scene.xf);
       onDraw();
-    this -> unbind();
+    pipe.unbind();
 
     process -> bind();   
     process -> bind( scene.xf );      
