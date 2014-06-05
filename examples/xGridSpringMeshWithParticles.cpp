@@ -227,11 +227,11 @@ struct MyApp : Simulator<Foo>, Touch {
          // mouse.print();
 
           float dist = Ro::sqd(fa.pos(), mouse);
-          float famt = 1.0/(1 + (dist) );
+          float famt = 1.0/(.01 + (dist) );
           LOG("%f %f",dist,famt);
           Vec tv( fa.pos() - mouse );
           tv[2] = 0;
-          dx += tv * famt;// * 10;
+          dx += tv * famt * 50;
         }
 
         if (!toonear.empty()){
