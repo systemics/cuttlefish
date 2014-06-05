@@ -59,7 +59,7 @@ using namespace vsr;
 //.01, .1, .765
 
 struct MyApp : Simulator<Foo>, Touch {
-  MyApp() : Simulator<Foo>("192.168.7.255" /* , 1 / 30.f */) {}
+  MyApp() : Simulator<Foo>("192.168.7.255" , 1 / 30.f ) {}
 
   //SPRINGMESH
   float d, sk, nk;
@@ -285,7 +285,7 @@ struct MyApp : CuttleboneApp<Foo> {
   SamplePlayer<float, ipl::Linear, tap::Wrap> play[MAX_TOUCH];
   float gain[MAX_TOUCH];
 
-  //  HyperProcess * process;
+  // HyperProcess * process;
   DisplacementProcess* process;
 
   //PARTICLES
@@ -355,7 +355,7 @@ struct MyApp : CuttleboneApp<Foo> {
 
     particleRender = new HyperSimplex(0,0,this);
 
-    //    process = new HyperProcess( w-> surface.width/2, w->surface.height/2,
+//        process = new HyperProcess( w-> surface.width/2, w->surface.height/2,
     // this);
     process = new DisplacementProcess(w->surface.width / 2,
                                       w->surface.height / 2, this);
@@ -393,7 +393,8 @@ struct MyApp : CuttleboneApp<Foo> {
       mbo->mesh[i].Pos = renderState->position[i];
       float v = renderState->position[i].z;
       bool flicker = Stat::Prob(v);
-      mbo->mesh[i].Col = Vec4f((flicker ? 0 : v), 0, 1, (flicker ? 1 : 0));
+      bool flicker2 = Stat::Prob(v/2.0);
+      mbo->mesh[i].Col = Vec4f((flicker ? 0 : 1), v, (flicker ? 1 : 0), 1);//(flicker ? 1 : 0));
     
     }
 
@@ -408,6 +409,7 @@ struct MyApp : CuttleboneApp<Foo> {
     process->blur.ux = .01;
     process->blur.uy = .01;
     process->blur.amt = .5;
+    process->dispmap.amt = 3.0;
   }
 
   virtual void onDraw() {

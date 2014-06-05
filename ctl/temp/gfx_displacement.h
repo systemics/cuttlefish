@@ -126,10 +126,10 @@ struct DisplacementProcess : public Process {
 
     //blur();
 
-      /* slab.texture->bind(); */ 
-      /*    glLineWidth(1); */ 
-      /*    dispmap(); */ 
-      /* slab.texture->unbind(); */ 
+      slab.texture->bind(); 
+         glLineWidth(1); 
+         dispmap(); 
+      slab.texture->unbind(); 
 
     r2t.swap();   // Swap textures
     rp2t.swap();  
