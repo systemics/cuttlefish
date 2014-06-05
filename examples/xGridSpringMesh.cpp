@@ -19,6 +19,7 @@ struct Foo {
   float time;
   gfx::Vec3f position[N_VERTICES];
   gfx::Vec2f touch[MAX_TOUCH];
+  unsigned index[MAX_TOUCH];
   int touchCount;
 };
 
@@ -91,7 +92,8 @@ struct MyApp : Simulator<Foo>, Touch {
       unsigned r = (unsigned)((state.touch[i].y + 1.0f) / 2 * HEIGHT);
       unsigned c = (unsigned)((state.touch[i].x + 1.0f) / 2 * WIDTH);
       int z = indexOf(r, c);
-      LOG("r:%u c:%u x:%f y:%f", r, c, state.touch[i].x, state.touch[i].y);
+      state.index[i] = z;
+      // LOG("r:%u c:%u x:%f y:%f", r, c, state.touch[i].x, state.touch[i].y);
 
       Vec3f v(0.0f, 0.0f, -1.0f);
       state.position[z] += v;
@@ -161,17 +163,20 @@ using namespace gam;
 struct MyApp : CuttleboneApp<Foo> {
 
   MBO* mbo;
-  SamplePlayer<float, ipl::Cubic, tap::Wrap> play;
-  float gain;
+  SamplePlayer<float, ipl::Cubic, tap::Wrap> play[MAX_TOUCH];
+  float gain[MAX_TOUCH];
 
   MyApp() : CuttleboneApp<Foo>(Layout(4, 4), 30.0) {
     Sound::init(256, 48000);
     Sync::master().spu(48000);
-    gain = 0;
-    if (!play.load(CLIENT_PATH SOUND_FILE)) {
+    for (auto& e : gain) e = 0;
+
+    if (!play[0].load(CLIENT_PATH SOUND_FILE)) {
       LOG("ERROR: failed to load %s", CLIENT_PATH SOUND_FILE);
       exit(1);
     }
+    for (int i = 1; i < MAX_TOUCH; i++)
+      play[i].buffer(play[0], play[0].frameRate(), play[0].channels());
   }
 
   virtual void setup() {
@@ -201,12 +206,12 @@ struct MyApp : CuttleboneApp<Foo> {
       period -= 1.0;
       LOG("Ren: %d", count);
       count = 0;
-      LOG("displacemt is %f", renderState->position[1250].z);
     }
     period += dt;
     count++;
 
-    gain = renderState->position[1250].z;
+    for (int i = 0; i < state.touchCount; i++)
+      gain[i] = renderState->position[renderState->index[i]].z;
 
     for (int i = 0; i < N_VERTICES; i++) {
       mbo->mesh[i].Pos =
@@ -222,9 +227,9 @@ struct MyApp : CuttleboneApp<Foo> {
 
   virtual void onSound(Sound::SoundData& io) {
     for (int i = 0; i < io.n; ++i) {
-      float s = play();
+      float s = play[0]();
       for (int j = 0; j < 2; j++) {
-        *io.outputBuffer++ = (short)(s * 32767.0) * gain;
+        *io.outputBuffer++ = (short)(s * 32767.0) * gain[0];
       }
     }
   }
