@@ -84,8 +84,8 @@ struct MyApp : Simulator<Foo>, Touch {
     auto indexOf = [](unsigned y, unsigned x) { return y * WIDTH + x; };
 
     for (int i = 0; i < state.touchCount; ++i) {
-      unsigned r = (unsigned)((state.touch[0].y + 1.0f) / 2 * HEIGHT);
-      unsigned c = (unsigned)((state.touch[0].x + 1.0f) / 2 * WIDTH);
+      unsigned r = (unsigned)((state.touch[i].y + 1.0f) / 2 * HEIGHT);
+      unsigned c = (unsigned)((state.touch[i].x + 1.0f) / 2 * WIDTH);
       int z = indexOf(r, c);
       LOG("r:%u c:%u x:%f y:%f", r, c, state.touch[i].x, state.touch[i].y);
 
