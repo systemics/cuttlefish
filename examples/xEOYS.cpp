@@ -235,11 +235,11 @@ struct MyApp : Simulator<Foo>, Touch {
             state.touch[i][1] * 29, 0);
 
           float dist = Ro::sqd(fa.pos(), mouse);
-          float famt = 1.0/(.01 + (dist) );
+          float famt = 1.0/(.01 + (dist * dist) ); //fall off change
           LOG("%f %f",dist,famt);
           Vec tv( fa.pos() - mouse );
           tv[2] = 0;
-          dx += tv * famt * 30;
+          dx += tv * famt * 50;  // was 30, now 50
 
         }
 
