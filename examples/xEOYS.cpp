@@ -172,17 +172,13 @@ struct MyApp : Simulator<Foo>, Touch {
     //LOG("%f %f %f", state.position[100].x, state.position[100].y, state.position[100].z);
     //
     //PARTICLES
-    
-    
+      
       //swarm -- find nearest neighbors in z direction (within halfspace of xyplane)
       float acc = .02;
       float rotAcc = .02; 
 
       float thresh = 20;
       float min = 2.75;
-
-
-     // Line line = mouse ^ Vec::z ^ Inf(1);
       
       int numNeighbors = 3;
       for (auto& fa : frame){
@@ -280,6 +276,9 @@ struct MyApp : Simulator<Foo>, Touch {
 
 #include "vsr/vsr_simplex.h"
 #include "gfx/gfx_process.h"
+
+//RENDERERS FOR THIS PROJECT
+#include "temp/meshshader_glsl.h"
 #include "temp/hyperAmt_glsl.h"
 #include "temp/gfx_hyper.h"
 #include "temp/gfx_displacement.h"
@@ -295,21 +294,21 @@ struct MyApp : CuttleboneApp<Foo> {
   SamplePlayer<float, ipl::Linear, tap::Wrap> play[MAX_TOUCH];
   float gain[MAX_TOUCH];
 
-   HyperProcess * process;
+  //HyperProcess * process;
   //DisplacementProcess* process;
+   
+   //SHADERS AND GFX PROCESSES
+   MeshProcess * meshRender;
+   HyperSimplex * particleRender;
+  
+   MBO * simplexMBO;
+   Simplex<4> simplex;
 
-  //PARTICLES
-  float v;
+   //PARTICLE DATA
+   float v;
 
-  MBO * simplexMBO;
-  HyperSimplex * particleRender;
-
-  Simplex<4> simplex;
-
-  //Frame frame[NUMAGENTS];
-  Rot rot[NUMAGENTS];
-  vsr::Vec pos[NUMAGENTS];
-
+   Rot rot[NUMAGENTS];
+   vsr::Vec pos[NUMAGENTS];
 
   MyApp() : CuttleboneApp<Foo>(Layout(4, 4), 30.0) {
     for (auto& e : gain) e = 0;
@@ -368,9 +367,11 @@ struct MyApp : CuttleboneApp<Foo> {
     particlemesh.mode( GL::LS );
     simplexMBO = new MBO( particlemesh );
 
+
+    meshRender = new MeshProcess(this);
     particleRender = new HyperSimplex(0,0,this);
 
-       process = new HyperProcess( w-> surface.width/2, w->surface.height/2, this);
+    //process = new HyperProcess( w-> surface.width/2, w->surface.height/2, this);
 //    process = new DisplacementProcess(w->surface.width / 2, w->surface.height / 2, this);
   }
 
@@ -422,9 +423,9 @@ struct MyApp : CuttleboneApp<Foo> {
     process->blur.ux = .01;
     process->blur.uy = .01;
     process->blur.amt = .5;
-    //process->dispmap.amt = .5;
-    //
-    process -> hypmap.amt = state.time;
+   
+   // process->dispmap.amt = .5;
+   // process -> hypmap.amt = state.time;
   }
 
   virtual void onDraw() {
@@ -441,17 +442,8 @@ struct MyApp : CuttleboneApp<Foo> {
        // particleRender -> bindModelView( mvm * vsr::Xf::mat(pos[i]) );
         particleRender -> program -> uniform("vpos", pos[i][0], pos[i][1], pos[i][2] );
         particleRender -> program -> uniform("amt", val);
-        //particleRender -> program -> uniform("vcol", .2f);
-        
-        //rot[i][0], rot[i][1], rot[i][2] );
-        //simplexMBO -> mesh.mode(GL::LS);
+
         pipe.draw(*simplexMBO);
-
-        //particleRender -> program -> uniform("vcol", .8f);
-
-        //simplexMBO -> mesh.mode(GL::T);
-        pipe.draw(*simplexMBO);
-
       }
 
     pipe.end( *simplexMBO );
@@ -468,9 +460,6 @@ struct MyApp : CuttleboneApp<Foo> {
 
   //  (*process)();
 
-
-  //    onDraw();
-//    process -> bind();   
     particleRender -> bind( scene.xf );      
         drawAgents();
     particleRender -> unbind();
