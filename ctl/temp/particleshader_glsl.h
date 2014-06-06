@@ -71,7 +71,7 @@ string particlevert = R"(
    void main(void){
      
       vec4 colorfalse= doColor();  
-      colorDst = vec4(sourceColor.r, normal.g, normal.b, sourceColor.a);
+      colorDst = vec4(1.0+sourceColor.r, normal.g, normal.b, sourceColor.a + 2.0);
       //colorDst = vec4(1.0 - normal.x, 1.0 - normal.y * normal.y, 1.0 - normal.z * normal.y, 1.0);//sourceColor;
       
       texco = texCoord;
