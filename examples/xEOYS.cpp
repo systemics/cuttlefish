@@ -267,7 +267,7 @@ struct MyApp : Simulator<Foo>, Touch {
       int iter = 0;
       for (int i=0;i<NUMAGENTS;++i){
 
-        simplex.spin( spinSimp[i], frame[i].dx().wt() );
+        simplex.spin( spinSimp[i], state.time );//frame[i].dx().wt() );
         auto proj = simplex.project(1.0);
 
         vsr::Rot rot( frame[i].rot()[0], frame[i].rot()[1], frame[i].rot()[2], frame[i].rot()[3] );
@@ -398,8 +398,9 @@ struct MyApp : CuttleboneApp<Foo> {
     Mesh particlemesh;
     particlemesh.mode(GL::T);
     for (int i = 0; i < NUMAGENTS; ++i){
+      float t = (float)i/NUMAGENTS;
       Vertex v(0,0,0);
-      v.Col = Vec4f(1,0,0,.5);
+      v.Col = Vec4f(1.0 - t/5.0 , t/5.0, .5);
       particlemesh.add(v).add(v).add(v).add(v).add(v); 
       int idx = i * 5;
       particlemesh.add(idx).add(idx+1).add(idx+2);
@@ -492,9 +493,7 @@ struct MyApp : CuttleboneApp<Foo> {
     val += .1;
 
     pipe.begin( *simplexMBO );
-//       simplexMBO -> mesh.mode(GL:T);
        pipe.draw(*simplexMBO);
-
     pipe.end( *simplexMBO );
     
   }
@@ -511,14 +510,14 @@ struct MyApp : CuttleboneApp<Foo> {
 
 //    pipe.bind(scene.xf);
       
- //     meshRender -> bind( scene.xf);
-    //   onDraw();
-  //    meshRender -> unbind();
+      meshRender -> bind( scene.xf);
+       onDraw();
+      meshRender -> unbind();
 //    pipe.unbind();
 
-   particleRender -> bind( scene.xf );      
-      drawAgents();
-   particleRender -> unbind();
+     particleRender -> bind( scene.xf );      
+       drawAgents();
+     particleRender -> unbind();
 
 
     w->swapBuffers();
