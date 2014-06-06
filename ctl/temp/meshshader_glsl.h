@@ -97,10 +97,9 @@ struct MeshProcess : public Process {
     this->bindAll();
   }
 
-  virtual void udpate();
+  virtual void udpate(){}
 
   virtual void operator()(){
-
 
   }
 

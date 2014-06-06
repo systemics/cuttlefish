@@ -165,8 +165,8 @@ struct MyApp : Simulator<Foo>, Touch {
       }
 
       //calc normals
-      Vec3f& a = state.position[neighbor[i][0]] - state.position[i];
-      Vec3f& b = state.position[neighbor[i][1]] - state.position[i];
+      Vec3f a = state.position[neighbor[i][0]] - state.position[i];
+      Vec3f b = state.position[neighbor[i][1]] - state.position[i];
       state.normal[i] = a.cross(b).unit();
   
 
@@ -425,9 +425,9 @@ struct MyApp : CuttleboneApp<Foo> {
     }
 
     // UPDATE SHADER PARAMETERS
-    process->blur.ux = .01;
-    process->blur.uy = .01;
-    process->blur.amt = .5;
+   // process->blur.ux = .01;
+   // process->blur.uy = .01;
+   // process->blur.amt = .5;
    
    // process->dispmap.amt = .5;
    // process -> hypmap.amt = state.time;
