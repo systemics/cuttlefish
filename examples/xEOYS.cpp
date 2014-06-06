@@ -17,6 +17,7 @@
 struct Foo {
   float time;
   gfx::Vec3f position[N_VERTICES];
+  gfx::Vec3f normal[N_VERTICES];
   gfx::Vec2f touch[MAX_TOUCH];
   unsigned index[MAX_TOUCH];
   gfx::Vec3f pos[NUMAGENTS];
@@ -163,6 +164,12 @@ struct MyApp : Simulator<Foo>, Touch {
         force += (v - n) * -NK;
       }
 
+      //calc normals
+      Vec3f& a = state.position[neighbor[i][0]] - state.position[i];
+      Vec3f& b = state.position[neighbor[i][1]] - state.position[i];
+      state.normal[i] = a.cross(b).unit();
+  
+
       velocity[i] += force;
       velocity[i] *= D;
     }
@@ -229,14 +236,11 @@ struct MyApp : Simulator<Foo>, Touch {
            db += fa.xz() * .1;
            dx += fa.z() * 2;
          }
-
         }
 
          dx += -Vec(fa.pos()) * .01;
-
          fa.db() = db * rotAcc; 
          fa.dx() = dx * acc;    
-
          fa.move(); fa.spin();
       }
 
@@ -405,6 +409,7 @@ struct MyApp : CuttleboneApp<Foo> {
 
       float t = (float)i / N_VERTICES * Rand::Num();
       mbo->mesh[i].Pos = renderState->position[i];
+      mbo->mesh[i].Norm = renderState->normal[i];
       float v = renderState->position[i].z;
       bool flicker = Stat::Prob(v);
       bool flicker2 = Stat::Prob(v/2.0);
