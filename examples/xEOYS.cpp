@@ -193,7 +193,7 @@ struct MyApp : Simulator<Foo>, Touch {
     for (int i = 0; i < N_VERTICES; i++) {
       Vec3f a = state.position[neighbor[i][0]] - state.position[i];
       Vec3f b = state.position[neighbor[i][1]] - state.position[i];
-      Ve3f cx = a.cross(b);
+      Vec3f cx = a.cross(b);
       state.normal[i] = cx.unit();
       avg += cx;
     }
