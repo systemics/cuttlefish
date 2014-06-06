@@ -252,10 +252,12 @@ struct MyApp : Simulator<Foo>, Touch {
       }
 
 
-      auto proj = simplex.project(1.0);
 
       int iter = 0;
       for (int i=0;i<NUMAGENTS;++i){
+
+        simplex.spin( Rand::Num(4), frame[i].dx().wt() );
+        auto proj = simplex.project(1.0);
 
         vsr::Rot rot( frame[i].rot()[0], frame[i].rot()[1], frame[i].rot()[2], frame[i].rot()[3] );
         vsr::Vec vec( frame[i].pos()[0], frame[i].pos()[1], frame[i].pos()[2] );
@@ -400,8 +402,8 @@ struct MyApp : CuttleboneApp<Foo> {
     particlemesh.mode(GL::T);
     for (int i = 0; i < NUMAGENTS; ++i){
       Vertex v(0,0,0);
-      v.Col = Vec4f(1,0,0,1);
-      particlemesh.add(v); 
+      v.Col = Vec4f(1,0,0,.5);
+      particlemesh.add(v).add(v).add(v).add(v).add(v); 
       int idx = i * 5;
       particlemesh.add(idx).add(idx+1).add(idx+2);
       particlemesh.add(idx+2).add(idx+1).add(idx+3);
@@ -413,7 +415,6 @@ struct MyApp : CuttleboneApp<Foo> {
     }
 
     simplexMBO = new MBO( particlemesh, GL::DYNAMIC );
-
 
     meshRender = new MeshProcess(this);
     particleRender = new HyperSimplex(0,0,this);
@@ -486,7 +487,9 @@ struct MyApp : CuttleboneApp<Foo> {
     val += .1;
 
     pipe.begin( *simplexMBO );
+//       simplexMBO -> mesh.mode(GL:T);
        pipe.draw(*simplexMBO);
+
     pipe.end( *simplexMBO );
     
   }
