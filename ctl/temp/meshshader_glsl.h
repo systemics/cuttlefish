@@ -19,7 +19,7 @@
 #ifndef  meshshader_glsl_INC
 #define  meshshader_glsl_INC
 
-string meshshader = R"(
+string meshvert = R"(
 
    // ATTRIBUTES
    attribute vec3 position;
@@ -36,7 +36,6 @@ string meshshader = R"(
   // VARYING 
    varying vec4 colorDst;
    varying lowp vec2 texco;
-
 
   // NORMAL CALC
   vec3 doNormal(vec4 n) {
@@ -70,8 +69,9 @@ string meshshader = R"(
 
    void main(void){
      
-      colorDst = doColor();  
-     // colorDst = sourceColor;
+      vec4 colorfalse= doColor();  
+      //colorDst = vec4(normal, 1.0);//sourceColor;
+      colorDst = vec4(1.0 - normal.x, 1.0 - normal.y * normal.y, 1.0 - normal.z * normal.y, 1.0);//sourceColor;
       
       texco = texCoord;
                       
@@ -87,13 +87,31 @@ string meshshader = R"(
 )";
 
 
+string meshfrag = R"(
+
+  uniform sampler2D sampleTexture;  
+  varying vec4 colorDst;
+  varying lowp vec2 texco;
+ 
+  void main(void){
+      
+      vec4 litColor = colorDst;
+      
+      vec4 texColor = texture2D(sampleTexture, texco);
+      
+      gl_FragColor = litColor;     //mix(litColor, texColor, .5);
+  }
+
+)";
+
+
 struct MeshProcess : public Process {
 
   
   MeshProcess(Renderer * r) : Process(0,0,r) { init(); }
 
   virtual void init(){
-    this->program = new ShaderProgram( meshshader, DefaultFragES, 0);
+    this->program = new ShaderProgram( meshvert, DefaultFragES, 0);
     this->bindAll();
   }
 

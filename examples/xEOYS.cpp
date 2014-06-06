@@ -5,6 +5,7 @@
 #include "gfx/gfx_matrix.h"
 #include "vsr/vsr_cga3D_frame.h"
 #include "vsr/vsr_stat.h"
+#include "vsr/vsr_simplex.h"
 
 #define MAX_TOUCH (3)
 #define NUMAGENTS (30)
@@ -15,13 +16,17 @@
 #define N_VERTICES (WIDTH * HEIGHT)
 
 struct Foo {
+  
   float time;
+  
   gfx::Vec3f position[N_VERTICES];
   gfx::Vec3f normal[N_VERTICES];
   gfx::Vec2f touch[MAX_TOUCH];
+  
   unsigned index[MAX_TOUCH];
-  gfx::Vec3f pos[NUMAGENTS];
-  gfx::Vec4f rot[NUMAGENTS];
+
+  gfx::Vec3f simplex[NUMAGENTS*5];
+  
   int touchCount;
 };
 
@@ -48,6 +53,7 @@ using namespace vsr;
 #define SK (0.02f)
 #define NK (0.05f)
 #define D (0.97)
+
 //#define SK (0.02f)
 //#define NK (0.05f)
 //#define D (0.98)
@@ -63,9 +69,9 @@ struct MyApp : Simulator<Foo>, Touch {
   vector<vector<unsigned short>> neighbor;
 
   //PARTICLES
+  Simplex<4> simplex;
   vector<Frame> frame;
   float range;
-  
 
   virtual void setup(Foo& state) {
     Touch::setup("/dev/input/event2");
@@ -97,11 +103,9 @@ struct MyApp : Simulator<Foo>, Touch {
   virtual void update(float dt, Foo& state) {
 
     // Time
-    //
     state.time += dt;
 
     // Touches and Interaction
-    //
     pollTouches();
     int k = 0;
     for (auto& e : touchPoint)
@@ -247,11 +251,22 @@ struct MyApp : Simulator<Foo>, Touch {
          fa.move(); fa.spin();
       }
 
+
+      auto proj = simplex.project(1.0);
+
+      int iter = 0;
       for (int i=0;i<NUMAGENTS;++i){
-        state.pos[i].set( frame[i].pos()[0], frame[i].pos()[1], frame[i].pos()[2] );
-        state.rot[i].set( 
-          frame[i].rot()[0], frame[i].rot()[1], 
-          frame[i].rot()[2], frame[i].rot()[3] );
+
+        vsr::NERot<3> rot( frame[i].rot()[0], frame[i].rot()[1], frame[i].rot()[2], frame[i].rot()[3] );
+        vsr::NEVec<3> vec( frame[i].pos()[0], frame[i].pos()[1], frame[i].pos()[2] );
+
+        for (auto& j : proj ){
+          j = j.spin( rot );
+          j += vec;
+          state.simplex[iter].set( j[0], j[1], j[2]  );
+          iter++;
+        }
+
       }
 
 
@@ -306,10 +321,9 @@ struct MyApp : CuttleboneApp<Foo> {
    
    //SHADERS AND GFX PROCESSES
    MeshProcess * meshRender;
-   HyperSimplex * particleRender;
+  // HyperSimplex * particleRender;
   
    MBO * simplexMBO;
-   Simplex<4> simplex;
 
    //PARTICLE DATA
    float v;
@@ -317,7 +331,8 @@ struct MyApp : CuttleboneApp<Foo> {
    Rot rot[NUMAGENTS];
    vsr::Vec pos[NUMAGENTS];
 
-  MyApp() : CuttleboneApp<Foo>(Layout(4, 4), 30.0) {
+
+   MyApp() : CuttleboneApp<Foo>(Layout(4, 4), 30.0) {
     for (auto& e : gain) e = 0;
 
     for (int i = 0; i < MAX_TOUCH; i++) {
@@ -340,14 +355,17 @@ struct MyApp : CuttleboneApp<Foo> {
     Sound::init(256, 48000);
     Rand::Seed();
 
+
     // SPRINGMESH
     Foo state;
     vector<vector<unsigned short>> neighbor;
     vector<unsigned short> triangleIndex;
     vector<unsigned short> lineIndex;
 
+
     generateGridSpringMesh(WIDTH, HEIGHT, state, triangleIndex, lineIndex,
                            neighbor);
+
 
     Mesh mesh;
     mesh.mode(GL::T);
@@ -358,21 +376,42 @@ struct MyApp : CuttleboneApp<Foo> {
 
     mbo = new MBO(mesh, GL::DYNAMIC);
 
-    //Particles
-     Mesh particlemesh;
-    for (auto& i : simplex.verts ){
+    //Particles OLD WAY
+     /* Mesh particlemesh; */
+     /* int iter = 0; */
+    /* for (auto& i : simplex.verts ){ */
+     /*  //Vertex v(0,0,0); */
+     /*  float f = (float)iter/simplex.verts.size(); */
+     /*  Vertex v(i[0],i[1],i[2]); */
+     /*  v.Norm = Vec3f(i[0],i[1],i[2]); */
+     /*  v.Col = Vec4f(f, f*f,1-f/2.0,1.0);//i[0],i[1],i[2],i[3]); */
+
+     /*  particlemesh.add(v); */
+    /* } */
+
+    /* for (auto& i : simplex.edges ){ */
+     /*  particlemesh.add( i.a).add(i.b);//.add(i.c); */
+    /* } */
+
+    /* particlemesh.mode( GL::LS ); */
+
+    Mesh particlemesh;
+    particlemesh.mode(GL:T);
+    for (int i = 0; i < NUMAGENTS; ++i){
       Vertex v(0,0,0);
-      v.Norm = Vec3f(i[0],i[1],i[2]);
-      v.Col = Vec4f(i[0],i[1],i[2],i[3]);
-      particlemesh.add(v);
+      v.Col = Vec4f(1,0,0,1);
+      particlemesh.add(v); 
+      int idx = i * 5;
+      particlemesh.add(idx).add(idx+1).add(idx+2);
+      particlemesh.add(idx+2).add(idx+1).add(idx+3);
+      particlemesh.add(idx+3).add(idx+1).add(idx+2);
+      particlemesh.add(idx).add(idx+4).add(idx+2);
+      particlemesh.add(idx+2).add(idx+4).add(idx+3);
+      particlemesh.add(idx+3).add(idx+4).add(idx+0);
+
     }
 
-    for (auto& i : simplex.edges ){
-      particlemesh.add( i.a).add(i.b);//.add(i.c);
-    }
-
-    particlemesh.mode( GL::LS );
-    simplexMBO = new MBO( particlemesh );
+    simplexMBO = new MBO( particlemesh, GL::DYNAMIC );
 
 
     meshRender = new MeshProcess(this);
@@ -416,16 +455,16 @@ struct MyApp : CuttleboneApp<Foo> {
       float v = renderState->position[i].z;
       bool flicker = Stat::Prob(v);
       bool flicker2 = Stat::Prob(v/2.0);
-      mbo->mesh[i].Col = Vec4f(0,0,1,1);//(flicker ? 0 : 1), v, (flicker ? 1 : 0), (flicker ? 1 : .3));
+      mbo->mesh[i].Col = Vec4f((flicker ? 0 : 1), v, (flicker ? 1 : 0), (flicker ? 1 : .3));
     
     }
     mbo->update();
 
     //Particles
-    for (int i = 0; i<NUMAGENTS; ++i){
-      rot[i] = Rot( state.rot[i][0], state.rot[i][1], state.rot[i][2], state.rot[i][3]);
-      pos[i] = vsr::Vec( state.pos[i][0], state.pos[i][1], state.pos[i][2]);
+    for (int i = 0; i<NUMAGENTS*5; ++i){
+      simplexMBO -> mesh[i].Pos = state.simplex[i];
     }
+      simplexMBO -> update();
 
     // UPDATE SHADER PARAMETERS
    // process->blur.ux = .01;
@@ -433,7 +472,8 @@ struct MyApp : CuttleboneApp<Foo> {
    // process->blur.amt = .5;
    
    // process->dispmap.amt = .5;
-   // process -> hypmap.amt = state.time;
+   // process->hypmap.amt = state.time;
+   
   }
 
   virtual void onDraw() {
@@ -445,15 +485,7 @@ struct MyApp : CuttleboneApp<Foo> {
     val += .1;
 
     pipe.begin( *simplexMBO );
-
-      for (int i = 0; i<NUMAGENTS; ++i){
-       // particleRender -> bindModelView( mvm * vsr::Xf::mat(pos[i]) );
-        particleRender -> program -> uniform("vpos", pos[i][0], pos[i][1], pos[i][2] );
-        particleRender -> program -> uniform("amt", val);
-
-        pipe.draw(*simplexMBO);
-      }
-
+       pipe.draw(*simplexMBO);
     pipe.end( *simplexMBO );
     
   }
@@ -468,16 +500,17 @@ struct MyApp : CuttleboneApp<Foo> {
 
   //  (*process)();
 
-    /* particleRender -> bind( scene.xf ); */      
-    /*     drawAgents(); */
-    /* particleRender -> unbind(); */
-
 //    pipe.bind(scene.xf);
       
-      meshRender -> bind( scene.xf);
-       onDraw();
-      meshRender -> unbind();
+ //     meshRender -> bind( scene.xf);
+    //   onDraw();
+  //    meshRender -> unbind();
 //    pipe.unbind();
+
+   particleRender -> bind( scene.xf );      
+      drawAgents();
+   particleRender -> unbind();
+
 
     w->swapBuffers();
   }

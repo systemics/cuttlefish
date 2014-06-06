@@ -46,11 +46,16 @@ struct HyperSimplex : public Process {
       Mesh mesh;
         
       //SIMPLEX
+       int iter =0;
        for (auto& i : simplex.verts ){
-        Vertex v(0,0,0);
+         float t = (float)iter/simplex.verts.size();
+        Vertex v(i[0],i[1],i[2]);
+       // Vertex v(0,0,0);
         v.Norm = Vec3f(i[0],i[1],i[2]);
-        v.Col = Vec4f(i[0],i[1],i[2],i[3]);
+        //v.Col = Vec4f(i[0],i[1],i[2],i[3]);
+        v.Col = Vec4f(t, t*t,1-t,1);
         mesh.add(v);
+        iter ++;
        }
 
        for (auto& i : simplex.edges ){
@@ -64,7 +69,7 @@ struct HyperSimplex : public Process {
    }
 
    virtual void initShader(){
-    this->program = new ShaderProgram( hyperAmt, DefaultFragES, 0);
+    this->program = new ShaderProgram( DefaultVertES, DefaultFragES, 0);//hyperAmt, DefaultFragES, 0);
     this->bindAll();
    } 
 
@@ -73,9 +78,9 @@ struct HyperSimplex : public Process {
    }
 
   virtual void operator()(){
-    this->bind();
+   // this->bind();
     this->bind( renderer -> scene.xf ); //binds
-        update();
+    //    update();
         draw();
     this->unbind();   
   }
