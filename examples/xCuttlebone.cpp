@@ -1,18 +1,26 @@
-#include "ctl_bone.h"
-
 struct Foo {
   float value;
 };
 
 #if SIM
 
-struct MyApp : ctl::Simulator<Foo> {
+#include "ctl_bone.h"
+using namespace ctl;
+
+struct MyApp : Simulator<Foo> {
+
+  // for a free-running simulation, use a negative timer period
+  //
+  // MyApp() : Simulator<Foo>("127.0.0.1", -1) {
+
   MyApp() : Simulator<Foo>("192.168.7.255", 1 / 30.f) {
     //
     // shouldLog = true;
   }
   virtual void setup(Foo& state) { state.value = 0; }
   virtual void update(float dt, Foo& state) {
+    static FPS fps;
+    fps(dt, "sim");
     state.value += 0.01f;
     //    LOG("update(%f) -> %f", dt, state.value);
   }
@@ -36,6 +44,8 @@ struct MyApp : CuttleboneApp<Foo> {
   virtual void setup() {}
 
   virtual void update(float dt, Foo& state, int popCount) {
+    static FPS fps;
+    fps(dt, "ren");
     v = state.value - int(state.value);
   }
 

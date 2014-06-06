@@ -34,7 +34,7 @@ struct Simulator : Timer {
   STATE* simulationState;
 
   Queue<STATE> simulateBroadcast;
-  thread broadcast;
+  thread broadcast, simulate;
 
   Simulator(const char* broadcastIp = "127.0.0.1", float timerRate = 1 / 60.0f)
       : broadcastIp(broadcastIp),
@@ -77,13 +77,26 @@ struct Simulator : Timer {
     setup(*simulationState);
 
     waitingToStart = false;
-    Timer::start(timerRate);
 
+    bool useTimer = (timerRate > 0);
+
+    if (useTimer)
+      Timer::start(timerRate);
+    else {
+      simulate = thread([&]() {
+        while (!done)
+          onTimer();
+      });
+    }
+
+    // WAIT...
     getchar();
 
-    Timer::stop();
+    if (useTimer) Timer::stop();
+
     done = true;
     broadcast.join();
+    if (!useTimer) simulate.join();
   }
 
   void onTimer() {
@@ -194,6 +207,21 @@ struct Subscriber {
     done = true;
     receive.join();
     render.join();
+  }
+};
+
+struct FPS {
+  FPS() : count(0), period(0) {}
+  int count;
+  float period;
+  void operator()(float dt, const char* header = "FPS") {
+    count++;
+    period += dt;
+    if (period > 1.0) {
+      LOG("%s:%d", header, count);
+      period -= 1.0;
+      count = 0;
+    }
   }
 };
 
