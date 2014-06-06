@@ -188,11 +188,17 @@ struct MyApp : Simulator<Foo>, Touch {
       for (int i = 0; i < N_VERTICES; i++) state.position[i] += velocity[i];
 
    //calc mesh normals
+   //and average
+    Vec3f avg;
     for (int i = 0; i < N_VERTICES; i++) {
       Vec3f a = state.position[neighbor[i][0]] - state.position[i];
       Vec3f b = state.position[neighbor[i][1]] - state.position[i];
-      state.normal[i] = a.cross(b).unit();
+      Ve3f cx = a.cross(b);
+      state.normal[i] = cx.unit();
+      avg += cx;
     }
+
+    LOG("AVERAGE NORMAL: %f", avg.len());
 
     //LOG("%f %f %f", state.position[100].x, state.position[100].y, state.position[100].z);
     //
@@ -203,7 +209,11 @@ struct MyApp : Simulator<Foo>, Touch {
     //PARTICLES
       
       //swarm -- find nearest neighbors in z direction (within halfspace of xyplane)
-      float acc = .02;
+      
+      //change acc dynamics based on some variable (spring mesh average z?)
+      float acc = .02 * avg.len();
+
+
       float rotAcc = .02; 
 
       float thresh = 20;
