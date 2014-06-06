@@ -8,7 +8,7 @@
 #include "vsr/vsr_simplex.h"
 
 #define MAX_TOUCH (3)
-#define NUMAGENTS (30)
+#define NUMAGENTS (50)
 
 #define MULTIPLY (4)
 #define WIDTH (16 * MULTIPLY)
@@ -26,6 +26,7 @@ struct Foo {
   unsigned index[MAX_TOUCH];
 
   gfx::Vec3f simplex[NUMAGENTS*5];
+  gfx::Vec3f simplexNormals[NUMAGENTS];
   
   int touchCount;
 };
@@ -70,6 +71,7 @@ struct MyApp : Simulator<Foo>, Touch {
 
   //PARTICLES
   Simplex<4> simplex;
+  float spinSimp[NUMAGENTS];
   vector<Frame> frame;
   float range;
 
@@ -92,12 +94,17 @@ struct MyApp : Simulator<Foo>, Touch {
     range = 8;
 
     Rand::Seed();
+
     for (auto& f : frame ){
       Vec v( Rand::Num(-1,1) , Rand::Num(-1,1), Rand::Num(-1,1));
       f.pos() = Ro::null( v * range );
       f.rot() = Gen::rot( Biv(  Rand::Num(), Rand::Num(), Rand::Num() ) );
       f.scale() = .5;
     }   
+
+    for (int i=0;i<NUMAGENTS;++i){
+      spinSimp[i] = Rand::Num(4);
+    }
   }
 
   virtual void update(float dt, Foo& state) {
@@ -176,7 +183,7 @@ struct MyApp : Simulator<Foo>, Touch {
   //
       for (int i = 0; i < N_VERTICES; i++) state.position[i] += velocity[i];
 
-   //calc normals
+   //calc mesh normals
     for (int i = 0; i < N_VERTICES; i++) {
       Vec3f a = state.position[neighbor[i][0]] - state.position[i];
       Vec3f b = state.position[neighbor[i][1]] - state.position[i];
@@ -184,6 +191,10 @@ struct MyApp : Simulator<Foo>, Touch {
     }
 
     //LOG("%f %f %f", state.position[100].x, state.position[100].y, state.position[100].z);
+    //
+    //
+    //
+    //
     //
     //PARTICLES
       
@@ -256,7 +267,7 @@ struct MyApp : Simulator<Foo>, Touch {
       int iter = 0;
       for (int i=0;i<NUMAGENTS;++i){
 
-        simplex.spin( Rand::Num(4), frame[i].dx().wt() );
+        simplex.spin( spinSimp[i], frame[i].dx().wt() );
         auto proj = simplex.project(1.0);
 
         vsr::Rot rot( frame[i].rot()[0], frame[i].rot()[1], frame[i].rot()[2], frame[i].rot()[3] );
@@ -270,9 +281,19 @@ struct MyApp : Simulator<Foo>, Touch {
           iter++;
         }
 
+        //normals
+        NEVec<3> na = (proj[1] - proj[0]) ^  proj[2] - proj[0] ).dual().unit();
+       // NEVec<3> nb = (proj[1] - proj[2]) ^  proj[3] - proj[2] ).dual().unit();
+       // NEVec<3> nc = (proj[0] - proj[4]) ^  proj[0] - proj[2] ).dual().unit();
+
+        simplexNormals[i] = Vec3f(na[0],na[1],na[2]);
+     //   simplexNormals[i*3+1] = Vec3f(nb[0],nb[1],nb[2]);
+     //   simplexNormals[i*3+2] =Vec3f(nc[0],nc[1],nc[2]);
+
       }
 
 
+    //USE AGENTS TO DISTURB THE MESH 
     for (auto& f : frame){
       float x = f.vec()[0] / 44.0;
       float y = f.vec()[1] / 30.0;
@@ -304,9 +325,10 @@ struct MyApp : Simulator<Foo>, Touch {
 
 //RENDERERS FOR THIS PROJECT
 #include "temp/meshshader_glsl.h"
-#include "temp/hyperAmt_glsl.h"
-#include "temp/gfx_hyper.h"
-#include "temp/gfx_displacement.h"
+#include "temp/particleshader_glsl.h"
+
+//#include "temp/gfx_hyper.h"
+//#include "temp/gfx_displacement.h"
 
 using namespace ctl;
 using namespace gfx;
@@ -315,25 +337,19 @@ using namespace vsr;
 
 struct MyApp : CuttleboneApp<Foo> {
 
-  MBO* mbo;
-  SamplePlayer<float, ipl::Linear, tap::Wrap> play[MAX_TOUCH];
-  float gain[MAX_TOUCH];
+   SamplePlayer<float, ipl::Linear, tap::Wrap> play[MAX_TOUCH];
+   float gain[MAX_TOUCH];
 
   //HyperProcess * process;
   //DisplacementProcess* process;
    
    //SHADERS AND GFX PROCESSES
    MeshProcess * meshRender;
-   HyperSimplex * particleRender;
+   ParticleProcess * particleRender;
   
+   //MESHes
+   MBO* mbo;    
    MBO * simplexMBO;
-
-   //PARTICLE DATA
-   float v;
-
-   Rot rot[NUMAGENTS];
-   vsr::Vec pos[NUMAGENTS];
-
 
    MyApp() : CuttleboneApp<Foo>(Layout(4, 4), 30.0) {
     for (auto& e : gain) e = 0;
@@ -379,25 +395,6 @@ struct MyApp : CuttleboneApp<Foo> {
 
     mbo = new MBO(mesh, GL::DYNAMIC);
 
-    //Particles OLD WAY
-     /* Mesh particlemesh; */
-     /* int iter = 0; */
-    /* for (auto& i : simplex.verts ){ */
-     /*  //Vertex v(0,0,0); */
-     /*  float f = (float)iter/simplex.verts.size(); */
-     /*  Vertex v(i[0],i[1],i[2]); */
-     /*  v.Norm = Vec3f(i[0],i[1],i[2]); */
-     /*  v.Col = Vec4f(f, f*f,1-f/2.0,1.0);//i[0],i[1],i[2],i[3]); */
-
-     /*  particlemesh.add(v); */
-    /* } */
-
-    /* for (auto& i : simplex.edges ){ */
-     /*  particlemesh.add( i.a).add(i.b);//.add(i.c); */
-    /* } */
-
-    /* particlemesh.mode( GL::LS ); */
-
     Mesh particlemesh;
     particlemesh.mode(GL::T);
     for (int i = 0; i < NUMAGENTS; ++i){
@@ -417,7 +414,7 @@ struct MyApp : CuttleboneApp<Foo> {
     simplexMBO = new MBO( particlemesh, GL::DYNAMIC );
 
     meshRender = new MeshProcess(this);
-    particleRender = new HyperSimplex(0,0,this);
+    particleRender = new ParticleProcess(this);
 
     //process = new HyperProcess( w-> surface.width/2, w->surface.height/2, this);
 //    process = new DisplacementProcess(w->surface.width / 2, w->surface.height / 2, this);
@@ -462,9 +459,17 @@ struct MyApp : CuttleboneApp<Foo> {
     }
     mbo->update();
 
-    //Particles
+    //Particles Update
     for (int i = 0; i<NUMAGENTS*5; ++i){
       simplexMBO -> mesh[i].Pos = state.simplex[i];
+    }
+
+    for (int i = 0; i<NUMAGENTS;++i){
+      int idx = i * 5;
+      int nidx = i;
+      simplexMBO -> mesh[idx].Norm = state.simplexNormals[nidx];
+      simplexMBO -> mesh[idx+1].Norm = state.simplexNormals[nidx];
+      simplexMBO -> mesh[idx+2].Norm = state.simplexNormals[nidx];
     }
       simplexMBO -> update();
 
@@ -536,6 +541,8 @@ struct MyApp : CuttleboneApp<Foo> {
 #endif
 
 int main() {
+  LOG("state is %d bytes", sizeof(Foo) );
+
   MyApp app;
   app.start();
 }
