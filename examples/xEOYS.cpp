@@ -257,10 +257,11 @@ struct MyApp : Simulator<Foo>, Touch {
       int iter = 0;
       for (int i=0;i<NUMAGENTS;++i){
 
-        vsr::NERot<3> rot( frame[i].rot()[0], frame[i].rot()[1], frame[i].rot()[2], frame[i].rot()[3] );
-        vsr::NEVec<3> vec( frame[i].pos()[0], frame[i].pos()[1], frame[i].pos()[2] );
+        vsr::Rot rot( frame[i].rot()[0], frame[i].rot()[1], frame[i].rot()[2], frame[i].rot()[3] );
+        vsr::Vec vec( frame[i].pos()[0], frame[i].pos()[1], frame[i].pos()[2] );
 
-        for (auto& j : proj ){
+        for (auto& tj : proj ){
+          Vec j(tj[0],tj[1],tj[2]);
           j = j.spin( rot );
           j += vec;
           state.simplex[iter].set( j[0], j[1], j[2]  );
@@ -321,7 +322,7 @@ struct MyApp : CuttleboneApp<Foo> {
    
    //SHADERS AND GFX PROCESSES
    MeshProcess * meshRender;
-  // HyperSimplex * particleRender;
+   HyperSimplex * particleRender;
   
    MBO * simplexMBO;
 
@@ -396,7 +397,7 @@ struct MyApp : CuttleboneApp<Foo> {
     /* particlemesh.mode( GL::LS ); */
 
     Mesh particlemesh;
-    particlemesh.mode(GL:T);
+    particlemesh.mode(GL::T);
     for (int i = 0; i < NUMAGENTS; ++i){
       Vertex v(0,0,0);
       v.Col = Vec4f(1,0,0,1);
