@@ -209,7 +209,7 @@ struct MyApp : Simulator<Foo>, Touch {
       
       //change acc dynamics based on some variable (spring mesh average z?)
       float acc = .02;// * avg.len();
-      float attractionCoef = sin(state.time);
+      float attractionCoef = fabs( sin(state.time * 10) );
 
       float rotAcc = .02; 
 
@@ -245,9 +245,9 @@ struct MyApp : Simulator<Foo>, Touch {
           LOG("%f DIST", dist);
           float famt = 1.0/(.01 + (dist * dist) ); //fall off change
           LOG("%f %f",dist,famt);
-          Vec tv( mouse - fa.pos() ); //switch!
+          Vec tv( fa.pos() -mouse ); //switch!
           tv[2] = 0;
-          dx += tv * famt * 5000; //less /10 
+          dx += tv * famt * 50000; //less /10 
 
         }
 
