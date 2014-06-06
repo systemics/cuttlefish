@@ -234,8 +234,8 @@ struct MyApp : Simulator<Foo>, Touch {
             state.touch[i][0] * 43,
             state.touch[i][1] * 29, 0);
 
-          float dist = Ro::sqd(fa.pos(), mouse);
-         // LOG("%f DIST", dist);
+          float dist = Ro::sqd( Ro::null(fa.pos()[0], fa.pos()[1], 0), mouse);
+          LOG("%f DIST", dist);
           float famt = 1.0/(.01 + (dist * dist) ); //fall off change
           LOG("%f %f",dist,famt);
           Vec tv( fa.pos() - mouse );
