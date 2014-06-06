@@ -53,7 +53,7 @@ using namespace vsr;
 
 #define SK (0.02f)
 #define NK (0.05f)
-#define D (0.97)
+float D = 0.97;
 
 //#define SK (0.02f)
 //#define NK (0.05f)
@@ -61,6 +61,7 @@ using namespace vsr;
 //.01, .1, .765
 
 struct MyApp : Simulator<Foo>, Touch {
+  //MyApp() : Simulator<Foo>("127.0.0.1" /*, 1 / 30.f */) {}
   MyApp() : Simulator<Foo>("192.168.7.255" /*, 1 / 30.f */) {}
 
   //SPRINGMESH
@@ -111,6 +112,9 @@ struct MyApp : Simulator<Foo>, Touch {
 
     // Time
     state.time += dt;
+
+    D = 0.82 + abs(cos(state.time / 10 * (1 + sin(state.time / 9) * 0.1))) * 0.15;
+    //LOG("%f", D);
 
     // Touches and Interaction
     pollTouches();
