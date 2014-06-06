@@ -70,8 +70,8 @@ string meshvert = R"(
    void main(void){
      
       vec4 colorfalse= doColor();  
-      //colorDst = vec4(normal, 1.0);//sourceColor;
-      colorDst = vec4(1.0 - normal.x, 1.0 - normal.y * normal.y, 1.0 - normal.z * normal.y, 1.0);//sourceColor;
+      colorDst = vec4(normal.zyx, position.z);//sourceColor;
+      //colorDst = vec4(1.0 - normal.x, 1.0 - normal.y, 1.0 - normal.z * normal.y, 1.0);//sourceColor;
       
       texco = texCoord;
                       

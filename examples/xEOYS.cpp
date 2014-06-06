@@ -267,7 +267,7 @@ struct MyApp : Simulator<Foo>, Touch {
       int iter = 0;
       for (int i=0;i<NUMAGENTS;++i){
 
-        simplex.spin( spinSimp[i], sin( frame[i].dx().wt() ) );
+        simplex.spin( spinSimp[i], sin( frame[i].dx().wt()  / 50.0 ) );
         auto proj = simplex.project(1.0);
 
         vsr::Rot rot( frame[i].rot()[0], frame[i].rot()[1], frame[i].rot()[2], frame[i].rot()[3] );
@@ -341,7 +341,7 @@ struct MyApp : CuttleboneApp<Foo> {
    float gain[MAX_TOUCH];
 
   //HyperProcess * process;
-  //DisplacementProcess* process;
+    DisplacementProcess* process;
    
    //SHADERS AND GFX PROCESSES
    MeshProcess * meshRender;
@@ -418,7 +418,7 @@ struct MyApp : CuttleboneApp<Foo> {
     particleRender = new ParticleProcess(this);
 
     //process = new HyperProcess( w-> surface.width/2, w->surface.height/2, this);
-    //process = new DisplacementProcess(w->surface.width / 2, w->surface.height / 2, this);
+    process = new DisplacementProcess(w->surface.width / 2, w->surface.height / 2, this);
   }
 
   virtual void update(float dt, Foo& state, int popCount) {
@@ -506,18 +506,21 @@ struct MyApp : CuttleboneApp<Foo> {
 
     glLineWidth(2);
 
-  //  (*process)();
-
-//    pipe.bind(scene.xf);
-      
-      meshRender -> bind( scene.xf);
-       onDraw();
-      meshRender -> unbind();
-//    pipe.unbind();
 
      particleRender -> bind( scene.xf );      
        drawAgents();
      particleRender -> unbind();
+
+    (*process)();
+
+//    pipe.bind(scene.xf);
+      
+//      meshRender -> bind( scene.xf);
+//       onDraw();
+//      meshRender -> unbind();
+//    pipe.unbind();
+
+
 
 
     w->swapBuffers();

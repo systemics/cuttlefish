@@ -122,9 +122,9 @@ struct DisplacementProcess : public Process {
     glViewport(0, 0, renderer -> contextWidth, renderer -> contextHeight ); 
     //renderer -> clear();
 
-    // slab();
+     slab();
 
-    //blur();
+//      blur();
 
       slab.texture->bind(); 
          glLineWidth(1); 
