@@ -213,7 +213,7 @@ struct MyApp : Simulator<Foo>, Touch {
 
       float rotAcc = .02; 
 
-      float thresh = 20;
+      float thresh = 20 + 20 * fabs( sin(state.time) );;
       float min = 2.75;
       
       int numNeighbors = 3;
