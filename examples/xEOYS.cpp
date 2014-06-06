@@ -194,8 +194,9 @@ struct MyApp : Simulator<Foo>, Touch {
       Vec3f a = state.position[neighbor[i][0]] - state.position[i];
       Vec3f b = state.position[neighbor[i][1]] - state.position[i];
       Vec3f cx = a.cross(b);
-      state.normal[i] = cx.unit();
       avg += cx;
+
+      state.normal[i] = cx.unit();
     }
 
     LOG("AVERAGE NORMAL: %f", avg.len());
@@ -211,8 +212,8 @@ struct MyApp : Simulator<Foo>, Touch {
       //swarm -- find nearest neighbors in z direction (within halfspace of xyplane)
       
       //change acc dynamics based on some variable (spring mesh average z?)
-      float acc = .02 * avg.len();
-
+      float acc = .02;// * avg.len();
+      float attractionCoef = sin(state.time);
 
       float rotAcc = .02; 
 
@@ -262,7 +263,7 @@ struct MyApp : Simulator<Foo>, Touch {
 
          for (auto& neigh : nearest){
            db += Gen::log( neigh.rot() ) / nearest.size();
-           dx += Vec( neigh.pos() - fa.pos() ) / nearest.size();
+           dx += ( Vec( neigh.pos() - fa.pos() ) / nearest.size() ) * attractionCoef;
          }
 
          if (nearest.empty()){
