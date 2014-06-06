@@ -188,18 +188,14 @@ struct MyApp : Simulator<Foo>, Touch {
       for (int i = 0; i < N_VERTICES; i++) state.position[i] += velocity[i];
 
    //calc mesh normals
-   //and average
-    Vec3f avg;
     for (int i = 0; i < N_VERTICES; i++) {
       Vec3f a = state.position[neighbor[i][0]] - state.position[i];
       Vec3f b = state.position[neighbor[i][1]] - state.position[i];
       Vec3f cx = a.cross(b);
-      avg += cx;
-
       state.normal[i] = cx.unit();
     }
 
-    LOG("AVERAGE NORMAL: %f", avg.len());
+    //LOG("AVERAGE NORMAL: %f", avg.len());
 
     //LOG("%f %f %f", state.position[100].x, state.position[100].y, state.position[100].z);
     //
@@ -249,7 +245,7 @@ struct MyApp : Simulator<Foo>, Touch {
           LOG("%f DIST", dist);
           float famt = 1.0/(.01 + (dist * dist) ); //fall off change
           LOG("%f %f",dist,famt);
-          Vec tv( fa.pos() - mouse );
+          Vec tv( mouse - fa.pos() ); //switch!
           tv[2] = 0;
           dx += tv * famt * 50000; 
 
