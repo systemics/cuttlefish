@@ -247,7 +247,7 @@ struct MyApp : Simulator<Foo>, Touch {
           LOG("%f %f",dist,famt);
           Vec tv( mouse - fa.pos() ); //switch!
           tv[2] = 0;
-          dx += tv * famt * 50000; 
+          dx += tv * famt * 5000; //less /10 
 
         }
 
