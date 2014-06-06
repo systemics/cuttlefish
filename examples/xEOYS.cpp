@@ -267,7 +267,7 @@ struct MyApp : Simulator<Foo>, Touch {
       int iter = 0;
       for (int i=0;i<NUMAGENTS;++i){
 
-        //simplex.spin( spinSimp[i], state.time );//frame[i].dx().wt() );
+        simplex.spin( spinSimp[i], sin( frame[i].dx().wt() ) );
         auto proj = simplex.project(1.0);
 
         vsr::Rot rot( frame[i].rot()[0], frame[i].rot()[1], frame[i].rot()[2], frame[i].rot()[3] );
