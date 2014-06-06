@@ -154,7 +154,7 @@ struct MyApp : Simulator<Foo>, Touch {
         */
 
     // PHYSICS
-    //
+    // calc velocities
     for (int i = 0; i < N_VERTICES; i++) {
       Vec3f& v = state.position[i];
       Vec3f force = (v - stationary[i]) * -SK;
@@ -164,17 +164,20 @@ struct MyApp : Simulator<Foo>, Touch {
         force += (v - n) * -NK;
       }
 
-      //calc normals
-      Vec3f a = state.position[neighbor[i][0]] - state.position[i];
-      Vec3f b = state.position[neighbor[i][1]] - state.position[i];
-      state.normal[i] = a.cross(b).unit();
-  
-
       velocity[i] += force;
       velocity[i] *= D;
     }
 
-    for (int i = 0; i < N_VERTICES; i++) state.position[i] += velocity[i];
+  //hey karl -> !!! calc positions
+  //
+      for (int i = 0; i < N_VERTICES; i++) state.position[i] += velocity[i];
+
+   //calc normals
+    for (int i = 0; i < N_VERTICES; i++) {
+      Vec3f a = state.position[neighbor[i][0]] - state.position[i];
+      Vec3f b = state.position[neighbor[i][1]] - state.position[i];
+      state.normal[i] = a.cross(b).unit();
+    }
 
     //LOG("%f %f %f", state.position[100].x, state.position[100].y, state.position[100].z);
     //
@@ -347,7 +350,7 @@ struct MyApp : CuttleboneApp<Foo> {
                            neighbor);
 
     Mesh mesh;
-    mesh.mode(GL::L);
+    mesh.mode(GL::T);
     // mesh.mode(GL::L);
     for (int i = 0; i < triangleIndex.size(); i++) mesh.add(triangleIndex[i]);
     // for (int i = 0; i < lineIndex.size(); i++) mesh.add(lineIndex[i]);
@@ -413,7 +416,7 @@ struct MyApp : CuttleboneApp<Foo> {
       float v = renderState->position[i].z;
       bool flicker = Stat::Prob(v);
       bool flicker2 = Stat::Prob(v/2.0);
-      mbo->mesh[i].Col = Vec4f((flicker ? 0 : 1), v, (flicker ? 1 : 0), (flicker ? 1 : .3));
+      mbo->mesh[i].Col = Vec4f(0,0,1,1);//(flicker ? 0 : 1), v, (flicker ? 1 : 0), (flicker ? 1 : .3));
     
     }
     mbo->update();
@@ -465,13 +468,16 @@ struct MyApp : CuttleboneApp<Foo> {
 
   //  (*process)();
 
-    particleRender -> bind( scene.xf );      
-        drawAgents();
-    particleRender -> unbind();
+    /* particleRender -> bind( scene.xf ); */      
+    /*     drawAgents(); */
+    /* particleRender -> unbind(); */
 
-    pipe.bind(scene.xf);
-      onDraw();
-    pipe.unbind();
+//    pipe.bind(scene.xf);
+      
+      meshRender -> bind( scene.xf);
+       onDraw();
+      meshRender -> unbind();
+//    pipe.unbind();
 
     w->swapBuffers();
   }
