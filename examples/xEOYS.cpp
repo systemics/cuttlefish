@@ -267,7 +267,7 @@ struct MyApp : Simulator<Foo>, Touch {
       int iter = 0;
       for (int i=0;i<NUMAGENTS;++i){
 
-        simplex.spin( spinSimp[i], sin( frame[i].dx().wt()  / 50.0 ) );
+        simplex.spin( spinSimp[i], sin( frame[i].dx().wt()  / 10.0 ) );
         auto proj = simplex.project(1.0);
 
         vsr::Rot rot( frame[i].rot()[0], frame[i].rot()[1], frame[i].rot()[2], frame[i].rot()[3] );
@@ -328,7 +328,7 @@ struct MyApp : Simulator<Foo>, Touch {
 #include "temp/particleshader_glsl.h"
 
 //#include "temp/gfx_hyper.h"
-//#include "temp/gfx_displacement.h"
+#include "temp/gfx_displacement.h"
 
 using namespace ctl;
 using namespace gfx;
@@ -511,13 +511,13 @@ struct MyApp : CuttleboneApp<Foo> {
        drawAgents();
      particleRender -> unbind();
 
-    (*process)();
+//    (*process)();
 
 //    pipe.bind(scene.xf);
       
-//      meshRender -> bind( scene.xf);
-//       onDraw();
-//      meshRender -> unbind();
+      meshRender -> bind( scene.xf);
+       onDraw();
+      meshRender -> unbind();
 //    pipe.unbind();
 
 

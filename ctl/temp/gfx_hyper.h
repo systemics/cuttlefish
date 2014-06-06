@@ -201,23 +201,23 @@ struct HyperProcess : public Process {
     r2t();        
 
     // Now Blur it and Capture that!
-    rp2t();
+    //rp2t();
 
     //switch to original viewport
     glViewport(0, 0, renderer -> contextWidth, renderer -> contextHeight ); 
     //renderer -> clear();
 
-    // slab();
+    //slab();
 
-    //blur();
+    blur();
 
-     slab.texture->bind();
-        glLineWidth(1);
-        hypmap();
-     slab.texture->unbind();
+     /* slab.texture->bind(); */
+     /*    glLineWidth(1); */
+     /*    hypmap(); */
+     /* slab.texture->unbind(); */
 
     r2t.swap();   // Swap textures
-    rp2t.swap();  
+  //  rp2t.swap();  
   }
 
 };
