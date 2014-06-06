@@ -282,11 +282,11 @@ struct MyApp : Simulator<Foo>, Touch {
         }
 
         //normals
-        NEVec<3> na = (proj[1] - proj[0]) ^  proj[2] - proj[0] ).dual().unit();
+        NEVec<3> na = (proj[1] - proj[0]) ^ ( proj[2] - proj[0] ).dual().unit();
        // NEVec<3> nb = (proj[1] - proj[2]) ^  proj[3] - proj[2] ).dual().unit();
        // NEVec<3> nc = (proj[0] - proj[4]) ^  proj[0] - proj[2] ).dual().unit();
 
-        simplexNormals[i] = Vec3f(na[0],na[1],na[2]);
+        state.simplexNormals[i] = Vec3f(na[0],na[1],na[2]);
      //   simplexNormals[i*3+1] = Vec3f(nb[0],nb[1],nb[2]);
      //   simplexNormals[i*3+2] =Vec3f(nc[0],nc[1],nc[2]);
 

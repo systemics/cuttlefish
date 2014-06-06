@@ -88,28 +88,28 @@ string particlevert = R"(
 )";
 
 
-string meshfrag = R"(
+/* string meshfrag = R"( */
 
-  uniform sampler2D sampleTexture;  
-  varying vec4 colorDst;
-  varying lowp vec2 texco;
+/*   uniform sampler2D sampleTexture; */  
+/*   varying vec4 colorDst; */
+/*   varying lowp vec2 texco; */
  
-  void main(void){
+/*   void main(void){ */
       
-      vec4 litColor = colorDst;
+/*       vec4 litColor = colorDst; */
       
-      vec4 texColor = texture2D(sampleTexture, texco);
+/*       vec4 texColor = texture2D(sampleTexture, texco); */
       
-      gl_FragColor = litColor;     //mix(litColor, texColor, .5);
-  }
+/*       gl_FragColor = litColor;     //mix(litColor, texColor, .5); */
+/*   } */
 
-)";
+/* )"; */
 
 
 struct ParticleProcess : public Process {
 
   
-  MeshProcess(Renderer * r) : Process(0,0,r) { init(); }
+  ParticleProcess(Renderer * r) : Process(0,0,r) { init(); }
 
   virtual void init(){
     this->program = new ShaderProgram( particlevert, DefaultFragES, 0);
