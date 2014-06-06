@@ -59,7 +59,7 @@ string particlevert = R"(
        //Specular Coefficient
        float sf = max(0.0, dot(L,H) );
            
-       return vec4((sourceColor * (df + sf)).xyz , 1 );
+       return vec4((sourceColor * sf).xyz , 1 );
    }
 
   //POSITION CALC
@@ -71,7 +71,7 @@ string particlevert = R"(
    void main(void){
      
       vec4 colorfalse= doColor();  
-      colorDst = vec4(normal, 1.0);//sourceColor;
+      colorDst = vec4(sourceColor.r, normal.g, normal.b, sourceColor.a);
       //colorDst = vec4(1.0 - normal.x, 1.0 - normal.y * normal.y, 1.0 - normal.z * normal.y, 1.0);//sourceColor;
       
       texco = texCoord;
