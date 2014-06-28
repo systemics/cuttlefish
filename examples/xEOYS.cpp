@@ -1,3 +1,5 @@
+#define DONT_COMPILE_LOG // like LOG never existed
+
 #define SERVER_PATH "/home/ky/"
 //#define SERVER_PATH "/Users/ky/code/cuttlefish/"
 #define CLIENT_PATH "/home/pi/"
