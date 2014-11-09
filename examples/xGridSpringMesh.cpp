@@ -12,7 +12,7 @@
 
 #define MAX_TOUCH (3)
 
-#define MULTIPLY (4)
+#define MULTIPLY (6)
 #define WIDTH (16 * MULTIPLY)
 #define HEIGHT (9 * MULTIPLY)
 #define N_VERTICES (WIDTH* HEIGHT)
