@@ -1,0 +1,10 @@
+top....
+
+tlm
+d 0.5
+
+H # threads on 
+
+f and configure CPU%, time, memory, args
+
+S # cumulative time on

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+curl -O http://www.jaredwolff.com/toolchains/rpi-xtools-201402102110.dmg.zip
+unzip rpi-xtools-201402102110.dmg.zip
+mkdir xtools
+hdiutil attach -mountpoint xtools rpi-xtools-201402102110.dmg.zip
+rsync -av xtools/arm-none-linux-gnueabi .
+hdiutil detach xtools
+rm -rf xtools rpi-xtools-201402102110.dmg  rpi-xtools-201402102110.dmg.zip

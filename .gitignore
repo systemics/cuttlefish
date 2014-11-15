@@ -1,4 +1,6 @@
 build/
+cross/arm-none-linux-gnueabi/
+cross/pi-root/
 xcuserdata
 doxygen_objdb_*
 .DS_Store

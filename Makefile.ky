@@ -4,8 +4,8 @@ HOST = 192.168.0.9
 #@192.168.2.2
 NAME = main
 
-CXX = ${HOME}/code/arm-none-linux-gnueabi/bin/arm-none-linux-gnueabi-g++ -std=c++0x
-AR = ${HOME}/code/arm-none-linux-gnueabi/bin/arm-none-linux-gnueabi-ar crs
+CXX = cross/arm-none-linux-gnueabi/bin/arm-none-linux-gnueabi-g++ -std=c++0x
+AR  = cross/arm-none-linux-gnueabi/bin/arm-none-linux-gnueabi-ar crs
 CXXFLAGS = -D __raspberry__ -D __LINUX_ALSA__
 #CXXFLAGS = -D __raspberry__ -U __linux__  -D __LINUX_ALSA__
 
@@ -20,7 +20,7 @@ EXT_DIR		= ext/
 
 EXEC_TARGETS = tests/%.cpp tests/%.c  examples/%.cpp
 
-PIROOT = $(HOME)/code/pi-root/
+PIROOT = cross/pi-root/
 
 INC_DIR = ctl/
 SRC_DIR = src/
@@ -56,7 +56,7 @@ LDFLAGS += -lGLESv2
 LDFLAGS += -lpthread
 #LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libportaudio.a
 #LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libjack.a
-LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libasound.so
+LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libasound.so.2
 LDFLAGS += -lGamma
 LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libsndfile.a
 LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libFLAC.so
@@ -125,7 +125,7 @@ mpssh-kill:
 	mpssh -s "pkill main"
 
 screens:
-	pscp -h screens.hosts build/bin/$(NAME) /tmp
+	pscp -h screens.hosts build/bin/$(NAME) /root/content
 
 servers:
 	pscp -h servers.hosts build/bin/$(NAME) /tmp

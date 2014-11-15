@@ -1,6 +1,9 @@
+
+#define DONT_COMPILE_LOG  // like LOG never existed
+
 #define SERVER_PATH "/home/ky/"
 //#define SERVER_PATH "/Users/ky/code/cuttlefish/"
-#define CLIENT_PATH "/home/pi/"
+#define CLIENT_PATH "/root/"
 
 //#define SOUND_FILE "czonic.wav"
 //#define SOUND_FILE "5SNCLOCKS.aif"
@@ -12,7 +15,7 @@
 
 #define MAX_TOUCH (3)
 
-#define MULTIPLY (6)
+#define MULTIPLY (5)
 #define WIDTH (16 * MULTIPLY)
 #define HEIGHT (9 * MULTIPLY)
 #define N_VERTICES (WIDTH* HEIGHT)
@@ -233,7 +236,29 @@ struct MyApp : CuttleboneApp<Foo> {
     for (int i = 0; i < N_VERTICES; i++) {
       mbo->mesh[i].Pos = renderState->position[i];
       float v = renderState->position[i].z;
-      mbo->mesh[i].Col = Vec4f(1 - v, 1 - (v * v), v * v * v, 0.3f);
+      // mbo->mesh[i].Col = Vec4f(1 - v, 1 - (v * v), v * v * v, 0.3f);
+
+      auto hue2rgb = [](float p, float q, float t) {
+        if (t < 0)
+          t += 1;
+        if (t > 1)
+          t -= 1;
+        if (t < 1 / 6)
+          return p + (q - p) * 6 * t;
+        if (t < 1 / 2)
+          return q;
+        if (t < 2 / 3)
+          return p + (q - p) * (2 / 3 - t) * 6;
+        return p;
+      };
+
+      float h = 0.5 + v;
+      float s = 1;
+      float l = v;
+      float q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+      float p = 2 * l - q;
+      mbo->mesh[i].Col = Vec4f(hue2rgb(p, q, h + 1 / 3), hue2rgb(p, q, h),
+                               hue2rgb(p, q, h - 1 / 3), 1.0f);
     }
     mbo->update();
   }

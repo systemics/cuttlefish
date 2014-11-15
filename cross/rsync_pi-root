@@ -1,0 +1,8 @@
+#!/bin/sh
+mkdir -p pi-root
+cd pi-root
+mkdir -p usr
+rsync -rl --safe-links root@00.cf:/opt .
+rsync -rl --safe-links root@00.cf:/lib .
+rsync -rl --safe-links root@00.cf:/usr/include usr
+rsync -rl --safe-links root@00.cf:/usr/lib usr
