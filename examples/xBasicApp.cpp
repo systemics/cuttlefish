@@ -26,35 +26,10 @@
 #include "gfx/util/egl_window.h"  
 #include "gfx/gfx_render.h"
 
+using namespace ctl;
 using namespace gfx;
 
-struct SceneGraph {
-    
-    Scene mScene;
-
-    GFXRenderNode mRenderNode;
-    GFXViewNode mViewNode;
-    GFXShaderNode mShaderNode;
-    GFXSceneNode mSceneNode;
-    GFXMeshNode mMeshNode;
-
-    void init(int w, int h){
-      mSceneNode.scene(&mScene);
-      mShaderNode.immediate(false);
-      mRenderNode << mViewNode << mShaderNode << mSceneNode << mMeshNode;
-      mRenderNode.init(w,h);
-    }
-
-    void onRender(){
-      mScene.push(false);
-        mRenderNode.onRender();
-      mScene.pop(false);
-    }
-
-};
-
-
-struct App {
+struct App : Host {
 
   /*-----------------------------------------------------------------------------
    *  Context and Graphics
@@ -63,17 +38,18 @@ struct App {
     RPIContext mContext;            //<-- EGL Window Context 
 
    /*-----------------------------------------------------------------------------
-    *  1. Initialize Context and Graphics
+    *  1. Initialize Context, Graphics Objects, and Monitor Layout
     *-----------------------------------------------------------------------------*/    
     void initContext(){
       RPIContext::System -> Initialize();
       mContext.create(1920,1080,"hullo");
       mSceneGraph.init(1920,1080);
+      mSceneGraph.setView(50, true, identifier.row, identifier.col);
       setup();
     }
 
     virtual void setup()  = 0;                          //<-- subclasses must define this
-    virtual void onDraw() { mSceneGraph.onRender(); }  //<-- subclasses must define this
+    virtual void onDraw() { mSceneGraph.onRender(); }   //<-- subclasses can redefine this
 
     virtual void onAnimate(){}
 
@@ -102,8 +78,8 @@ struct App {
 struct MyApp : App {
   MBO mbo;
   void setup(){
-    mbo = Mesh::Circle();
-    mSceneGraph.mMeshNode.mbo(&mbo);
+    mbo = Mesh::Circle(10);
+    mSceneGraph.mMeshNode.add(&mbo);
   }
 };
 
