@@ -54,7 +54,8 @@ namespace ctl {
             Transparent = EGL_TRANSPARENT_TYPE,
             None        = EGL_NONE,
             Slow        = EGL_SLOW_CONFIG
-        };
+        
+       };
         
         struct Display  {
             EGLDisplay display;

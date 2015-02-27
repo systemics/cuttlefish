@@ -16,8 +16,9 @@ echo SIMTarget Name is $SIMTARGET
 
 #fi
 #if [ $2 lt 3 ]; then
-echo Compiling $1 as $RENDERTARGET to RENDERERS 
-make $1 NAME=$RENDERTARGET && make copy NAME=$RENDERTARGET #&& make many NAME=$RENDERTARGET
+echo Compiling $1 as $RENDERTARGET and sending to jetson:~/share folder 
+make $1 NAME=$RENDERTARGET #&& make copy NAME=$RENDERTARGET #&& make many NAME=$RENDERTARGET
+scp build/bin/$RENDERTARGET pc@cuttlefish.mat.ucsb.edu:/share
 #fi
 
 

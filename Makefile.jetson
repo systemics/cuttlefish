@@ -97,7 +97,6 @@ dir:
 $(EXEC_TARGETS) : title dir FORCE
 	@echo "cross compiling executable" $@
 	$(CXX) $(CXXFLAGS) $(IPATH) $(OBJ_FILES) $@ -o $(BIN_DIR)$(NAME) $(LDFLAGS) 
-	#@make deploy
 
 sync:
 	@rsync -avzL $(addPrefix($(HOST):~/, $(SYNCITEMS))) $(PIROOT)

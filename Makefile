@@ -43,6 +43,7 @@ IPATH += -I$(PIROOT)opt/vc/include/interface/vcos/pthreads
 IPATH += -I$(PIROOT)opt/vc/include/interface/vmcs_host/linux
 IPATH += -I$(EXT_DIR)/vsr/
 IPATH += -I$(EXT_DIR)/gfx/
+IPATH += -I$(EXT_DIR)/gfx/gfx/
 IPATH += -I$(EXT_DIR)/cuttlebone/
 IPATH += -I$(EXT_DIR)/Gamma/
 
@@ -60,6 +61,10 @@ LDFLAGS += -lGLESv2
 LDFLAGS += -lpthread
 #LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libportaudio.a
 #LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libjack.a
+
+OBJ_FILES = 
+
+ifeq (1,$(AUDIOBUILD))
 LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libasound.so
 LDFLAGS += -lGamma
 LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libsndfile.a
@@ -67,11 +72,15 @@ LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libFLAC.so
 LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libvorbis.so
 LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libvorbisenc.so
 LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libogg.so
-
+OBJ_FILES += src/ctl_sound.cpp src/RtAudio.cpp
 #LDFLAGS += -lsndfile1
 #LDFLAGS += -lasound
 #LDFLAGS += -ljack
 #LDFLAGS += -lportaudio
+endif
+
+
+
 LDFLAGS += -lbcm_host
 LDFLAGS += -llo
 LDFLAGS += -lm
@@ -81,10 +90,6 @@ LDFLAGS += -lvchiq_arm
 LDFLAGS += -lvcos
 LDFLAGS += -lvsr
 
-#USEVSR = 0
-#VSRFLAGS = -I$(EXT_DIR)/vsr/ -I$(EXT_DIR)/gfx/ -lvsr 
-
-OBJ_FILES = src/ctl_sound.cpp src/RtAudio.cpp
 
 FORCE:
 

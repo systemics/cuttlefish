@@ -13,4 +13,3 @@ make $1 NAME=$TARGET
 
 
 
-#make deploy $1 HOST=pi@192.168.0.2 NAME=$TARGET

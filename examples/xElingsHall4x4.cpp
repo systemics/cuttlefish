@@ -1,12 +1,17 @@
+#include "util/egl_window.h"
+#include "gfx/gfx_app.h"
+#include "gfx/gfx_monitorLayout.h"
 
-#include "ctl_app.h"
+using namespace gfx;
+
+//#include "ctl_app.h"
 //#include "gfx/gfx_mbo.h"
 
 using namespace std;
 using namespace ctl; 
 
 
-struct MyApp : public App {
+struct MyApp : public GFXApp<RPIContext> {
         
   //THIS IS THE APP SPECIFIC STUFF, 
   MBO * circle;  
@@ -24,12 +29,19 @@ struct MyApp : public App {
     circle = new MBO( Mesh::Circle(6) );
     circle = new MBO( Mesh::Circle(6) );
 
+		mboR = new MBO( Mesh::Num(identifier.row).translate(-1,0,0).moveTo( layout.speakerL + Vec3f(3,0,0) ) );
+		mboC = new MBO( Mesh::Num(identifier.col).translate(1,0,0).moveTo( layout.speakerL + 
+                    Vec3f(layout.screenWidth - 3,0,0) ) );  
+
+    static float time = 0; time +=.01;
+    
+    //background color
+    background.set( fabs( sin(time) ) * .2, fabs( cos(time) ) * 1, 1, 1 );    
   }  
   
   //UPDATE() CHANGES THE POSITION OF THE CIRCLE
   virtual void update(){
      
-    static float time = 0; time +=.01;
     
     //change position of vertices
     circle -> mesh.moveTo( sin(time) * layout.totalWidth()/2.0, cos(time) * layout.totalHeight()/2.0, 0 );   
@@ -37,15 +49,6 @@ struct MyApp : public App {
     
     //send changes to buffer
     circle -> update();                                   
-    
-		mboR = new MBO( Mesh::Num(identifier.row).translate(-1,0,0).moveTo( layout.speakerL + Vec3f(3,0,0) ) );
-		mboC = new MBO( Mesh::Num(identifier.col).translate(1,0,0).moveTo( layout.speakerL + 
-                    Vec3f(layout.screenWidth - 3,0,0) ) );  
-
-    
-
-    //background color
-    background.set( fabs( sin(time) ) * .2, fabs( cos(time) ) * 1, 1, 1 );  
    
   }
 
