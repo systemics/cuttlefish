@@ -54,8 +54,7 @@ struct App : Host {
     virtual void onAnimate(){}
 
     void start(){
-      initContext();
-      setup();      
+      initContext();     
       while(true){       
          onFrame();
          usleep(166);
