@@ -9,14 +9,20 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 
-find_package(Crypto REQUIRED)
-set(libraries ${libraries} ${CRYPTO_LIBRARIES})
-find_package(ZLIB REQUIRED)
-set(libraries ${libraries} ${ZLIB_LIBRARIES})
-include_directories(${ZLIB_INCLUDE_DIRS} )
-include_directories(${CRYPTO_INCLUDE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../ms_demos)
+#find_package(Crypto REQUIRED)
+#set(libraries ${libraries} ${CRYPTO_LIBRARIES})
+#find_package(ZLIB REQUIRED)
+#set(libraries ${libraries} ${ZLIB_LIBRARIES})
+#include_directories(${ZLIB_INCLUDE_DIRS} )
+#include_directories(${CRYPTO_INCLUDE_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ctl)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ext/Gamma)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ext/cuttlebone)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ext/gfx)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ext/osc)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ext/vsr)
+
+#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../ms_demos)
 
 if(UNIX AND NOT APPLE)
   set(libraries ${libraries} rt pthread)
@@ -31,3 +37,62 @@ foreach(source_file ${source_list})
   add_executable(${target} ${source_file})
   target_link_libraries(${target} ${libraries})
 endforeach(source_file)
+
+#CXXFLAGS = -D __raspberry__ -D __LINUX_ALSA__
+
+#IPATH += -Ictl
+#IPATH += -I$(PIROOT)usr/include
+#IPATH += -I$(PIROOT)usr/local/include
+#IPATH += -I$(PIROOT)opt/vc/include
+#IPATH += -I$(PIROOT)opt/vc/include/interface/vcos/pthreads
+#IPATH += -I$(PIROOT)opt/vc/include/interface/vmcs_host/linux
+#IPATH += -I$(EXT_DIR)/vsr/
+#IPATH += -I$(EXT_DIR)/gfx/
+#IPATH += -I$(EXT_DIR)/gfx/gfx/
+#IPATH += -I$(EXT_DIR)/cuttlebone/
+#IPATH += -I$(EXT_DIR)/Gamma/
+#
+#LDFLAGS += -L$(PIROOT)lib
+#LDFLAGS += -L$(PIROOT)usr/lib
+#LDFLAGS += -L$(PIROOT)usr/local/lib
+#LDFLAGS += -L$(PIROOT)opt/vc/lib 
+#LDFLAGS += -L$(EXT_DIR)Gamma/build/lib
+#LDFLAGS += -L$(EXT_DIR)vsr/build/lib
+##LDFLAGS += -L$(PIROOT)lib/arm-linux-gnueabihf
+##LDFLAGS += -L$(PIROOT)usr/lib/arm-linux-gnueabihf
+#LDFLAGS += -lEGL
+#LDFLAGS += -lGLESv2
+##LDFLAGS += -lGamma
+#LDFLAGS += -lpthread
+##LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libportaudio.a
+##LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libjack.a
+#
+#OBJ_FILES = 
+#
+#ifeq (1,$(AUDIOBUILD))
+#LDFLAGS += -lGamma
+#LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libasound.so
+#LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libsndfile.a
+#LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libFLAC.so
+#LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libvorbis.so
+#LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libvorbisenc.so
+#LDFLAGS += $(PIROOT)usr/lib/arm-linux-gnueabihf/libogg.so
+#OBJ_FILES += src/ctl_sound.cpp src/RtAudio.cpp
+##LDFLAGS += -lsndfile1
+##LDFLAGS += -lasound
+##LDFLAGS += -ljack
+##LDFLAGS += -lportaudio
+#endif
+#
+#
+#
+#LDFLAGS += -lbcm_host
+#LDFLAGS += -llo
+#LDFLAGS += -lm
+#LDFLAGS += -lrt
+#LDFLAGS += -lstdc++
+#LDFLAGS += -lvchiq_arm
+#LDFLAGS += -lvcos
+#LDFLAGS += -lvsr
+#
+#

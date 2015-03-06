@@ -1,0 +1,4 @@
+#!/bin/sh
+setfont /usr/share/consolefonts/Uni2-Terminus32x16.psf.gz
+setterm -initialize -powersave off -blank 0 -cursor off -linewrap on
+perl -e '$|++; print sprintf("\033[0%u;3%um%s\033[0m", int rand 2, int rand 8, int rand 2) and select(undef, undef, undef, 0.01) while 1'
