@@ -16,11 +16,19 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/mo
 #include_directories(${ZLIB_INCLUDE_DIRS} )
 #include_directories(${CRYPTO_INCLUDE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ctl)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ctl)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ext/Gamma)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ext/cuttlebone)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ext/gfx)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ext/gfx/gfx)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ext/osc)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ext/vsr)
+
+include_directories(${CMAKE_FIND_ROOT_PATH}/usr/include)
+include_directories(${CMAKE_FIND_ROOT_PATH}/usr/local/include)
+include_directories(${CMAKE_FIND_ROOT_PATH}/opt/vc/include)
+include_directories(${CMAKE_FIND_ROOT_PATH}/opt/vc/include/interface/vcos/pthreads)
+include_directories(${CMAKE_FIND_ROOT_PATH}/opt/vc/include/interface/vmcs_host/linux)
 
 #include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../ms_demos)
 
@@ -28,15 +36,26 @@ if(UNIX AND NOT APPLE)
   set(libraries ${libraries} rt pthread)
 endif()
 
-aux_source_directory(tests source_list)
-aux_source_directory(examples source_list)
-aux_source_directory(scratch source_list)
+aux_source_directory(test source_list)
+aux_source_directory(example source_list)
+#aux_source_directory(scratch source_list)
 foreach(source_file ${source_list})
   string(REGEX REPLACE "/" "_" target ${source_file})
   string(REGEX REPLACE ".cpp" "" target ${target})
   add_executable(${target} ${source_file})
   target_link_libraries(${target} ${libraries})
 endforeach(source_file)
+
+#DIRECTORIES
+get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY LINK_DIRECTORIES)
+foreach(d ${dirs})
+message(STATUS "link dir='${d}'")
+endforeach()
+get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+foreach(d ${dirs})
+message(STATUS "include dir='${d}'")
+endforeach()
+
 
 #CXXFLAGS = -D __raspberry__ -D __LINUX_ALSA__
 
