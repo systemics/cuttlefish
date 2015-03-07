@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 project(cuttlefish)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -Wno-deprecated-declarations")
+#note that __raspberry__ is specific, can we put this in a toolchain file?
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D __raspberry__ -Wall -std=c++11 -Wno-deprecated-declarations")
 set(CMAKE_CXX_FLAGS_DEBUG          "-O0 -g")
 set(CMAKE_CXX_FLAGS_MINSIZEREL     "-Os -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE        "-O4 -DNDEBUG")
@@ -17,12 +18,18 @@ find_package(FindGLES)
 find_package(FindJack)
 find_package(FindRtAudio)
 
+#Is Crypto and Zlib Necessary?
+
 #find_package(Crypto REQUIRED)
 #set(libraries ${libraries} ${CRYPTO_LIBRARIES})
 #find_package(ZLIB REQUIRED)
 #set(libraries ${libraries} ${ZLIB_LIBRARIES})
 #include_directories(${ZLIB_INCLUDE_DIRS} )
 #include_directories(${CRYPTO_INCLUDE_DIR})
+
+find_package( EGL REQUIRED )
+find_package( GLES REQUIRED )
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ctl)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ctl)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ext/Gamma)
@@ -40,9 +47,27 @@ include_directories(${CMAKE_FIND_ROOT_PATH}/opt/vc/include/interface/vmcs_host/l
 
 #include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../ms_demos)
 
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/ext/vsr/build/lib)
+link_directories(${CMAKE_CURRENT_SOURCE_DIR}/ext/Gamma/build/lib)
+link_directories(${CMAKE_FIND_ROOT_PATH}/usr/lib)
+link_directories(${CMAKE_FIND_ROOT_PATH}/usr/local/lib)
+link_directories(${CMAKE_FIND_ROOT_PATH}/opt/vc/lib)
+
 if(UNIX AND NOT APPLE)
   set(libraries ${libraries} rt pthread)
 endif()
+
+set(libraries ${libraries} bcm_host lo vchiq_arm vcos vsr ${EGL_LIBRARY} ${GLES_LIBRARY} )
+
+#LDFLAGS += -lbcm_host
+#LDFLAGS += -llo
+#LDFLAGS += -lm
+#LDFLAGS += -lrt
+#LDFLAGS += -lstdc++
+#LDFLAGS += -lvchiq_arm
+#LDFLAGS += -lvcos
+#LDFLAGS += -lvsr
+
 
 aux_source_directory(test source_list)
 aux_source_directory(example source_list)
