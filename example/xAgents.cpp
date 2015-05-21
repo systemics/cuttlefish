@@ -59,7 +59,7 @@ struct App : Host {
       mSceneGraph.init(1920,1080);
       
       /*! SET TO TRUE FOR MULTISCREEN GRID */
-      mSceneGraph.setView(50, false, identifier.row, identifier.col);
+      mSceneGraph.setView(50, true, identifier.row, identifier.col);
       //mSceneGraph.setView(50, true, identifier.row, identifier.col);
       setup();
     }
