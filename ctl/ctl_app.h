@@ -3,138 +3,108 @@
  *
  *       Filename:  ctl_app.h
  *
- *    Description:  APP CLASS FOR RASPBERRY PI
+ *    Description:  simplified wrapper
  *
  *        Version:  1.0
- *        Created:  02/17/2014 18:53:05
+ *        Created:  05/19/2015 18:34:52
  *       Revision:  none
  *       Compiler:  gcc
  *
- *         Author:  Pablo Colapinto (), gmail -> wolftype
- *   Organization:
+ *         Author:  Pablo Colapinto (), gmail->wolftype
+ *   Organization:  wolftype
  *
  * =====================================================================================
  */
 
 #include "ctl_bcm.h"
-#include "ctl_bone.h"
 #include "ctl_timer.h"
 #include "ctl_host.h"
 #include "ctl_sound.h"
 #include "ctl_osc.h"
-#include "ctl_egl.h"
 
-#include "gfx/gfx_renderer.h"  //<-- the encapsulated rendering engine
+#include "Cuttlebone/cuttlebone.hpp"
 
-namespace ctl {
+#include "gfx/util/egl_window.h"  
+#include "gfx/gfx_render.h"
 
-using namespace EGL;
+using namespace ctl;
 using namespace gfx;
 
-struct App : public BCM, Host, Window, Renderer, OSCPacketHandler, Sound {
+namespace ctl{
 
-  /// CONSTRUCTOR FOR SINGLE COMPUTER AND SCREEN
-  App(float w, float h, float z = 30.0) : Window(), Renderer(w, h, z) {
-    cout << "ID: " << identifier.row << " " << identifier.col << endl;
-    Renderer::initGL(Renderer::GLES, Renderer::BUFFERED, surface.width,
-                     surface.height);
-    addListener(GetTouch, "/touch", "iiii", this);
-  }
+/*-----------------------------------------------------------------------------
+ *  APPLICATION IS TEMPLATED ON THE STATE PARAMETERS TO BE PASSED WITH CUTTLEBONE
+ *  THIS APPLICATION WILL TYPICALLY RUN ON ONE OF THE RASPBERRY PIs
+ *-----------------------------------------------------------------------------*/
+template<class STATE>
+struct RenderApp : Host {
+  
+  /*-----------------------------------------------------------------------------
+   *  State
+   *-----------------------------------------------------------------------------*/
+   cuttlebone::Taker<STATE> taker;
+   STATE * state;
 
-  /// CONSTRUCTOR FOR MULTIPLE COMPUTERS AND SCREENS
-  App(const Layout &l, float z = 30.0) : Window(), Renderer(l, z) {
-    cout << "ID: " << identifier.row << " " << identifier.col << endl;
-    Renderer::initGL(Renderer::GLES, Renderer::BUFFERED, surface.width,
-                     surface.height);
-    /// Set individual view frustums
-    setView(z, true, identifier.row, identifier.col);
-    addListener(GetTouch, "/touch", "iiii", this);
-  }
+  /*-----------------------------------------------------------------------------
+   *  Context and Graphics
+   *-----------------------------------------------------------------------------*/
+    SceneGraph mSceneGraph;         //<-- OpenGL Pipeline Graph
+    RPIContext mContext;            //<-- EGL Window Context 
 
-  virtual void init() {}
-  virtual void update() {}
+   /*-----------------------------------------------------------------------------
+    *  1. Initialize Context, Graphics Objects, and Monitor Layout
+    *-----------------------------------------------------------------------------*/    
+    void initContext(){
+      RPIContext::System -> Initialize();
+      mContext.create(1920,1080,"hullo");
+      mSceneGraph.init(1920,1080);
+      //..................z...grid.............row............col
+      mSceneGraph.setView(50, true, identifier.row, identifier.col);
+      setup();
+    }
 
-  // TOUCH CALLBACK (could be encapsulated in a TouchHandler class)
-  static int GetTouch(const char *path, const char *types, lo_arg **argv,
-                      int argc, void *data, void *user_data) {
-    App &app = *(App *)user_data;
-    app.onTouch(argv[0]->i, argv[1]->i, argv[2]->i, argv[3]->i);
-  }
+    virtual void setup()  = 0;                          //<-- subclasses MUST define this
+    virtual void onDraw() { mSceneGraph.onRender(); }   //<-- subclasses CAN redefine this
 
-  virtual void onTouch(int n, int x, int y, int t) { cout << n << endl; }
+    virtual void onAnimate(){                           //<-- subclasses must call RenderApp::onAnimate() if this is redefined
+      int popCount = taker.get(*state);
+    }                        
 
-  virtual void onSound(SoundData &io) {}
+    /*-----------------------------------------------------------------------------
+     *  START MAIN LOOP (TO DO: launch audio)
+     *-----------------------------------------------------------------------------*/
+    void start(){
+      initContext();     
+      state = new STATE;
+      taker.start();   
+      while(true){       
+         onFrame();
+         usleep(166);
+      }    
+    }
 
-  ///  THIS IS THE FUNCTION TO OVERLOAD
-  virtual void onDraw() {};
+    
+    /*-----------------------------------------------------------------------------
+     *  CALLED BY SCENEGRAPH OBJECT
+     *-----------------------------------------------------------------------------*/
+    void onFrame(){
+      onAnimate();
+      onDraw(); 
+      RPIContext::SwapBuffers();
+    }
 
-  /// You can also overload this function for adding effects (blur, motion
-  /// trace, etc)
-  virtual void onFrame() {
-    update();
-    Renderer::clear();
-    Renderer::render();
-    Window::swapBuffers();
-  }
+    void onSound(){} //..... to do
+  
+    /*-----------------------------------------------------------------------------
+     *  CLEAN UP . . . (Q: how to clean up cuttlebone::Taker?)
+     *-----------------------------------------------------------------------------*/
+   ~RenderApp(){
+     RPIContext::System -> Terminate();
+   } 
+
 };
 
-/// ***MACRO***
-#define STARTANDRUN()                 \
-  bool running = true;                \
-  void quit(int) { running = false; } \
-                                      \
-  int main() {                        \
-                                      \
-    MyApp app;                        \
-                                      \
-    while (running) {                 \
-      app.onFrame();                  \
-      usleep(166);                    \
-    }                                 \
-                                      \
-    return 0;                         \
-  }
 
-template <typename STATE, unsigned PACKET_SIZE = 1400>
-struct CuttleboneApp : BCM,
-                       Host,
-                       Subscriber<STATE, PACKET_SIZE>,
-                       Renderer,
-                       Sound {
 
-  EGL::Window* w;
 
-  CuttleboneApp(float w, float h, float z = 30.0) : Renderer(w, h, z) {
-    cout << "ID: " << identifier.row << " " << identifier.col << endl;
-  }
-
-  CuttleboneApp(const Layout &l, float z = 30.0) : Renderer(l, z) {
-    cout << "ID: " << identifier.row << " " << identifier.col << endl;
-    setView(z, true, identifier.row, identifier.col);
-  }
-
-  virtual void firstRun() {
-    w = new EGL::Window;
-    Renderer::initGL(Renderer::GLES, Renderer::BUFFERED, w->surface.width,
-                     w->surface.height);
-    setup();
-  }
-
-  virtual void gotState(float dt, STATE &state, int popCount) {
-    update(dt, state, popCount);
-    onFrame();
-  }
-
-  virtual void setup() = 0;
-  virtual void update(float dt, STATE &state, int popCount) = 0;
-  virtual void onSound(SoundData &io) = 0;
-  virtual void onDraw() = 0;
-
-  virtual void onFrame() {
-    Renderer::clear();
-    Renderer::render();
-    w->swapBuffers();
-  }
-};
-
-}  // ctl::
+}// ctl::

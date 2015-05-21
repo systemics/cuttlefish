@@ -17,11 +17,12 @@
  */
 
 #include "ctl_bcm.h"
-#include "ctl_bone.h"
 #include "ctl_timer.h"
 #include "ctl_host.h"
 #include "ctl_sound.h"
 #include "ctl_osc.h"
+
+#include "Cuttlebone/cuttlebone.hpp"
 
 #include "gfx/util/egl_window.h"  
 #include "gfx/gfx_render.h"
@@ -29,7 +30,22 @@
 using namespace ctl;
 using namespace gfx;
 
+
+/*-----------------------------------------------------------------------------
+ *  STATE (TO BE PASSED AROUND TO ALL SCREENS)
+ *-----------------------------------------------------------------------------*/
+static const int NUM = 1000;
+struct State {
+  float speed[NUM];
+};
+
 struct App : Host {
+  
+  /*-----------------------------------------------------------------------------
+   *  State
+   *-----------------------------------------------------------------------------*/
+   cuttlebone::Taker<State> taker;
+   State * state;
 
   /*-----------------------------------------------------------------------------
    *  Context and Graphics
@@ -48,13 +64,14 @@ struct App : Host {
       setup();
     }
 
-    virtual void setup()  = 0;                          //<-- subclasses must define this
-    virtual void onDraw() { mSceneGraph.onRender(); }   //<-- subclasses can redefine this
-
-    virtual void onAnimate(){}
+    virtual void setup()  = 0;                          //<-- subclasses MUST define this
+    virtual void onDraw() { mSceneGraph.onRender(); }   //<-- subclasses CAN redefine this
+    virtual void onAnimate(){}                          //<-- subclasses CAN redefine this
 
     void start(){
       initContext();     
+      state = new State;
+      taker.start();   
       while(true){       
          onFrame();
          usleep(166);
@@ -77,9 +94,10 @@ struct App : Host {
 struct MyApp : App {
   MBO mbo;
   void setup(){
-    mbo = Mesh::Circle(10);
+    mbo =  Mesh::Circle(10) ;
     mSceneGraph.mMeshNode.add(&mbo);
   }
+  
 };
 
 int main(){

@@ -9,6 +9,14 @@ Find the latest version of [Cuttlefish][].
 
 # Getting Started with Cuttlefish
 
+example/
+
+	xBasicApp.cpp: using cuttlebone and gfx, demonstrates bare bones use of ctl\_app.h
+	xRawApp.cpp: using cuttlebone and gfx, demonstrates the "guts" of ctl\_app.h
+	xField.cpp: using cuttlebone and gfx and versor to warp a field of points
+	xAgents.cpp: using cuttlebone and gfx and versor to simulatie a swarm (controlled by a simulator machine)
+
+
 ## Download and Install Dependencies
 
 You'll need to download and install some software before you start developing
