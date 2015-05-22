@@ -40,7 +40,7 @@ link_directories(${GFX_LINK_DIR} ${VSR_LINK_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ctl)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ctl)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ext/Gamma)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../cuttlebone)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ext/cuttlebone)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ext/osc)
 
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/ext/Gamma/build/lib)
