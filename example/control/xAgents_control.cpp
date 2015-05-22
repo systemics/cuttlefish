@@ -17,7 +17,7 @@
  */
 
 
-#include "Cuttlebone/cuttlebone.hpp"
+#include "Cuttlebone/Cuttlebone.hpp"
 
 #include "vsr/util/vsr_cga3D_simple_app.h"
 
