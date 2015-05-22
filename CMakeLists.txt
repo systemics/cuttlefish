@@ -60,6 +60,9 @@ if(${RASPBERRY})
   #ADD ALL .CPP FILES IN EXAMPLES AND TESTS FOLDER AS TARGETS
   aux_source_directory(test source_list)
   aux_source_directory(example source_list)
+
+  set(source_list ${source_list} example/sync/pi.cpp)
+
   #aux_source_directory(scratch source_list)
   foreach(source_file ${source_list})
     string(REGEX REPLACE "/" "_" target ${source_file})
@@ -78,6 +81,8 @@ elseif(${APPLE})
 
   #ADD ALL .CPP FILES IN EXAMPLES AND TESTS FOLDER AS TARGETS
   aux_source_directory(example/control source_list)
+
+  set(source_list ${source_list} example/sync/sim.cpp)
 
   foreach(source_file ${source_list})
     string(REGEX REPLACE "/" "_" target ${source_file})
