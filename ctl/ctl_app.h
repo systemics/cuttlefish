@@ -57,6 +57,7 @@ struct RenderApp : Host {
     void initContext(){
       RPIContext::System -> Initialize();
       mContext.create(1920,1080,"hullo");
+      mSceneGraph.mShaderNode.bES =true;
       mSceneGraph.init(1920,1080);
       //..................z...grid.............row............col
       mSceneGraph.setView(50, true, identifier.row, identifier.col);

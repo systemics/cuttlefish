@@ -35,7 +35,7 @@ struct Organism;
  *-----------------------------------------------------------------------------*/
 struct Population{
 
-  Population(int num=NUMPOSE) : mNum(num) {}
+  Population(int num=NUMAGENTS) : mNum(num) {}
 
   ~Population();
     
@@ -83,7 +83,7 @@ struct Population{
   float maxDistance = 10;        ///<-- Threshold of influence between Members
   float minDistance = 1;        ///<-- Minimum Spacing Between Members
   int   maxNeighbors = 3;   ///<-- Max number of influencing neighbors
-  int   mNum=NUMPOSE;            ///<-- Size of Population
+  int   mNum=NUMAGENTS;            ///<-- Size of Population
   int   maxNum = 100;       ///<-- Max Size of Population
 
 
@@ -127,7 +127,7 @@ struct Organism : public Frame {
        
         if (mBehavior & Flock)  flock();
         if (mBehavior & Force)  force();
-       // if (mBehavior & Feed)   feed();
+        if (mBehavior & Feed)   feed();
         if (mBehavior & Follow) follow();
         if (mBehavior & Flee)   flee();
         if (mBehavior & Fold)   fold();

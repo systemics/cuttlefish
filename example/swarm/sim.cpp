@@ -67,10 +67,9 @@ struct MyApp : App, SimApp<State> {
   }
 
   void onSimulate(){
-       cout << population.member.size() << endl;
        for(int i=0;i<NUMPOSE;++i){
-  //       state->pose[i].set( population.member[i]->pos(),  population.member[i]->quat() );
-  //       state->speed[i] = population.member[i]->neighborhood().toonear.size() * .2;
+         state->pose[i].set( population.member[i]->pos(),  population.member[i]->quat() );
+         state->speed[i] = population.member[i]->neighborhood().toonear.size() * .2;
        }
   }
   
