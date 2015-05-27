@@ -173,7 +173,6 @@ struct MyApp : App {
 
       if (bReset) initFrames();
 
-
         
       ///frame physics timestep
       for (auto & f : frame ){

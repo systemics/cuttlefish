@@ -4,7 +4,7 @@ project(cuttlefish)
 #from Toolchain file
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DEFINITIONS}")
 #C++11
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3 -ftemplate-depth-1200")
 #TURN OFF A BUNCH OF WARNINGS
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations -Wno-reorder -Wno-unused-function -Wno-sign-compare -Wno-unused-variable  -Wno-unknown-pragmas")
 
@@ -61,7 +61,7 @@ if(${RASPBERRY})
   aux_source_directory(test source_list)
   aux_source_directory(example source_list)
 
-  set(source_list ${source_list} example/sync/pi.cpp)
+  set(source_list ${source_list} example/swarm/pi.cpp) #INDIVIDUAL FILE
 
   #aux_source_directory(scratch source_list)
   foreach(source_file ${source_list})
@@ -82,7 +82,7 @@ elseif(${APPLE})
   #ADD ALL .CPP FILES IN EXAMPLES AND TESTS FOLDER AS TARGETS
   aux_source_directory(example/control source_list)
 
-  set(source_list ${source_list} example/sync/sim.cpp)
+  set(source_list ${source_list} example/swarm/sim.cpp) #INDIVIDUAL FILE
 
   foreach(source_file ${source_list})
     string(REGEX REPLACE "/" "_" target ${source_file})

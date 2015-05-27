@@ -66,8 +66,8 @@ struct RenderApp : Host {
     virtual void setup()  = 0;                          //<-- subclasses MUST define this
     virtual void onDraw() { mSceneGraph.onRender(); }   //<-- subclasses CAN redefine this
 
-    virtual void onAnimate(){                           //<-- subclasses must call RenderApp::onAnimate() if this is redefined
-      int popCount = taker.get(*state);
+    virtual void onAnimate(){                           //<-- subclasses can redefine this is redefined
+     // int popCount = taker.get(*state);
     }                        
 
     /*-----------------------------------------------------------------------------
@@ -88,6 +88,7 @@ struct RenderApp : Host {
      *  CALLED BY SCENEGRAPH OBJECT
      *-----------------------------------------------------------------------------*/
     void onFrame(){
+      int popCount = taker.get(*state);
       onAnimate();
       onDraw(); 
       RPIContext::SwapBuffers();
