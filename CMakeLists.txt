@@ -89,8 +89,7 @@ link_directories(${GFX_LINK_DIR} ${VSR_LINK_DIR})
   aux_source_directory(example/control source_list)
 
   set(source_list ${source_list} example/sync/sim.cpp) #INDIVIDUAL FILE
-  set(source_list ${source_list} example/swarm/sim.cpp) #INDIVIDUAL FILE
-  set(source_list ${source_list} example/sync/sim.cpp) #INDIVIDUAL FILE
+  set(source_list ${source_list} example/swarm/desktop_sim.cpp) #INDIVIDUAL FILE
 
   foreach(source_file ${source_list})
     string(REGEX REPLACE "/" "_" target ${source_file})
