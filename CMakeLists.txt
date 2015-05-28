@@ -83,7 +83,7 @@ elseif(${APPLE})
   #ADD ALL .CPP FILES IN EXAMPLES AND TESTS FOLDER AS TARGETS
   aux_source_directory(example/control source_list)
 
-  set(source_list ${source_list} example/sync/pi.cpp) #INDIVIDUAL FILE
+  set(source_list ${source_list} example/sync/sim.cpp) #INDIVIDUAL FILE
   set(source_list ${source_list} example/swarm/sim.cpp) #INDIVIDUAL FILE
 
   foreach(source_file ${source_list})
