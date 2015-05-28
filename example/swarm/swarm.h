@@ -35,7 +35,7 @@ struct Organism;
  *-----------------------------------------------------------------------------*/
 struct Population{
 
-  Population(int num=NUMAGENTS) : mNum(num) {}
+  Population(int num=NUM_AGENTS) : mNum(num) {}
 
   ~Population();
     
@@ -83,7 +83,7 @@ struct Population{
   float maxDistance = 10;        ///<-- Threshold of influence between Members
   float minDistance = 1;        ///<-- Minimum Spacing Between Members
   int   maxNeighbors = 3;   ///<-- Max number of influencing neighbors
-  int   mNum=NUMAGENTS;            ///<-- Size of Population
+  int   mNum=NUM_AGENTS;            ///<-- Size of Population
   int   maxNum = 100;       ///<-- Max Size of Population
 
 

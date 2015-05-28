@@ -67,7 +67,7 @@ struct MyApp : App, SimApp<State> {
   }
 
   void onSimulate(){
-       for(int i=0;i<NUMPOSE;++i){
+       for(int i=0;i<NUM_AGENTS;++i){
          state->pose[i].set( population.member[i]->pos(),  population.member[i]->quat() );
          state->speed[i] = population.member[i]->neighborhood().toonear.size() * .2;
        }
