@@ -21,7 +21,11 @@ struct SimApp {
     maker.start();
     if (makeThread) {
       running = true;
-      thread t([this]() {while (running) { onStep(); } });
+      thread t([this]() {
+        onSetup();
+        while (running)
+          onStep();
+      });
       getchar();
       running = false;
       t.join();
@@ -36,6 +40,7 @@ struct SimApp {
   }
 
   virtual void onSimulate(double dt) = 0;
+  virtual void onSetup() = 0;
 
   void onStep(){
     static cuttlebone::Timestamp<> t;

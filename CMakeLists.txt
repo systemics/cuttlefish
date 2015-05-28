@@ -104,6 +104,7 @@ elseif(${JETSON})
   message("****** COMPILING BINARIES FOR JETSON ********")
 set(libraries ${VSR_LIBRARIES})
 
+include_directories(${GFX_INCLUDE_DIR})
 include_directories(${VSR_INCLUDE_DIR})
 link_directories(${VSR_LINK_DIR})
 
