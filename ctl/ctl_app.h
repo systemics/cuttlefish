@@ -1,21 +1,3 @@
-/*
- * =====================================================================================
- *
- *       Filename:  ctl_app.h
- *
- *    Description:  simplified wrapper
- *
- *        Version:  1.0
- *        Created:  05/19/2015 18:34:52
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Pablo Colapinto (), gmail->wolftype
- *   Organization:  wolftype
- *
- * =====================================================================================
- */
-
 #include "ctl_bcm.h"
 #include "ctl_timer.h"
 #include "ctl_host.h"
@@ -45,6 +27,10 @@ struct RenderApp : Host {
    cuttlebone::Taker<STATE> taker;
    STATE * state;
 
+   bool running = false;
+   int popCount;
+   double dt;
+
   /*-----------------------------------------------------------------------------
    *  Context and Graphics
    *-----------------------------------------------------------------------------*/
@@ -67,32 +53,50 @@ struct RenderApp : Host {
     virtual void setup()  = 0;                          //<-- subclasses MUST define this
     virtual void onDraw() { mSceneGraph.onRender(); }   //<-- subclasses CAN redefine this
 
-    virtual void onAnimate(){                           //<-- subclasses can redefine this is redefined
+    virtual void onAnimate() {
+      //<-- subclasses can redefine this is redefined
      // int popCount = taker.get(*state);
-    }                        
+    }
 
     /*-----------------------------------------------------------------------------
      *  START MAIN LOOP (TO DO: launch audio)
      *-----------------------------------------------------------------------------*/
     void start(){
-      initContext();     
       state = new STATE;
-      taker.start();   
-      while(true){       
-         onFrame();
-         usleep(166);
-      }    
+      taker.start();
+      running = true;
+      thread t([this]() {
+        initContext(); // must be the same thread as onFrame
+        while (running) { onFrame(); }
+      });
+      getchar();
+      running = false;
+      t.join();
+      stop();
     }
+
+  void stop(){
+    running = false;
+    taker.stop();
+//    delete state;
+  }
 
     
     /*-----------------------------------------------------------------------------
      *  CALLED BY SCENEGRAPH OBJECT
      *-----------------------------------------------------------------------------*/
     void onFrame(){
-      int popCount = taker.get(*state);
-      onAnimate();
-      onDraw(); 
-      RPIContext::SwapBuffers();
+      static cuttlebone::Timestamp<> t;
+      static double time, last;
+      popCount = taker.get(*state);
+      if (popCount) {
+        time = t.stamp();
+        dt = time - last;
+        onAnimate();
+        last = time;
+        onDraw();
+        RPIContext::SwapBuffers();
+      }
     }
 
     void onSound(){} //..... to do
