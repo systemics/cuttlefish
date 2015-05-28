@@ -29,6 +29,34 @@
 using namespace vsr;
 using namespace vsr::cga;
 
+//FOOD CRYSTALS
+struct Substrate{
+
+  SpaceGroup2D<Vec> sg
+  Point pnt[NUM_VERTICES_SUBSTRATE];
+
+  vector<Point> motif;
+ 
+  //num, ratio, pin, div  (p3m1)
+  Substrate() : sg(3,1,true,3){
+    motif = vector<Point>(NUM_VERTEX_BASE_SUBSTRATE);  
+  }
+  
+  void makeMeshData(){
+
+    sg.apply(motif, NUM_CELLS_WIDTH_SUBSTRATE, NUM_CELLS_HEIGHT_SUBSTRATE);
+              
+    for (int i=0;i<NUM_CELLS_WIDTH_SUBSTRATE;++i){
+    for (int j=0;j<NUM_CELLS_HEIGHT_SUBSTRATE;++j){
+      int first = (i*NUM_CELLS_HEIGHT_SUBSTRATE + j) * NUM_VERTEX_PER_CELL;
+      for (int m=0;m<NUM_VERTEX_BASE_SUBSTRATE;++m){
+        * // sg.hang( motif,i,j );
+      }
+ 
+    }}
+  }
+};
+
 
 struct Organism;
 
@@ -56,6 +84,7 @@ struct Population{
   struct Neighborhood{
     vector<Relationship> nearest;
     vector<Relationship> toonear;
+    Point food;
     void clear(){ nearest.clear(); toonear.clear(); }
   };
   
@@ -64,6 +93,11 @@ struct Population{
    *  A List of Members of the Population
    *-----------------------------------------------------------------------------*/
   vector<Organism*> member;
+
+  /*-----------------------------------------------------------------------------
+   *  A List of Known Food Sources
+   *-----------------------------------------------------------------------------*/
+  vector<Point> foodsource;
 
   /// initialize on a type of organism
   template<typename T>
@@ -76,7 +110,7 @@ struct Population{
   /// Add a member
   void add(Organism * org){ member.push_back(org); }
 
-  /// Build a Neighborhood of relationships
+  /// Build a Neighborhood of relationships to other members (and to food)
   void buildNeighborhoods();  
 
   /// timestep
@@ -91,15 +125,17 @@ struct Population{
   int   maxNum = 100;             ///<-- Max Size of Population
 
 
+  ///GLOBAL CONTROL OF MEMBERS
   float globalFlockRotVel;
   float globalAvertRotVel;
   float globalSourceRotVel;
 
 
-  bool bDrawNetwork;
+  ///Behavior Switching
+  void startFollowing();
+  void stopFollowing();
 
-//  void draw(GFXSceneNode *re);
-//  void draw();
+
 };
 
 
@@ -109,12 +145,12 @@ struct Population{
  *-----------------------------------------------------------------------------*/
 struct Organism : public Frame {
 
-
   float time=0;
-  Point pnt[NUM_VERTEX_PER_AGENT];      ///for mesh data . . .
+  float energy=100;
+  
+  Point pnt[NUM_VERTEX_PER_AGENT];      ///<-- for mesh data . . .
   
   Population * mPopulation;
-
   void population(Population * pop) { mPopulation = pop; }
 
   enum Behavior{
@@ -132,16 +168,21 @@ struct Organism : public Frame {
   {}
 
 
+  void behaviorOn(int mode){ mBehavior |= mode; }
+  void behaviorOff(int mode){ mBehavior &= ~mode; }
+  void behaviorToggle(int mode) { mBehavior ^= mode; }
+
+
   virtual void init(){}
 
-  virtual void onStep(float dt){}
+  virtual void onStep(float dt){}       ///<-- subclass's onStep(dt) method
 
   virtual void step(float dt){
 
-        time+=dt;
+        time+=dt+vVelocity;
+        energy -= vVelocity;
 
-        onStep(dt);
-        
+        onStep(dt); //subclass's onStep(dt) method
        
         if (mBehavior & Flock)  flock();
         if (mBehavior & Force)  force();
@@ -151,7 +192,7 @@ struct Organism : public Frame {
         if (mBehavior & Fold)   fold();
         if (mBehavior & Unfold) unfold();
         
-        //move forward by 
+         
         this->dVec += this->z() * vVelocity;
         
         this->dBiv *= aBiv; 
@@ -193,6 +234,7 @@ struct Organism : public Frame {
 
   
   void follow(){
+    if(!target) if (!mNeighborhood.nearest.empty()){ target = mNeighborhood.nearest[0].partner; }
     if(target) this -> relTwist( *target, vFollowVel );
   }
 
@@ -207,13 +249,6 @@ struct Organism : public Frame {
   
   virtual void fold(){}
   virtual void unfold(){}
-
-//  virtual void draw(GFXSceneNode * re){
-//      render::pipe( *(Frame*)(this), re );     
-//  };
-//  virtual void draw(){
-//      render::draw( *(Frame*)(this) );     
-//  };
 
   Population::Neighborhood mNeighborhood;
   Population::Neighborhood& neighborhood() { return mNeighborhood; }
@@ -261,6 +296,8 @@ void Population::reset(){
    init<T>();
 }
 
+
+/// Build Neighborhoods to Other Members (and To Food Sources)
 void Population::buildNeighborhoods() {
     
     for (auto& ma : member){
@@ -281,6 +318,11 @@ void Population::buildNeighborhoods() {
         }
        }
 
+       //Find closest Food Source
+       for (auto& f : foodsource){
+
+       }
+
     }
 }
 
@@ -289,35 +331,6 @@ void Population::step(float dt){
   for (auto& i : member) i->step(dt);
 }
   
-//void Population::draw(GFXSceneNode * re){
-//  for(auto& i : member) i->draw(re);
-//  if (bDrawNetwork) render::pipe(mNetworkMesh,re);
-//}
-
-//void Population::draw(){
-//  for(auto& i : member) i->draw();
-//
-//    glBegin(GL_LINES);
-//      for(auto& i : member){
-//            glColor3f(0,1,0);
-//
-//        for (auto& j : i->neighborhood().nearest){
-//          GL::vertex( i->pos() );
-//          GL::vertex( j.partner->pos() );
-//        }
-//            glColor3f(0,1,1);
-//
-//        for (auto& j : i->neighborhood().toonear){
-//          GL::vertex( i->pos() );
-//          GL::vertex( j.partner->pos() );
-//        }
-//
-//      }
-//    glEnd();   
-//}
-
-
-
 
 
 /*-----------------------------------------------------------------------------
@@ -325,7 +338,7 @@ void Population::step(float dt){
  *-----------------------------------------------------------------------------*/
 struct Jelly : Organism {
 
-  Circle midsectionR, midsectionL; 
+  Circle midsection;
   TorusKnot tk;
   PointGroup3D<Vec> pg;
 
@@ -333,54 +346,48 @@ struct Jelly : Organism {
 
   Jelly( Point p = point(0,0,0), Rotor r = Rot(1) ) 
   : Organism(p,r),
-    pg(4,3,false,true) 
+    pg(3,3) 
    { 
-    // init(); 
-    }
+     init();
+   }
 
 
-  virtual void init(){
-   
+  virtual void init(){   
     tk = TorusKnot(3,2);
-   // midsectionR = this->cxz().dilate( this->pos(), .5 );//.trs(.2,0,0);
-   // mBehavior = 0;
-   // midsectionL = this->cxz().dilate( this->pos(), .2 ).trs(-.2,0,0);
   }
-
-//  virtual void draw(GFXSceneNode * re){
-//    render::pipe(midsectionR, re);
-//    render::pipe(midsectionL, re);
-//    render::pipe(this->cxz(), re);
-//  }
 
 
   virtual void onStep(float dt){
     //tk.HF.cir() = this->cxz();
     //auto par = tk.par() * .01;
-    auto cir = round::produce( round::dls(1.0,0,0,0), this->xz() );
-    auto shrink = cir.dilate( PAO, .5 );
-    midsectionR = shrink.boost( cir.dual() * time  );
-   // midsectionL = midsectionL.boost( par );
+    
+    auto cir = round::produce( round::dls(-1.0,0,0,0).trs(1,1,0), this->xz() );
+    auto shrink = cir.dilate( PAO, .5 ).trs(.5,0,0);
+    
+    midsection = shrink.boost( cir.dual() * time  );
 
     makeMeshData();
 
   }
 
   void makeMeshData(){
-    //pnt.clear();
 
     vector<Point> base;
+
     for (int i =0; i<NUM_VERTEX_BASE; ++i){
-      float t = TWOPI * (float)i/NUM_VERTEX_BASE;
-      base.push_back( point(midsectionR, t) );
+      float t = TWOPI * (float)i/(NUM_VERTEX_BASE);
+       base.push_back( point(midsection, t) );
     }
     
-    auto vp = pg( base );
-   // cout << vp.size() << endl;
-   // cout << NUM_VERTEX_PER_AGENT << endl;
-    for (int i =0; i<NUM_VERTEX_PER_AGENT; ++i){
-      pnt[i] = vp[i] + this->pos(); //<-- could optimize as memcopy
+    //transpose . . .
+    for (int i=0;i<NUM_VERTEX_BASE;++i){
+        auto vp = pg(base[i]);
+        for (int j=0;j<MAX_NUM_REFLECTIONS;++j){
+          int idx = j*NUM_VERTEX_BASE + i;
+          pnt[idx] = vp[j] + this->pos();
+        }
     }
+    
   } 
   
 
