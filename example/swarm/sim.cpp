@@ -1,4 +1,3 @@
-
 /*
  * =====================================================================================
  *
@@ -18,12 +17,12 @@
  */
 
 #include "vsr_app.h"  
-#include "ctl_sim.h"
-
+#include "ctl_desktop_sim.h"
 
 #include "form/vsr_knot.h"
 #include "form/vsr_twist.h"
 #include "util/vsr_stat.h"
+#include "form/vsr_group.h"
 
 #include "swarm.h"
 #include "state.hpp"
@@ -44,6 +43,7 @@ struct MyApp : App, SimApp<State> {
   //Jelly jelly;
   Population population;
 
+  MBO mbo;
   /*-----------------------------------------------------------------------------
    *  Setup Variables
    *-----------------------------------------------------------------------------*/
@@ -60,23 +60,33 @@ struct MyApp : App, SimApp<State> {
     gui(population.globalSourceRotVel, "globalSourceRotVel",0,100);
     gui(population.globalAvertRotVel, "globalAvertRotVel",0,100);
 
-    population.init();
-   // jelly.init();
-   // mSceneRenderer.immediate(false);    
-    
-  }
 
-  void onSimulate(){
-       for(int i=0;i<NUM_AGENTS;++i){
-         state->pose[i].set( population.member[i]->pos(),  population.member[i]->quat() );
-         state->speed[i] = population.member[i]->neighborhood().toonear.size() * .2;
-       }
+    population.init<Jelly>();
+
+
+   // jelly.init();
+    mSceneRenderer.immediate(false);    
+
+    mbo = MBO(Mesh::Points(NUM_VERTICES).mode(GL::T), GL::DYNAMIC);
+    
+    for (int i = 0; i<mbo.mesh.num(); ++i){
+      float t = (float)i/mbo.mesh.num();
+      mbo.mesh[i].Col.set( Rand::Num(), 1-t, t*.5, 1);
+    }
+    
   }
   
   void onAnimate(){
     population.step(.01);
-    if (bReset) population.reset();
+    if (bReset) population.reset<Jelly>();
     onStep();
+
+     for (int i = 0;i < NUM_VERTICES;++i){
+        mbo.mesh[i].Pos = state->vec[i];
+      }
+
+      mbo.update();
+
   }
 
   /*-----------------------------------------------------------------------------
@@ -84,15 +94,37 @@ struct MyApp : App, SimApp<State> {
    *-----------------------------------------------------------------------------*/
   void onDraw(){
 
-    if (mSceneRenderer.immediate() ){
       for (auto& i : population.member){
-        Draw( *(Frame*)(i) );
+        render::pipe( *(Frame*)(i), this);
       }
-    }
+      
+      render::pipe( mbo, this );
+  }
+
+   // PointGroup3D<Vec>( );
       //population.draw();
    // else population.draw(this);
 
+  void onSimulate(){
+
+    for(int i=0;i<NUM_AGENTS;++i){
+       for (int j=0;j<NUM_VERTEX_PER_AGENT;++j){
+          int idx = i*NUM_VERTEX_PER_AGENT+j;
+          state->vec[idx] = population.member[i]->pnt[j];
+       }
+    }
+   
+//       for(int i=0;i<NUM_AGENTS;++i){
+//         for (int j=0;j<NUM_VERTEX_PER_AGENT;++j){
+//            int idx = i*NUM_VERTEX_PER_AGENT+j;
+//            state->vec[idx] = population.member[i]->pnt[j];
+//         }
+//         //state->pose[i].set( population.member[i]->pos(),  population.member[i]->quat() );
+//         state->speed[i] = population.member[i]->neighborhood().toonear.size() * .2;
+//       }
+     
   }
+  
   
 };
 

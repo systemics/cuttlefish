@@ -14,32 +14,26 @@ struct MyApp : RenderApp<State> {
   MBO mbo;
 
   void setup() {
-    mbo = MBO(Mesh::Points(NUMPOSE * 3).mode(GL::T), GL::DYNAMIC);
+    
+    mbo = MBO(Mesh::Points(NUM_VERTICES).mode(GL::T), GL::DYNAMIC);
+    
+    for (int i = 0; i<mbo.mesh.num(); ++i){
+      float t = (float)i/mbo.mesh.num();
+      mbo.mesh[i].Col.set( Rand::Num(), 1-t, t*.5, 1);
+    }
+    
     mSceneGraph.mMeshNode.add(&mbo);
+
   }
 
   virtual void onAnimate() {
 
     // update mesh
-    for (int i = 0; i < NUMPOSE; ++i) {
-      
+    for (int i = 0; i < NUM_VERTICES; ++i) {  
       int idx = i * 3;
-      
-      auto a = state->pose[i].pos() + state->pose[i].x();
-      auto b = state->pose[i].pos() + state->pose[i].y();
-      auto c = state->pose[i].pos() + state->pose[i].z();
-      auto norm = (b - a).cross(c - a).unit();
-      
-      mbo.mesh[idx].Pos = a;  // Vec3f(Rand::Num(2), Rand::Num(2), Rand::Num(2) );
-      mbo.mesh[idx + 1].Pos = b;  // state->pose[i].pos()+state->pose[i].y();
-      mbo.mesh[idx + 2].Pos = c;  // state->pose[i].pos()+state->pose[i].z();
-      mbo.mesh[idx].Norm = norm;
-      mbo.mesh[idx + 1].Norm = norm;
-      mbo.mesh[idx + 2].Norm = norm;
-      mbo.mesh[idx].Col = Vec4f(state->speed[i], 1, 1 - state->speed[i], .8);
-      mbo.mesh[idx + 1].Col = Vec4f(1, state->speed[i], 1 - state->speed[i], .8);
-      mbo.mesh[idx + 2].Col = Vec4f(state->speed[i], 1 - state->speed[i], 1, .8);
+      mbo.mesh[i].Pos = state->vec[i];
     }
+    
     mbo.update();
   }
 };

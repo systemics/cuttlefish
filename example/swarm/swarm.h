@@ -3,7 +3,7 @@
  *
  *       Filename:  swarm.h
  *
- *    Description:  `
+ *    Description:  
  *
  *        Version:  1.0
  *        Created:  05/27/2015 14:11:51
@@ -24,9 +24,11 @@
 #include "form/vsr_knot.h"
 #include "form/vsr_twist.h"
 #include "util/vsr_stat.h"
+#include "form/vsr_group.h"
 
 using namespace vsr;
 using namespace vsr::cga;
+
 
 struct Organism;
 
@@ -63,10 +65,12 @@ struct Population{
    *-----------------------------------------------------------------------------*/
   vector<Organism*> member;
 
-  /// initialize
+  /// initialize on a type of organism
+  template<typename T>
   void init();
   
   /// reset
+  template<typename T>
   void reset();
 
   /// Add a member
@@ -79,12 +83,12 @@ struct Population{
   void step(float dt);
 
 
-  float mSpacing=1;         ///<-- Initial Spacing of Population
-  float maxDistance = 10;        ///<-- Threshold of influence between Members
-  float minDistance = 1;        ///<-- Minimum Spacing Between Members
-  int   maxNeighbors = 3;   ///<-- Max number of influencing neighbors
-  int   mNum=NUM_AGENTS;            ///<-- Size of Population
-  int   maxNum = 100;       ///<-- Max Size of Population
+  float mSpacing=1;               ///<-- Initial Spacing of Population
+  float maxDistance = 10;         ///<-- Threshold of influence between Members
+  float minDistance = 1;          ///<-- Minimum Spacing Between Members
+  int   maxNeighbors = 3;         ///<-- Max number of influencing neighbors
+  int   mNum=NUM_AGENTS;          ///<-- Size of Population
+  int   maxNum = 100;             ///<-- Max Size of Population
 
 
   float globalFlockRotVel;
@@ -105,6 +109,10 @@ struct Population{
  *-----------------------------------------------------------------------------*/
 struct Organism : public Frame {
 
+
+  float time=0;
+  Point pnt[NUM_VERTEX_PER_AGENT];      ///for mesh data . . .
+  
   Population * mPopulation;
 
   void population(Population * pop) { mPopulation = pop; }
@@ -123,7 +131,17 @@ struct Organism : public Frame {
   target(NULL), mBehavior( Flock | Force | Feed )
   {}
 
+
+  virtual void init(){}
+
+  virtual void onStep(float dt){}
+
   virtual void step(float dt){
+
+        time+=dt;
+
+        onStep(dt);
+        
        
         if (mBehavior & Flock)  flock();
         if (mBehavior & Force)  force();
@@ -141,6 +159,8 @@ struct Organism : public Frame {
         
         this->spin();
         this->move();
+
+
   };
 
   virtual void feed(){
@@ -150,7 +170,7 @@ struct Organism : public Frame {
 
   virtual void flock(){
         
-       vVelocity = .01;
+       vVelocity = 0.01;
        //orient towards neighbors
        if (!mNeighborhood.nearest.empty()){
         for (auto& n : mNeighborhood.nearest){
@@ -203,7 +223,7 @@ struct Organism : public Frame {
 
   int mBehavior;                    ///<-- Behavior Mode
  
-  float vVelocity = .01;            ///<-- General Velocity
+  float vVelocity = .00;            ///<-- General Velocity
   float vFollowVel = .01;           ///<-- Velocity to chase
   
   float vSourceRotVel = .01;        ///<-- Rotational Velocity to food source 
@@ -219,21 +239,26 @@ Population::~Population(){
     for (auto& i : member) if(i) delete i;
 }
 
+template<typename T> ///<-- T must be an organism
 void Population::init(){
+  
     member.clear();
     member = vector<Organism*>(mNum);
     float range = mNum * mSpacing;
     Rand::Seed();
     for (auto& i : member ){
-      if (!i) i = new Organism();
+      if (!i) i = new T();
       i->population(this);
       i->pos() = point( -range/2.0 + Rand::Num(range), -range/2.0 + Rand::Num(range), -range/2.0 + Rand::Num(range) ); 
-      i->rot() = gen::rot( TWOPI*Rand::Num(), -PIOVERTWO + PI * Rand::Num() );   
+      i->rot() = gen::rot( TWOPI*Rand::Num(), -PIOVERTWO + PI * Rand::Num() );  
+      i->init(); 
     }
+
 }
 
+template<typename T>
 void Population::reset(){
-   init();
+   init<T>();
 }
 
 void Population::buildNeighborhoods() {
@@ -302,11 +327,24 @@ struct Jelly : Organism {
 
   Circle midsectionR, midsectionL; 
   TorusKnot tk;
+  PointGroup3D<Vec> pg;
 
-  void init(){
+  vector<Point> vp;
+
+  Jelly( Point p = point(0,0,0), Rotor r = Rot(1) ) 
+  : Organism(p,r),
+    pg(4,3,false,true) 
+   { 
+    // init(); 
+    }
+
+
+  virtual void init(){
+   
     tk = TorusKnot(3,2);
-    midsectionR = this->cxz().dilate( this->pos(), .2 ).trs(.2,0,0);
-    midsectionL = this->cxz().dilate( this->pos(), .2 ).trs(-.2,0,0);
+   // midsectionR = this->cxz().dilate( this->pos(), .5 );//.trs(.2,0,0);
+   // mBehavior = 0;
+   // midsectionL = this->cxz().dilate( this->pos(), .2 ).trs(-.2,0,0);
   }
 
 //  virtual void draw(GFXSceneNode * re){
@@ -315,12 +353,35 @@ struct Jelly : Organism {
 //    render::pipe(this->cxz(), re);
 //  }
 
-  virtual void step(float dt){
-    tk.HF.cir() = this->cxz();
-    auto par = tk.par() * .01;
-    midsectionR = midsectionR.boost( par );
-    midsectionL = midsectionL.boost( par );
+
+  virtual void onStep(float dt){
+    //tk.HF.cir() = this->cxz();
+    //auto par = tk.par() * .01;
+    auto cir = round::produce( round::dls(1.0,0,0,0), this->xz() );
+    auto shrink = cir.dilate( PAO, .5 );
+    midsectionR = shrink.boost( cir.dual() * time  );
+   // midsectionL = midsectionL.boost( par );
+
+    makeMeshData();
+
   }
+
+  void makeMeshData(){
+    //pnt.clear();
+
+    vector<Point> base;
+    for (int i =0; i<NUM_VERTEX_BASE; ++i){
+      float t = TWOPI * (float)i/NUM_VERTEX_BASE;
+      base.push_back( point(midsectionR, t) );
+    }
+    
+    auto vp = pg( base );
+   // cout << vp.size() << endl;
+   // cout << NUM_VERTEX_PER_AGENT << endl;
+    for (int i =0; i<NUM_VERTEX_PER_AGENT; ++i){
+      pnt[i] = vp[i] + this->pos(); //<-- could optimize as memcopy
+    }
+  } 
   
 
 };  
