@@ -1,6 +1,8 @@
 #ifndef __GRID__
 #define __GRID__
 
+#include "gfx/gfx_matrix.h" // Vec2f
+
 #define __FLOOR(v) ((unsigned)(v) - ((v) < 0.0 && (v) != (unsigned)(v)))
 #define __FRAC(v) (((v) >= 0.0) ? (v) - (unsigned)(v) : (-v) - (unsigned)(v))
 #define __CLAMP(v, bottom, top) ((v < bottom) ? bottom : ((v > top) ? top : v))
@@ -31,7 +33,7 @@ struct Grid {
 
   inline float& cell(unsigned c, unsigned r) { return data[r * C + c]; }
 
-  float read(const Vec2f& where) {
+  float read(const gfx::Vec2f& where) {
     float x = C * where.x;
     float y = R * where.y;
     unsigned xa = __FLOOR(x);
@@ -53,7 +55,7 @@ struct Grid {
     return (paaa * faaa) + (pbaa * fbaa) + (paba * faba) + (pbba * fbba);
   }
 
-  void add(const Vec2f& where, float f) {
+  void add(const gfx::Vec2f& where, float f) {
     float x = C * where.x;
     float y = R * where.y;
     unsigned xa = __FLOOR(x);

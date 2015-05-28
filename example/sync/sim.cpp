@@ -13,7 +13,6 @@ struct MyApp : SimApp<State>, ctl::Touch {
 
   virtual void onSetup() {
     Touch::setup("/dev/input/event2");
-
     grid = new Grid(16, 9);
   }
 
