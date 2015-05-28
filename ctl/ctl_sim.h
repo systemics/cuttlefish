@@ -16,9 +16,14 @@ struct SimApp {
     running = false;
   }
 
+  virtual ~SimApp() {
+    delete state;
+  }
+
 
   void start(bool makeThread = false){
     maker.start();
+
     if (makeThread) {
       running = true;
       thread t([this]() {
@@ -36,7 +41,6 @@ struct SimApp {
   void stop(){
     running = false;
     maker.stop();
-    delete state;
   }
 
   virtual void onSimulate(double dt) = 0;

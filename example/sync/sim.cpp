@@ -29,19 +29,21 @@ struct MyApp : SimApp<State>, ctl::Touch {
     int k = 0;
     for (auto& e : touchPoint)
       if (e.id != 0) {
-        touch[k] = Vec2f(CLAMP(e.x / 3200.0f, -1.0, 1.0), CLAMP(e.y / -2600.0f, -1.0, 1.0));
+        touch[k] = Vec2f(CLAMP(0.5f + 0.5f * (e.x / 3200.0f), 0.01, 0.99), CLAMP(0.5f + 0.5f * (e.y / -2600.0f), 0.01, 0.99));
         k++;
         if (k >= N) break;
       }
     if (k) {
       float f = grid->read(touch[0]);
-      LOG("%f", f);
+      //LOG("%f", f);
       grid->add(touch[0], 0.1);
     }
 
     if (t > 1.0) {
       t = t - 1.0;
+      printf("\033[2J\033[H");
       grid->print();
+      fflush(stdout);
     }
 
     state->phase++;
@@ -51,4 +53,15 @@ struct MyApp : SimApp<State>, ctl::Touch {
   }
 };
 
-int main() { MyApp().start(true); } // true starts a main loop
+int main() {
+  MyApp app;
+  //cuttlebone::Timestamp<> t;
+  //double time, last;
+  //app.onSetup();
+  //while (true) {
+  //  time = t.stamp();
+  //  app.onSimulate(time - last);
+  //  last = time;
+  //}
+  app.start(true); // use internal thread
+}

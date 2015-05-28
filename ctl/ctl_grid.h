@@ -21,7 +21,22 @@ struct Grid {
   void print() {
     int n = 0;
     for (unsigned i = 0; i < size; ++i) {
-      printf("%.2f ", data[i]);
+      char c;
+      if (data[i] < 0.0001)
+        c = ' ';
+      else if (data[i] < 0.2)
+        c = '.';
+      else if (data[i] < 0.4)
+        c = 'o';
+      else if (data[i] < 0.6)
+        c = 'O';
+      else if (data[i] < 0.8)
+        c = '%';
+        else
+      c = '#';
+
+      printf("%c", c);
+
       n++;
       if (n == C) {
         n = 0;
