@@ -4,7 +4,7 @@ project(cuttlefish)
 #from Toolchain file
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${DEFINITIONS}")
 #C++11
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -O3 -ftemplate-depth-1200")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -pthread -O3 -ftemplate-depth-1200")
 #TURN OFF A BUNCH OF WARNINGS
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations -Wno-reorder -Wno-unused-function -Wno-sign-compare -Wno-unused-variable  -Wno-unknown-pragmas")
 
@@ -31,11 +31,6 @@ get_property(VSR_LINK_DIR GLOBAL PROPERTY VSR_LINK_DIR)
 file(GLOB graphicsGL ext/vsr/src/draw/GL/*.cpp)
 file(GLOB graphicsGLES ext/vsr/src/draw/GLES/*.cpp)
 
-set(libraries ${GFX_LIBRARIES} ${VSR_LIBRARIES})
-
-include_directories(${GFX_INCLUDE_DIR} ${VSR_INCLUDE_DIR})
-link_directories(${GFX_LINK_DIR} ${VSR_LINK_DIR})
-
 #ADDITIONAL INCLUDES SPECIFIC TO CUTTLEFISH PROJECT
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ctl)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ctl)
@@ -48,6 +43,11 @@ link_directories(${CMAKE_CURRENT_SOURCE_DIR}/ext/Gamma/build/lib)
 if(${RASPBERRY})
 
   message("****** COMPILING BINARIES FOR RASPBERRY PI ********")
+set(libraries ${GFX_LIBRARIES} ${VSR_LIBRARIES})
+
+include_directories(${GFX_INCLUDE_DIR} ${VSR_INCLUDE_DIR})
+link_directories(${GFX_LINK_DIR} ${VSR_LINK_DIR})
+
    
   add_library(vsrgles ${graphicsGLES})
 
@@ -63,6 +63,7 @@ if(${RASPBERRY})
 
   set(source_list ${source_list} example/sync/pi.cpp) #INDIVIDUAL FILE
   set(source_list ${source_list} example/swarm/pi.cpp) #INDIVIDUAL FILE
+  set(source_list ${source_list} example/sync/pi.cpp) #INDIVIDUAL FILE
 
   #aux_source_directory(scratch source_list)
   foreach(source_file ${source_list})
@@ -75,6 +76,11 @@ if(${RASPBERRY})
 elseif(${APPLE})
    
   message("****** COMPILING BINARIES FOR OSX ********")
+set(libraries ${GFX_LIBRARIES} ${VSR_LIBRARIES})
+
+include_directories(${GFX_INCLUDE_DIR} ${VSR_INCLUDE_DIR})
+link_directories(${GFX_LINK_DIR} ${VSR_LINK_DIR})
+
 
   add_library(vsrgl ${graphicsGL} ${graphicsGLES}) 
  
@@ -85,6 +91,7 @@ elseif(${APPLE})
 
   set(source_list ${source_list} example/sync/sim.cpp) #INDIVIDUAL FILE
   set(source_list ${source_list} example/swarm/sim.cpp) #INDIVIDUAL FILE
+  set(source_list ${source_list} example/sync/sim.cpp) #INDIVIDUAL FILE
 
   foreach(source_file ${source_list})
     string(REGEX REPLACE "/" "_" target ${source_file})
@@ -96,6 +103,28 @@ elseif(${APPLE})
 elseif(${JETSON})
 
   message("****** COMPILING BINARIES FOR JETSON ********")
+set(libraries ${VSR_LIBRARIES})
+
+include_directories(${VSR_INCLUDE_DIR})
+link_directories(${VSR_LINK_DIR})
+
+
+  #add_library(vsrgl ${graphicsGL} ${graphicsGLES}) 
+ 
+  #set(libraries ${libraries} vsrgl)
+
+  #ADD ALL .CPP FILES IN EXAMPLES AND TESTS FOLDER AS TARGETS
+  ####aux_source_directory(example/control source_list)
+
+  #####set(source_list ${source_list} example/swarm/sim.cpp) #INDIVIDUAL FILE
+  set(source_list ${source_list} example/sync/sim.cpp) #INDIVIDUAL FILE
+
+  foreach(source_file ${source_list})
+    string(REGEX REPLACE "/" "_" target ${source_file})
+    string(REGEX REPLACE ".cpp" "" target ${target})
+    add_executable(${target} ${source_file})
+    target_link_libraries(${target} ${libraries})
+  endforeach(source_file)
   
 endif()
 

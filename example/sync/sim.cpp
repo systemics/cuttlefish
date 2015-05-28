@@ -1,29 +1,20 @@
+#include "ctl_sim.h"
 #include "Cuttlebone/Cuttlebone.hpp"
-#include "ctl_mainloop.h"
-#include "gfx/gfx_matrix.h"
 #include "state.hpp"
 
-struct MyApp : ctl::MainLoop {
-  cuttlebone::Maker<State> maker;
-  State* state;
-  MyApp() : maker("192.168.7.255") {}
+struct MyApp : SimApp<State> {
+  virtual void setup() { }
 
-  virtual void setup() {
-    state = new State;
-    memset(state, 0, sizeof(State));
-  }
-
-  virtual void onLoop(float dt) {
+  virtual void onSimulate(double dt) {
+    static cuttlebone::Stats stats;
+    stats(dt);
+    static double t;
+    t += dt;
     state->phase++;
-    maker.set(*state);
-    usleep(10000);
+    //LOG("phase:%d time:%lf", state->phase, t);
+    //LOG("phase:%d", state->phase);
+    usleep(16667);
   }
 };
 
-int main() {
-  MyApp app;
-  app.maker.start();
-  app.start();
-  return 0;
-}
-
+int main() { MyApp().start(true); } // true starts a main loop
