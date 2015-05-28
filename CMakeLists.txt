@@ -61,7 +61,6 @@ link_directories(${GFX_LINK_DIR} ${VSR_LINK_DIR})
   aux_source_directory(test source_list)
   aux_source_directory(example source_list)
 
-  set(source_list ${source_list} example/sync/pi.cpp) #INDIVIDUAL FILE
   set(source_list ${source_list} example/swarm/pi.cpp) #INDIVIDUAL FILE
   set(source_list ${source_list} example/sync/pi.cpp) #INDIVIDUAL FILE
 
