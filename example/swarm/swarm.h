@@ -49,6 +49,7 @@ struct Substrate{
 
   //Touches
   gfx::Vec2f touch[MAX_TOUCHES];
+  int numtouches;
 
   Substrate(){
 
@@ -299,14 +300,14 @@ struct Organism : public Frame {
    // if(target) this -> relTwist( *target, vFollowVel );
   }
 
-  void flee(){
+  void flee(dt){
     
     for (int i =0; i<mPopulation->substrate.numtouches;++i){
       auto v = mPopulation->substrate.touch[i];
       Point p = point( -WORLD_W/2.0 + v[0] * WORLD_W , -WORLD_H/2.0 + v[1]*WORLD_H, 0 );
     
       float idist = 1.0 / (.01 + round::dist( this->pos(), p ) );
-      dBiv -= this->relOrientBiv( p * idist);
+      dBiv -= this->relOrientBiv( p * idist * dt);
 
     }
     
