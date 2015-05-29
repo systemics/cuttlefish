@@ -206,12 +206,15 @@ struct Organism : public Frame {
 
   virtual void onStep(float dt){}       ///<-- subclass's onStep(dt) method
 
+
   void checkLocation(){
     auto v = gridPos();
     if ( (v[0] < 0) || (v[0] > 1) || (v[1] > 1) || (v[1] < 0 ) ){
       this->pos() = PAO;
     }
   }
+
+  
   virtual void step(float dt){
 
         time+=.005;
@@ -248,6 +251,8 @@ struct Organism : public Frame {
 
   };
 
+
+
   virtual void feed(float dt){
       vVelocity = 0;
       auto v = gridPos();
@@ -257,6 +262,8 @@ struct Organism : public Frame {
       mPopulation->substrate.grid.add( v, -morsel);       
       energy += morsel;
   }
+
+  
 
   virtual void flock(){
         
