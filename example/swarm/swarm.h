@@ -35,7 +35,7 @@ using namespace vsr::cga;
 struct Substrate{
 
   float time =0;
-  ctl::Grid grid = ctl::Grid(10,10); ///< A 10 x 10 Read/Write Scalar Field  
+  ctl::Grid grid = ctl::Grid(16,9); ///< A 10 x 10 Read/Write Scalar Field  
 
   //for rendering:
   Point pnt[NUM_VERTICES_SUBSTRATE];
