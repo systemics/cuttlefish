@@ -316,9 +316,9 @@ struct Organism : public Frame {
       Point p = point( -WORLD_W/2.0 + v[0] * WORLD_W , -WORLD_H/2.0 + v[1]*WORLD_H, 0 );
    
        
-      float idist = 2.0 / (.01 + round::sqd( this->pos(), p ) );
+      float idist = 2.0 / (.001 + round::sqd( this->pos(), p ) );
       dBiv -= this->relOrientBiv( p ) * idist * dt ;
-      vVelocity += idist * dt;
+      vVelocity += 2.0*idist * dt;
     }
         
   }

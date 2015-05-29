@@ -19,9 +19,19 @@ struct MyApp : RenderApp<State> {
   Substrate substrate;
   ctl::Grid grid = ctl::Grid(NUM_CELLS_WIDTH_SUBSTRATE, NUM_CELLS_HEIGHT_SUBSTRATE);
 
-  PointGroup2D<Vec> pg = PointGroup2D<Vec>(3,false);
+  SpaceGroup2D<Vec> sg = SpaceGroup2D<Vec>(3,1,false);
+
+  Point motif[ NUM_VERTEX_BASE_SUBSTRATE ];
 
   void setup() {  
+    
+    sg.mRatioX = 5;
+    sg.mRatioY = 5;
+    //motif
+    for (int i =0; i< NUM_VERTEX_BASE_SUBSTRATE;++i){
+      float t= TWOPI* (float)i/NUM_VERTEX_BASE_SUBSTRATE;
+      motif[i] = point( CXY(1).dilate(PAO,1), t );
+    }
     
     ///POPULATION MESH
     Mesh mesh = Mesh::Points(NUM_VERTICES).mode(GL::L);
@@ -44,7 +54,6 @@ struct MyApp : RenderApp<State> {
 
     mbo = MBO(mesh, GL::DYNAMIC);
     
-
     
     ///BACKGROUND "SUBSTRATE" MESH
     Mesh submesh = Mesh::Points(NUM_VERTICES_SUBSTRATE).mode(GL::T);
@@ -56,13 +65,13 @@ struct MyApp : RenderApp<State> {
 
     sub = MBO(submesh, GL::DYNAMIC);
 
-   mSceneGraph.mMeshNode.add(&mbo);
    mSceneGraph.mMeshNode.add(&sub);
+   mSceneGraph.mMeshNode.add(&mbo);
+
 
   }
 
   virtual void onAnimate() {
-
 
     fps(dt);
     
@@ -72,25 +81,56 @@ struct MyApp : RenderApp<State> {
     }
      mbo.update();
 
-    //SUBSTRATE MESH
-    for (int i = 0;i < NUM_VERTICES_SUBSTRATE;++i){
-     // sub.mesh[i].Pos = Vec3f(state->vec2[i][0], state->vec2[i][1],0);     
-    }
 
-    
-    memcpy( grid.data, state->food, sizeof(float)*NUM_CELLS_SUBSTRATE);
-
-    for (int i=0;i<NUM_CELLS_WIDTH_SUBSTRATE;++i){
-      for (int j =0;j<NUM_CELLS_HEIGHT_SUBSTRATE;++j){
-       int idx = (i*NUM_CELLS_HEIGHT_SUBSTRATE+j)*NUM_VERTEX_PER_CELL;
-       float val = grid.cell(i,j);
-       for (int k = 0; k<NUM_VERTEX_PER_CELL;++k){
-         sub.mesh[idx+k].Col.set(val,val,.2,1);
-       }
+    for (int i=0;i<state->numtouches;++i){
+      if (i<NUM_VERTEX_BASE_SUBSTRATE){
+        motif[i] = point( state->touch[i][0] * 5, state->touch[i][1] * 5, 0 ); 
       }
     }
+    
+    memcpy( grid.data, state->food, sizeof(float)*NUM_CELLS_SUBSTRATE);
+    
+    for (int i=0;i<NUM_VERTEX_BASE_SUBSTRATE;++i){
+      
+      auto tmp = sg.apply( motif[i], NUM_CELLS_WIDTH_SUBSTRATE, NUM_CELLS_HEIGHT_SUBSTRATE);
+ 
+      for (int k=0;k<NUM_CELLS_WIDTH_SUBSTRATE;++k){
+      for (int m=0;m<NUM_CELLS_HEIGHT_SUBSTRATE;++m){
+        
+        
+        int firstIn = (k*NUM_CELLS_HEIGHT_SUBSTRATE + m) * NUM_REFLECTIONS_PER_CELL;
+        int firstOut = (k*NUM_CELLS_HEIGHT_SUBSTRATE + m) * NUM_VERTEX_PER_CELL + i;
+        float val = grid.cell(k,m);
+
+        for (int j =0;j<NUM_REFLECTIONS_PER_CELL;++j){
+         int idx = j*NUM_VERTEX_BASE_SUBSTRATE + firstOut;
+         sub.mesh[idx].Pos = tmp[firstIn+j];
+
+        }
+
+        int first = (k*NUM_CELLS_HEIGHT_SUBSTRATE + m) * NUM_VERTEX_PER_CELL;
+        for (int j=0;j<NUM_REFLECTIONS_PER_CELL;++j){
+          sub.mesh[firstOut+j].Col.set(val,val,.2,1);
+        }
+        
+      }}
+       
+    }
+
+  
+    for (int i=0;i<NUM_CELLS_WIDTH_SUBSTRATE;++i){
+      for (int j =0;j<NUM_CELLS_HEIGHT_SUBSTRATE;++j){
+        int idx = (i*NUM_CELLS_HEIGHT_SUBSTRATE+j)*NUM_VERTEX_PER_CELL;
+        float val = grid.cell(i,j);
+         for (int k = 0; k<NUM_VERTEX_PER_CELL;++k){
+          // sub.mesh[idx+k].Col.set(val,val,.2,1);
+         }
+        }
+      }
+
 
     sub.update();
+
   }
 
 
