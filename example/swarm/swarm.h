@@ -202,7 +202,7 @@ struct Organism : public Frame {
 
   void checkLocation(){
     auto v = gridPos();
-    if ( (v[0] < 0) || (v[0] > x) || (v[1] > 1) || (v[1] < 0 ) ){
+    if ( (v[0] < 0) || (v[0] > 1) || (v[1] > 1) || (v[1] < 0 ) ){
       this->pos() = PAO;
     }
   }
