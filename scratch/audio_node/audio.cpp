@@ -6,7 +6,6 @@
 #include "../../example/swarm/state.hpp"
 
 struct MyApp : Audio {
-
   cuttlebone::Taker<State> taker;
   State* state;
 
@@ -39,22 +38,21 @@ struct MyApp : Audio {
 
     taker.get(*state);
 
-    if (state->numtouches == 0) 
-      for (int i = 0; i < MAX_TOUCHES; i++)
-        gain[i] *= 0.9;
+    if (state->numtouches == 0)
+      for (int i = 0; i < MAX_TOUCHES; i++) gain[i] *= 0.91;
 
     for (int i = 0; i < state->numtouches; i++) {
-      gain[i] += 0.05;
+      gain[i] += 0.08;
       if (gain[i] > 0.7) gain[i] = 0.7;
       float v = (state->touch[i] - last[i]).len();
-      play[i].rate(0.25 + v);
+      play[i].rate(0.4 + v);
     }
 
     memcpy(&last[0], state->touch, sizeof(gfx::Vec2f) * MAX_TOUCHES);
 
     for (unsigned i = 0; i < blockSize; ++i) {
       float s = 0;
-      for (int k = 0; k < MAX_TOUCHES; k++) s += play[k]() * gain[k] / 3.5;
+      for (int k = 0; k < MAX_TOUCHES; k++) s += play[k]() * gain[k] / 5;
       *output++ = s;
       *output++ = s;
     }
