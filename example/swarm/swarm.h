@@ -48,6 +48,7 @@ struct Substrate{
   Point pnt[NUM_VERTICES_SUBSTRATE];
 
   //Touches
+  
   gfx::Vec2f touch[MAX_TOUCHES];
   int numtouches; 
 
@@ -323,16 +324,15 @@ struct Organism : public Frame {
       Point p = point( -WORLD_W/2.0 + v[0] * WORLD_W , -WORLD_H/2.0 + v[1]*WORLD_H, 0 );
    
        
-      float idist = 2.0 / (.001 + round::sqd( this->pos(), p ) );
+      float idist = 5.0 / (.001 + round::sqd( this->pos(), p ) );
       dBiv -= this->relOrientBiv( p ) * idist * dt ;
-      vVelocity += 2.0*idist * dt;
+      vVelocity +=5.0*idist * dt;
     }
         
   }
 
   virtual void force(){
-    //get velocity from world's vector field
-    //auto v = world.vecAt( this->pos() );
+  
   }
   
   virtual void fold(){}
@@ -414,8 +414,17 @@ void Population::step(float dt){
   buildNeighborhoods();
   for (auto& i : member) i->step(dt);
   substrate.step(dt);
-
-  cout << " ENERGY: " << member[0]->energy << endl;
+  for (int i=0;i<substrate.numtouches;++i){
+      
+      auto v = substrate.touch[i];
+      Point p = point( -WORLD_W/2.0 + v[0] * WORLD_W , -WORLD_H/2.0 + v[1]*WORLD_H, 0 );
+	   
+      auto& m = *member[ i ];
+      m.pos() = p;
+	// m.db() += m.relOrientBiv( p ) * .05; 
+     // m.vVelocity = .01;
+  }
+  //cout << " ENERGY: " << member[0]->energy << endl;
 }
   
 
