@@ -25,6 +25,7 @@ struct MyApp : SimApp<State>, ctl::Touch {
   double t;
   cuttlebone::Stats stats;
   virtual void onSimulate(double dt) {
+    usleep(15000);
     stats(dt);  // XXX comment this out if shit crashes (BUG in LOGGER)
     t += dt;
 
