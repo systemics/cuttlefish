@@ -26,35 +26,61 @@
 #include "util/vsr_stat.h"
 #include "form/vsr_group.h"
 
+#include "ctl_grid.h"
+
 using namespace vsr;
 using namespace vsr::cga;
 
 //FOOD CRYSTALS
 struct Substrate{
 
-  SpaceGroup2D<Vec> sg
-  Point pnt[NUM_VERTICES_SUBSTRATE];
+  float time =0;
+  ctl::Grid grid = ctl::Grid(10,10); ///< A 10 x 10 Read/Write Scalar Field  
 
+  //for rendering:
+  Point pnt[NUM_VERTICES_SUBSTRATE];
+  SpaceGroup2D<Vec> sg = SpaceGroup2D<Vec>(3,2,true); // p3m1
   vector<Point> motif;
  
-  //num, ratio, pin, div  (p3m1)
-  Substrate() : sg(3,1,true,3){
+  Substrate() {
     motif = vector<Point>(NUM_VERTEX_BASE_SUBSTRATE);  
+    for (int i =0;i<NUM_VERTEX_BASE_SUBSTRATE;++i){
+      float t = TWOPI*(float)i/NUM_VERTEX_BASE_SUBSTRATE;
+      motif[i] = point( CXY(1), t );
+    }
+  }
+
+  void step(float dt){
+    time += dt;
+    for (int i =0;i<NUM_VERTEX_BASE_SUBSTRATE;++i){
+      float t = TWOPI*(float)i/NUM_VERTEX_BASE_SUBSTRATE;
+      motif[i] = point( CXY(1), t+time );
+    }
+    
+    makeMeshData();
   }
   
   void makeMeshData(){
-
-    sg.apply(motif, NUM_CELLS_WIDTH_SUBSTRATE, NUM_CELLS_HEIGHT_SUBSTRATE);
-              
-    for (int i=0;i<NUM_CELLS_WIDTH_SUBSTRATE;++i){
-    for (int j=0;j<NUM_CELLS_HEIGHT_SUBSTRATE;++j){
-      int first = (i*NUM_CELLS_HEIGHT_SUBSTRATE + j) * NUM_VERTEX_PER_CELL;
-      for (int m=0;m<NUM_VERTEX_BASE_SUBSTRATE;++m){
-        * // sg.hang( motif,i,j );
-      }
+    //transpose
+    for (int i=0;i<NUM_VERTEX_BASE_SUBSTRATE;++i){
+       auto tmp = sg.apply( motif[i], NUM_CELLS_WIDTH_SUBSTRATE, NUM_CELLS_HEIGHT_SUBSTRATE);
  
-    }}
+      for (int k=0;k<NUM_CELLS_WIDTH_SUBSTRATE;++k){
+      for (int m=0;m<NUM_CELLS_HEIGHT_SUBSTRATE;++m){
+        
+        int firstIn = (k*NUM_CELLS_HEIGHT_SUBSTRATE + m) * NUM_REFLECTIONS_PER_CELL;
+        int firstOut = (k*NUM_CELLS_HEIGHT_SUBSTRATE + m) * NUM_VERTEX_PER_CELL + i;
+        
+        for (int j =0;j<NUM_REFLECTIONS_PER_CELL;++j){
+         int idx = j*NUM_VERTEX_BASE_SUBSTRATE + firstOut;
+         pnt[idx] = tmp[firstIn+j];
+        }
+        
+      }}
+       
+    }
   }
+
 };
 
 
@@ -69,6 +95,7 @@ struct Population{
 
   ~Population();
     
+   Substrate substrate; 
   /*-----------------------------------------------------------------------------
    *  A Distance Relationship between Organisms
    *-----------------------------------------------------------------------------*/
@@ -116,7 +143,6 @@ struct Population{
   /// timestep
   void step(float dt);
 
-
   float mSpacing=1;               ///<-- Initial Spacing of Population
   float maxDistance = 10;         ///<-- Threshold of influence between Members
   float minDistance = 1;          ///<-- Minimum Spacing Between Members
@@ -147,6 +173,11 @@ struct Organism : public Frame {
 
   float time=0;
   float energy=100;
+
+  //Position on 2D Scalar Field of Food
+  gfx::Vec2f gridPos(){
+    
+  }
   
   Point pnt[NUM_VERTEX_PER_AGENT];      ///<-- for mesh data . . .
   
@@ -234,8 +265,8 @@ struct Organism : public Frame {
 
   
   void follow(){
-    if(!target) if (!mNeighborhood.nearest.empty()){ target = mNeighborhood.nearest[0].partner; }
-    if(target) this -> relTwist( *target, vFollowVel );
+    //if(!target) if (!mNeighborhood.nearest.empty()){ target = mNeighborhood.nearest[0].partner; }
+    //if(target) this -> relTwist( *target, vFollowVel );
   }
 
   void flee(){
@@ -329,6 +360,7 @@ void Population::buildNeighborhoods() {
 void Population::step(float dt){
   buildNeighborhoods();
   for (auto& i : member) i->step(dt);
+  substrate.step(dt);
 }
   
 

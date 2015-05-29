@@ -7,6 +7,8 @@
 #define __FRAC(v) (((v) >= 0.0) ? (v) - (unsigned)(v) : (-v) - (unsigned)(v))
 #define __CLAMP(v, bottom, top) ((v < bottom) ? bottom : ((v > top) ? top : v))
 
+namespace ctl{
+
 struct Grid {
   float* data;
   unsigned size, C, R;
@@ -48,6 +50,7 @@ struct Grid {
 
   inline float& cell(unsigned c, unsigned r) { return data[r * C + c]; }
 
+  //"where" is in range of (0,1)
   float read(const gfx::Vec2f& where) {
     float x = C * where.x;
     float y = R * where.y;
@@ -129,3 +132,5 @@ int main() {
   cout << "value: " << grid.read(v) << endl;
 }
 */
+
+}//ctl
