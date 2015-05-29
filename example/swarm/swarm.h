@@ -210,7 +210,7 @@ struct Organism : public Frame {
       //  cout << energy << endl;
         if (energy < 2 ) behavior( Feed );
         // else if( energy < 8 ) behavior ( Follow );
-        else if (energy > 8) behavior ( Flock );
+        else if (energy > 8) behavior ( Follow );
 
         //check for off screen
         checkLocation();        
