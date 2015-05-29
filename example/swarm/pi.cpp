@@ -19,6 +19,8 @@ struct MyApp : RenderApp<State> {
   Substrate substrate;
   ctl::Grid grid = ctl::Grid(NUM_CELLS_WIDTH_SUBSTRATE, NUM_CELLS_HEIGHT_SUBSTRATE);
 
+  PointGroup2D<Vec> pg = PointGroup2D<Vec>(3,false);
+
   void setup() {  
     
     ///POPULATION MESH
@@ -41,6 +43,8 @@ struct MyApp : RenderApp<State> {
     }
 
     mbo = MBO(mesh, GL::DYNAMIC);
+    
+
     
     ///BACKGROUND "SUBSTRATE" MESH
     Mesh submesh = Mesh::Points(NUM_VERTICES_SUBSTRATE).mode(GL::T);

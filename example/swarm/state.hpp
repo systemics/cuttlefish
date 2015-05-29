@@ -5,7 +5,7 @@
 /*-----------------------------------------------------------------------------
  *  AGENTS
  *-----------------------------------------------------------------------------*/
-#define NUM_AGENTS 10
+#define NUM_AGENTS 50
 #define NUM_VERTEX_BASE 5
 #define MAX_NUM_REFLECTIONS 24
 #define NUM_VERTEX_TAIL 0
@@ -16,15 +16,17 @@
 /*-----------------------------------------------------------------------------
  *  FOOD SUBSTRATE
  *-----------------------------------------------------------------------------*/
+#define MAX_TOUCHES 5
+
 #define NUM_CELLS_WIDTH_SUBSTRATE 16 
 #define NUM_CELLS_HEIGHT_SUBSTRATE 9
 #define NUM_CELLS_SUBSTRATE (NUM_CELLS_WIDTH_SUBSTRATE*NUM_CELLS_HEIGHT_SUBSTRATE) 
-#define NUM_VERTEX_BASE_SUBSTRATE 1
+#define NUM_VERTEX_BASE_SUBSTRATE 3
 #define NUM_REFLECTIONS_PER_CELL 3 
 #define NUM_VERTEX_PER_CELL (NUM_VERTEX_BASE_SUBSTRATE * NUM_REFLECTIONS_PER_CELL)
 #define NUM_VERTICES_SUBSTRATE (NUM_CELLS_SUBSTRATE * NUM_VERTEX_PER_CELL)
 
-#define MAX_TOUCHES 5
+
 
 struct State {
   

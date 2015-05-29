@@ -49,20 +49,25 @@ struct Substrate{
 
   //Touches
   gfx::Vec2f touch[MAX_TOUCHES];
-  int numtouches;
+  int numtouches; 
 
   Substrate(){
 
     for (int i=0;i<NUM_CELLS_WIDTH_SUBSTRATE;++i){
       for (int j=0;j<NUM_CELLS_HEIGHT_SUBSTRATE;++j){
+
           float ti = (float)i/NUM_CELLS_WIDTH_SUBSTRATE;
           float tj = (float)j/NUM_CELLS_HEIGHT_SUBSTRATE;
+        
           auto tmp = circle( -wSpacing/2.0 + ti * wSpacing, -hSpacing/2.0 + tj * hSpacing, 0 );
+         
           for (int k=0;k<NUM_VERTEX_PER_CELL;++k){
-           int idx = (i*NUM_CELLS_HEIGHT_SUBSTRATE+j)*NUM_VERTEX_PER_CELL + k;
+        
+            int idx = (i*NUM_CELLS_HEIGHT_SUBSTRATE+j)*NUM_VERTEX_PER_CELL + k;
 
             auto p = point(tmp, TWOPI*(float)k/NUM_VERTEX_PER_CELL);
             pnt[idx]=p;
+         
           }
       }
     }
@@ -210,8 +215,11 @@ struct Organism : public Frame {
   virtual void step(float dt){
 
         time+=.005;
+
+
         energy -= vVelocity;
         if (energy < 0) energy = 0; 
+
       //  cout << energy << endl;
         if (energy < 2 ) behavior( Feed | Flee );
         // else if( energy < 8 ) behavior ( Follow );
@@ -223,7 +231,7 @@ struct Organism : public Frame {
         if (mBehavior & Flock)  flock();
         if (mBehavior & Force)  force();
         if (mBehavior & Feed)   feed(dt);
-        if (mBehavior & Follow) follow();
+        if (mBehavior & Follow) follow(); 
         if (mBehavior & Flee)   flee(dt);
         if (mBehavior & Fold)   fold();
         if (mBehavior & Unfold) unfold();
@@ -302,7 +310,7 @@ struct Organism : public Frame {
   }
 
   void flee(float dt){
-    
+
     for (int i =0; i<mPopulation->substrate.numtouches;++i){
       auto v = mPopulation->substrate.touch[i];
       Point p = point( -WORLD_W/2.0 + v[0] * WORLD_W , -WORLD_H/2.0 + v[1]*WORLD_H, 0 );
