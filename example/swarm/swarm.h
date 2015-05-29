@@ -41,7 +41,6 @@ struct Substrate{
 
   //for rendering:
   Point pnt[NUM_VERTICES_SUBSTRATE];
-//  float density[NUM_CELLS_SUBSTRATE];
 
   SpaceGroup2D<Vec> sg = SpaceGroup2D<Vec>(3,1,false); // p3m1
   vector<Point> motif;
@@ -58,15 +57,9 @@ struct Substrate{
     time += dt;
     for (int i =0;i<NUM_VERTEX_BASE_SUBSTRATE;++i){
       float t = TWOPI*(float)i/NUM_VERTEX_BASE_SUBSTRATE;
-      motif[i] = vsr::cga::point( CXY(1), t+time );
+      motif[i] = vsr::cga::point( CXY(1), t );
     }
 
-//      for (int i=0;i<NUM_CELLS_WIDTH_SUBSTRATE;++i){
-//        for (int j=0;j<NUM_CELLS_HEIGHT_SUBSTRATE;++j){
-//                  
-//        }
-//      }
-    
     makeMeshData();
   }
   
@@ -171,9 +164,7 @@ struct Population{
   void startFollowing();
   void stopFollowing();
 
-
 };
-
 
 
 /*-----------------------------------------------------------------------------
