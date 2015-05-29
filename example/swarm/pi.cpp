@@ -6,6 +6,7 @@ using namespace ctl;
 using namespace gfx;
 
 #include "state.hpp"
+#include "swarm.h"
 
 using namespace vsr;
 
@@ -13,6 +14,8 @@ struct MyApp : RenderApp<State> {
  
   MBO mbo,sub;
   cuttlebone::Stats fps;
+
+  Substrate substrate;
 
   void setup() {  
     
@@ -42,7 +45,9 @@ struct MyApp : RenderApp<State> {
     for (int i = 0; i<submesh.num(); ++i){
        float t = (float)i/sub.mesh.num();
        submesh[i].Col.set( 1, 0, .2, 1);
+       submesh[i].Pos = substrate.pnt[i];
      }
+
     sub = MBO(submesh, GL::DYNAMIC);
 
 // mSceneGraph.mMeshNode.add(&mbo);
@@ -63,7 +68,7 @@ struct MyApp : RenderApp<State> {
 
     //SUBSTRATE MESH
     for (int i = 0;i < NUM_VERTICES_SUBSTRATE;++i){
-      sub.mesh[i].Pos = Vec3f(state->vec2[i][0], state->vec2[i][1],0);     
+     // sub.mesh[i].Pos = Vec3f(state->vec2[i][0], state->vec2[i][1],0);     
     }
 
 

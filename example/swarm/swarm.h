@@ -37,54 +37,72 @@ using namespace vsr::cga;
 struct Substrate{
 
   float time =0;
-  ctl::Grid grid = ctl::Grid(16,9); ///< A Read/Write Scalar Field  
+  float wSpacing = 10;
+  float hSpacing = 10;
+  ctl::Grid grid = ctl::Grid(NUM_CELLS_WIDTH_SUBSTRATE,NUM_CELLS_HEIGHT_SUBSTRATE); ///< A Read/Write Scalar Field  
 
   //for rendering:
   Point pnt[NUM_VERTICES_SUBSTRATE];
 
-  SpaceGroup2D<Vec> sg = SpaceGroup2D<Vec>(3,1,false); // p3m1
-  vector<Point> motif;
- 
-  Substrate() {
-    motif = vector<Point>(NUM_VERTEX_BASE_SUBSTRATE);  
-    for (int i =0;i<NUM_VERTEX_BASE_SUBSTRATE;++i){
-      float t = TWOPI*(float)i/NUM_VERTEX_BASE_SUBSTRATE;
-      motif[i] = vsr::cga::point( CXY(1), t );
+  Substrate(){
+    for (int i=0;i<NUM_CELLS_WIDTH_SUBSTRATE;++i){
+      for (int j=0;j<NUM_CELLS_HEIGHT_SUBSTRATE;++j){
+          int idx = i*NUM_CELLS_HEIGHT_SUBSTRATE+j;
+          auto tmp = circle( i * wSpacing, j * hSpacing, 0 );
+          for (int k=0;k<NUM_VERTEX_PER_CELL;++k){
+            auto p = point(tmp, TWOPI*(float)k/NUM_VERTEX_PER_CELL);
+            pnt[idx]=p;
+          }
+      }
     }
   }
 
-  void step(float dt){
-    time += dt;
-    for (int i =0;i<NUM_VERTEX_BASE_SUBSTRATE;++i){
-      float t = TWOPI*(float)i/NUM_VERTEX_BASE_SUBSTRATE;
-      motif[i] = vsr::cga::point( CXY(1), t );
-    }
-
-    makeMeshData();
-  }
+  void step(float dt){}
   
-  void makeMeshData(){
-    //transpose
-    for (int i=0;i<NUM_VERTEX_BASE_SUBSTRATE;++i){
-       auto tmp = sg.apply( motif[i], NUM_CELLS_WIDTH_SUBSTRATE, NUM_CELLS_HEIGHT_SUBSTRATE);
- 
-      for (int k=0;k<NUM_CELLS_WIDTH_SUBSTRATE;++k){
-      for (int m=0;m<NUM_CELLS_HEIGHT_SUBSTRATE;++m){
-        
-        int firstIn = (k*NUM_CELLS_HEIGHT_SUBSTRATE + m) * NUM_REFLECTIONS_PER_CELL;
-        int firstOut = (k*NUM_CELLS_HEIGHT_SUBSTRATE + m) * NUM_VERTEX_PER_CELL + i;
-        
-        for (int j =0;j<NUM_REFLECTIONS_PER_CELL;++j){
-         int idx = j*NUM_VERTEX_BASE_SUBSTRATE + firstOut;
-         pnt[idx] = tmp[firstIn+j];
-        }
-        
-      }}
-       
-    }
-  }
-
 };
+
+//    SpaceGroup2D<Vec> sg = SpaceGroup2D<Vec>(3,1,false); // p3m1
+//    vector<Point> motif;
+//   
+//    Substrate() {
+//      motif = vector<Point>(NUM_VERTEX_BASE_SUBSTRATE);  
+//      for (int i =0;i<NUM_VERTEX_BASE_SUBSTRATE;++i){
+//        float t = TWOPI*(float)i/NUM_VERTEX_BASE_SUBSTRATE;
+//        motif[i] = vsr::cga::point( CXY(1), t );
+//      }
+//    }
+//  
+//    void step(float dt){
+//      time += dt;
+//      for (int i =0;i<NUM_VERTEX_BASE_SUBSTRATE;++i){
+//        float t = TWOPI*(float)i/NUM_VERTEX_BASE_SUBSTRATE;
+//        motif[i] = vsr::cga::point( CXY(1), t );
+//      }
+//  
+//      makeMeshData();
+//    }
+//    
+//    void makeMeshData(){
+//      //transpose
+//      for (int i=0;i<NUM_VERTEX_BASE_SUBSTRATE;++i){
+//         auto tmp = sg.apply( motif[i], NUM_CELLS_WIDTH_SUBSTRATE, NUM_CELLS_HEIGHT_SUBSTRATE);
+//   
+//        for (int k=0;k<NUM_CELLS_WIDTH_SUBSTRATE;++k){
+//        for (int m=0;m<NUM_CELLS_HEIGHT_SUBSTRATE;++m){
+//          
+//          int firstIn = (k*NUM_CELLS_HEIGHT_SUBSTRATE + m) * NUM_REFLECTIONS_PER_CELL;
+//          int firstOut = (k*NUM_CELLS_HEIGHT_SUBSTRATE + m) * NUM_VERTEX_PER_CELL + i;
+//          
+//          for (int j =0;j<NUM_REFLECTIONS_PER_CELL;++j){
+//           int idx = j*NUM_VERTEX_BASE_SUBSTRATE + firstOut;
+//           pnt[idx] = tmp[firstIn+j];
+//          }
+//          
+//        }}
+//         
+//      }
+//    }
+
 
 
 struct Organism;
