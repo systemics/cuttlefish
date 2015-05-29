@@ -166,7 +166,7 @@ struct Organism : public Frame {
   gfx::Vec2f gridPos(){
     float x = this->mPos[0]/WORLD_W;
     float y = this->mPos[1]/WORLD_H;
-    return Vec2f(.5 + x, .5 + y);
+    return gfx::Vec2f(.5 + x, .5 + y);
   }
   
   Population * mPopulation;
