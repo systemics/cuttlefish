@@ -211,11 +211,11 @@ struct Organism : public Frame {
 
         time+=.005;
         energy -= vVelocity;
-        
+        if (energy < 0) energy = 0; 
       //  cout << energy << endl;
         if (energy < 2 ) behavior( Feed | Flee );
         // else if( energy < 8 ) behavior ( Follow );
-        else if (energy > 8) behavior ( Follow | Flee );
+        else if (energy > 6) behavior ( Follow | Flee );
 
         //check for off screen
         checkLocation();        
@@ -292,7 +292,8 @@ struct Organism : public Frame {
      if (!mNeighborhood.toonear.empty()){
      for (auto& n : mNeighborhood.toonear){
        if (n.dist>FPERROR) dBiv -= this->relOrientBiv( n.partner->pos() ) * (vAvertRotVel+mPopulation->globalAvertRotVel);
-      } 
+      	vVelocity += .01;
+	} 
      }
 
   //  dBiv += relOrientBiv( source ) * (vSourceRotVel+mPopulation->globalSourceRotVel);
@@ -300,17 +301,17 @@ struct Organism : public Frame {
    // if(target) this -> relTwist( *target, vFollowVel );
   }
 
-  void flee(dt){
+  void flee(float dt){
     
     for (int i =0; i<mPopulation->substrate.numtouches;++i){
       auto v = mPopulation->substrate.touch[i];
       Point p = point( -WORLD_W/2.0 + v[0] * WORLD_W , -WORLD_H/2.0 + v[1]*WORLD_H, 0 );
-    
-      float idist = 1.0 / (.01 + round::dist( this->pos(), p ) );
-      dBiv -= this->relOrientBiv( p * idist * dt);
-
+   
+       
+      float idist = 2.0 / (.01 + round::sqd( this->pos(), p ) );
+      dBiv -= this->relOrientBiv( p ) * idist * dt ;
+      vVelocity += idist * dt;
     }
-    
         
   }
 
@@ -437,7 +438,7 @@ struct Jelly : Organism {
     //tk.HF.cir() = this->cxz();
     //auto par = tk.par() * .01;
 
-    time += offset * .05;
+    time += offset *  (.01+(energy/100.0));
     
     auto cir = round::produce( round::dls(-1.0,0,0,0).trs(1,1,vVelocity), Biv::xz );//
     auto shrink = cir.dilate( PAO, .5 ).trs(.5,0,0);
