@@ -367,7 +367,7 @@ void Population::step(float dt){
   for (auto& i : member) i->step(dt);
   substrate.step(dt);
 
-  cout << " ENERGY: " << member->energy << endl;
+  cout << " ENERGY: " << member[0]->energy << endl;
 }
   
 
