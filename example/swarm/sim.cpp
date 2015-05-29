@@ -56,6 +56,11 @@ struct MyApp : SimApp<State>, ctl::Touch {
         state->vec[idx] = population.member[i]->pnt[j];
       }
     }
+    
+    for (int i=0;i<NUM_VERTICES_SUBSTRATE;++i){
+       state->vec2[i] = Vec2f(population.substrate.pnt[i][0],population.substrate.pnt[i][1]);
+    }
+    
   }
 };
 

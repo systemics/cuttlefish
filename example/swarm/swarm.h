@@ -43,7 +43,7 @@ struct Substrate{
   Point pnt[NUM_VERTICES_SUBSTRATE];
 //  float density[NUM_CELLS_SUBSTRATE];
 
-  SpaceGroup2D<Vec> sg = SpaceGroup2D<Vec>(3,2,true); // p3m1
+  SpaceGroup2D<Vec> sg = SpaceGroup2D<Vec>(3,1,false); // p3m1
   vector<Point> motif;
  
   Substrate() {

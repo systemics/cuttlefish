@@ -63,7 +63,7 @@ struct MyApp : RenderApp<State> {
 
     //SUBSTRATE MESH
     for (int i = 0;i < NUM_VERTICES_SUBSTRATE;++i){
-     // sub.mesh[i].Pos = Vec3f(state->vec2[i][0], state->vec2[i][1],0);     
+      sub.mesh[i].Pos = Vec3f(state->vec2[i][0], state->vec2[i][1],0);     
     }
 
     for (int i=0;i< NUM_CELLS_SUBSTRATE;++i){
