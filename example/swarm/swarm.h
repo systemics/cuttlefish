@@ -47,6 +47,9 @@ struct Substrate{
   //for rendering:
   Point pnt[NUM_VERTICES_SUBSTRATE];
 
+  //Touches
+  gfx::Vec2f touch[MAX_TOUCHES];
+
   Substrate(){
 
     for (int i=0;i<NUM_CELLS_WIDTH_SUBSTRATE;++i){
@@ -62,6 +65,7 @@ struct Substrate{
           }
       }
     }
+
   }
 
   void step(float dt){}
@@ -198,7 +202,7 @@ struct Organism : public Frame {
 
   void checkLocation(){
     auto v = gridPos();
-    if ( (v[0] < -WORLD_W/2.0) || (v[0] > WORLD_W/2.0) || (v[1] > WORLD_H/2.0) || (v[1] < -WORLD_H/2.0) ){
+    if ( (v[0] < 0) || (v[0] > x) || (v[1] > 1) || (v[1] < 0 ) ){
       this->pos() = PAO;
     }
   }
@@ -208,9 +212,9 @@ struct Organism : public Frame {
         energy -= vVelocity;
         
       //  cout << energy << endl;
-        if (energy < 2 ) behavior( Feed );
+        if (energy < 2 ) behavior( Feed | Flee );
         // else if( energy < 8 ) behavior ( Follow );
-        else if (energy > 8) behavior ( Follow );
+        else if (energy > 8) behavior ( Follow | Flee );
 
         //check for off screen
         checkLocation();        
@@ -219,7 +223,7 @@ struct Organism : public Frame {
         if (mBehavior & Force)  force();
         if (mBehavior & Feed)   feed(dt);
         if (mBehavior & Follow) follow();
-        if (mBehavior & Flee)   flee();
+        if (mBehavior & Flee)   flee(dt);
         if (mBehavior & Fold)   fold();
         if (mBehavior & Unfold) unfold();
         
@@ -296,7 +300,17 @@ struct Organism : public Frame {
   }
 
   void flee(){
-    if(target) this -> relTwistAway( *target, vFollowVel );
+    
+    for (int i =0; i<mPopulation->substrate.numtouches;++i){
+      auto v = mPopulation->substrate.touch[i];
+      Point p = point( -WORLD_W/2.0 + v[0] * WORLD_W , -WORLD_H/2.0 + v[1]*WORLD_H, 0 );
+    
+      float idist = 1.0 / (.01 + round::dist( this->pos(), p ) );
+      dBiv -= this->relOrientBiv( p * idist);
+
+    }
+    
+        
   }
 
   virtual void force(){

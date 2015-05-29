@@ -38,12 +38,15 @@ struct MyApp : SimApp<State>, ctl::Touch {
             gfx::Vec2f(__CLAMP(0.5f + 0.5f * (e.x / 3200.0f), 0.01, 0.99),
                        __CLAMP(0.5f + 0.5f * (e.y / -2600.0f), 0.01, 0.99));
         population.substrate.grid.add(state->touch[k], 5.0 * dt);
+        population.substrate.touch[k] = state->touch[k];
+
         k++;
         if (k >= MAX_TOUCHES) break;
       }
 
     state->numtouches = k;
-
+    population.substrate.numtouches = state->numtouches;
+  
     // memcopy food data
     memcpy(
         state->food, population.substrate.grid.data,
