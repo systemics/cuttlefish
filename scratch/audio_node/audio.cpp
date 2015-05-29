@@ -10,12 +10,15 @@ struct MyApp : Audio {
   cuttlebone::Taker<State> taker;
   State* state;
 
+  gfx::Vec2f last[MAX_TOUCHES];
+
   gam::SamplePlayer<float, gam::ipl::Linear, gam::tap::Wrap> play[MAX_TOUCHES];
   float gain[MAX_TOUCHES];
 
   MyApp() : Audio(1024) {
     state = new State();
     memset(state, 0, sizeof(State));
+    memset(&last[0], 0, sizeof(gfx::Vec2f) * MAX_TOUCHES);
 
     for (int i = 0; i < MAX_TOUCHES; i++) {
       char fileName[] = "/root/sound .wav";
@@ -24,6 +27,7 @@ struct MyApp : Audio {
       if (!play[i].load(fileName)) {
         LOG("ERROR: failed to load %s", fileName);
       }
+      LOG("loaded: ", fileName);
     }
     for (auto& e : gain) e = 0.1;
     gam::Sync::master().spu(sampleRate);
@@ -34,27 +38,23 @@ struct MyApp : Audio {
     fps((float)blockSize / sampleRate);
 
     taker.get(*state);
-    for (int i = 0; i < MAX_TOUCHES; i++) {
-      gain[i] = state->touch[i].y;
-      play[i].rate(state->touch[i].y);
+
+    if (state->numtouches == 0) 
+      for (int i = 0; i < MAX_TOUCHES; i++)
+        gain[i] *= 0.9;
+
+    for (int i = 0; i < state->numtouches; i++) {
+      gain[i] += 0.05;
+      if (gain[i] > 0.7) gain[i] = 0.7;
+      float v = (state->touch[i] - last[i]).len();
+      play[i].rate(0.25 + v);
     }
 
-    //   Vec3f& v = renderState->position[renderState->index[i]];
-    // for (int i = 0; i < MAX_TOUCHES; i++) {
-    //   static float xLast;
-    //   Vec3f& v = renderState->position[renderState->index[i]];
-    //   float rate = v.x - xLast;
-    //   rate /= 30;
-    //   gain[i] = fabs(v.z) / 5;
-    //   gain[i] = sqrt(gain[i]);
-    //   play[i].rate(rate);
-    //   //LOG("%f %f", v.z, v.x - xLast);
-    //   xLast = v.x;
-    // }
+    memcpy(&last[0], state->touch, sizeof(gfx::Vec2f) * MAX_TOUCHES);
 
     for (unsigned i = 0; i < blockSize; ++i) {
       float s = 0;
-      for (int k = 0; k < MAX_TOUCHES; k++) s += play[k]() * gain[k];
+      for (int k = 0; k < MAX_TOUCHES; k++) s += play[k]() * gain[k] / 3.5;
       *output++ = s;
       *output++ = s;
     }
