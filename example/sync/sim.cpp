@@ -9,22 +9,23 @@ using namespace gfx; // Vec2f
 
 struct MyApp : SimApp<State>, ctl::Touch {
 
-  Grid* grid;
+  ctl::Grid* grid;
 
   virtual void onSetup() {
     Touch::setup("/dev/input/event2");
-    grid = new Grid(16, 9);
+    grid = new ctl::Grid(16, 9);
   }
 
+  cuttlebone::Stats stats;
+  double t;
   virtual void onSimulate(double dt) {
-    static cuttlebone::Stats stats;
-    stats(dt);
-    static double t;
+    //stats(dt);
     t += dt;
 
 
     int N = 5;
     Vec2f touch[N];
+    //while (pollTouches()) {} // consider greed!?
     pollTouches();
     int k = 0;
     for (auto& e : touchPoint)
@@ -39,17 +40,18 @@ struct MyApp : SimApp<State>, ctl::Touch {
       grid->add(touch[0], 0.1);
     }
 
-    if (t > 1.0) {
-      t = t - 1.0;
+    if (t > 0.1) {
+      t = t - 0.1;
       printf("\033[2J\033[H");
       grid->print();
       fflush(stdout);
     }
 
-    state->phase++;
+    //state->phase++;
     //LOG("phase:%d time:%lf", state->phase, t);
     //LOG("phase:%d", state->phase);
-    usleep(16667);
+    //usleep(16667);
+    usleep(1667);
   }
 };
 

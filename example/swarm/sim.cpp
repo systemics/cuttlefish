@@ -1,21 +1,3 @@
-/*
- * =====================================================================================
- *
- *       Filename:  xJellies.cpp
- *
- *    Description:  jellyfish organisms
- *
- *        Version:  1.0
- *        Created:  05/26/2015 11:12:06
- *       Revision:  none
- *       Compiler:  gcc
- *
- *         Author:  Pablo Colapinto (), gmail->wolftype
- *   Organization:  wolftype
- *
- * =====================================================================================
- */
-
 #include "ctl_sim.h"  
 
 #include "form/vsr_knot.h"
@@ -26,26 +8,43 @@
 #include "swarm.h"
 #include "state.hpp"
 #include "ctl_sim.h"
+#include "ctl_touch.h"
 
 //using namespace vsr;
 //using namespace vsr::cga;
 
-/*-----------------------------------------------------------------------------
- * DESKTOP APPLICATION
- *-----------------------------------------------------------------------------*/
-struct MyApp : SimApp<State> {
- 
+struct MyApp : SimApp<State>, ctl::Touch {
+
   Population population;
 
-  void setup(){
+  virtual void onSetup(){
+
+    Touch::setup("/dev/input/event2");
 
     population.init<Jelly>();
-
   }
 
 
-  void onSimulate(){
-    
+  double t;
+  cuttlebone::Stats stats;
+  void onSimulate(double dt){
+  virtual void onSimulate(double dt) {
+    stats(dt); // XXX comment this out if shit crashes (BUG in LOGGER)
+    t += dt;
+
+    int N = 5;
+    gfx::Vec2f touch[N];
+    //while (pollTouches()) {} // consider greed!?
+    pollTouches();
+    int k = 0;
+    for (auto& e : touchPoint)
+      if (e.id != 0) {
+        touch[k] = gfx::Vec2f(CLAMP(0.5f + 0.5f * (e.x / 3200.0f), 0.01, 0.99), CLAMP(0.5f + 0.5f * (e.y / -2600.0f), 0.01, 0.99));
+        population.substrate.grid.add(touch[0], 0.4 * dt);
+        k++;
+        if (k >= N) break;
+      }
+
     population.step(.01);
 
     for(int i=0;i<NUM_AGENTS;++i){
@@ -54,18 +53,12 @@ struct MyApp : SimApp<State> {
           state->vec[idx] = population.member[i]->pnt[j];
        }
     }
-     
   }
-  
-  
 };
 
 
 int main(){
-                             
   MyApp app;
-  app.start();
-
-  return 0;
-
+  app.start(true); // use internal thread
+  //app.start();
 }

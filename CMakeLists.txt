@@ -117,6 +117,7 @@ link_directories(${VSR_LINK_DIR})
 
   #####set(source_list ${source_list} example/swarm/sim.cpp) #INDIVIDUAL FILE
   set(source_list ${source_list} example/sync/sim.cpp) #INDIVIDUAL FILE
+  set(source_list ${source_list} example/swarm/sim.cpp) #INDIVIDUAL FILE
 
   foreach(source_file ${source_list})
     string(REGEX REPLACE "/" "_" target ${source_file})

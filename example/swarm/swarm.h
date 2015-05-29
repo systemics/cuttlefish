@@ -21,6 +21,8 @@
 
 #include "state.hpp"
 
+#include "vsr/space/vsr_cga3D_funcs.h"
+#include "form/vsr_cga3D_frame.h"
 #include "form/vsr_knot.h"
 #include "form/vsr_twist.h"
 #include "util/vsr_stat.h"
@@ -46,7 +48,7 @@ struct Substrate{
     motif = vector<Point>(NUM_VERTEX_BASE_SUBSTRATE);  
     for (int i =0;i<NUM_VERTEX_BASE_SUBSTRATE;++i){
       float t = TWOPI*(float)i/NUM_VERTEX_BASE_SUBSTRATE;
-      motif[i] = point( CXY(1), t );
+      motif[i] = vsr::cga::point( CXY(1), t );
     }
   }
 
@@ -54,7 +56,7 @@ struct Substrate{
     time += dt;
     for (int i =0;i<NUM_VERTEX_BASE_SUBSTRATE;++i){
       float t = TWOPI*(float)i/NUM_VERTEX_BASE_SUBSTRATE;
-      motif[i] = point( CXY(1), t+time );
+      motif[i] = vsr::cga::point( CXY(1), t+time );
     }
     
     makeMeshData();
