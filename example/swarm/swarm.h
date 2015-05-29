@@ -37,10 +37,12 @@ using namespace vsr::cga;
 struct Substrate{
 
   float time =0;
-  ctl::Grid grid = ctl::Grid(16,9); ///< A 10 x 10 Read/Write Scalar Field  
+  ctl::Grid grid = ctl::Grid(16,9); ///< A Read/Write Scalar Field  
 
   //for rendering:
   Point pnt[NUM_VERTICES_SUBSTRATE];
+//  float density[NUM_CELLS_SUBSTRATE];
+
   SpaceGroup2D<Vec> sg = SpaceGroup2D<Vec>(3,2,true); // p3m1
   vector<Point> motif;
  
@@ -58,6 +60,12 @@ struct Substrate{
       float t = TWOPI*(float)i/NUM_VERTEX_BASE_SUBSTRATE;
       motif[i] = vsr::cga::point( CXY(1), t+time );
     }
+
+//      for (int i=0;i<NUM_CELLS_WIDTH_SUBSTRATE;++i){
+//        for (int j=0;j<NUM_CELLS_HEIGHT_SUBSTRATE;++j){
+//                  
+//        }
+//      }
     
     makeMeshData();
   }
@@ -176,10 +184,7 @@ struct Organism : public Frame {
   float time=0;
   float energy=100;
 
-  //Position on 2D Scalar Field of Food
-  gfx::Vec2f gridPos(){
-    
-  }
+
   
   Point pnt[NUM_VERTEX_PER_AGENT];      ///<-- for mesh data . . .
   
@@ -395,7 +400,7 @@ struct Jelly : Organism {
     //tk.HF.cir() = this->cxz();
     //auto par = tk.par() * .01;
     
-    auto cir = round::produce( round::dls(-1.0,0,0,0).trs(1,1,0), this->xz() );
+    auto cir = round::produce( round::dls(-1.0,0,0,0).trs(1,1,0), Biv::xz );//this->xz() );
     auto shrink = cir.dilate( PAO, .5 ).trs(.5,0,0);
     
     midsection = shrink.boost( cir.dual() * time  );
@@ -418,7 +423,7 @@ struct Jelly : Organism {
         auto vp = pg(base[i]);
         for (int j=0;j<MAX_NUM_REFLECTIONS;++j){
           int idx = j*NUM_VERTEX_BASE + i;
-          pnt[idx] = vp[j] + this->pos();
+          pnt[idx] = vp[j].spin(this->rot()) + this->pos();
         }
     }
     

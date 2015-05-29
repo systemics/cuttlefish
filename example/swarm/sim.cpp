@@ -45,6 +45,9 @@ struct MyApp : SimApp<State>, ctl::Touch {
         if (k >= N) break;
       }
 
+    //memcopy food data 
+    memcpy(state->food, population.substrate.grid.data, sizeof(float)*NUM_CELLS_WIDTH_SUBSTRATE*NUM_CELLS_HEIGHT_SUBSTRATE);
+    
     population.step(.01);
 
     for(int i=0;i<NUM_AGENTS;++i){

@@ -16,8 +16,8 @@
 /*-----------------------------------------------------------------------------
  *  FOOD SUBSTRATE
  *-----------------------------------------------------------------------------*/
-#define NUM_CELLS_WIDTH_SUBSTRATE 50
-#define NUM_CELLS_HEIGHT_SUBSTRATE 20
+#define NUM_CELLS_WIDTH_SUBSTRATE 16 
+#define NUM_CELLS_HEIGHT_SUBSTRATE 9
 #define NUM_CELLS_SUBSTRATE (NUM_CELLS_WIDTH_SUBSTRATE*NUM_CELLS_HEIGHT_SUBSTRATE) 
 #define NUM_VERTEX_BASE_SUBSTRATE 4
 #define NUM_REFLECTIONS_PER_CELL 6 
@@ -27,6 +27,8 @@
 struct State {
   
   gfx::Vec3f vec[NUM_VERTICES];
+  float food[NUM_CELLS_WIDTH_SUBSTRATE * NUM_CELLS_HEIGHT_SUBSTRATE];
+
 //  gfx::Vec2f vec2[NUM_VERTICES_SUBSTRATE];
 //  float density[NUM_VERTICES_SUBSTRATE];
 };

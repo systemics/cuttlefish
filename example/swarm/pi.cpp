@@ -38,15 +38,15 @@ struct MyApp : RenderApp<State> {
     mbo = MBO(mesh, GL::DYNAMIC);
     
     ///BACKGROUND "SUBSTRATE" MESH
-    // Mesh submesh = Mesh::Points(NUM_VERTICES_SUBSTRATE).mode(GL::L);
-    // for (int i = 0; i<submesh.num(); ++i){
-    //   float t = (float)i/sub.mesh.num();
-    //   submesh[i].Col.set( 1, 0, .2, 1);
-    // }
-    // sub = MBO(submesh, GL::DYNAMIC);
+    Mesh submesh = Mesh::Points(NUM_VERTICES_SUBSTRATE).mode(GL::L);
+    for (int i = 0; i<submesh.num(); ++i){
+       float t = (float)i/sub.mesh.num();
+       submesh[i].Col.set( 1, 0, .2, 1);
+     }
+    sub = MBO(submesh, GL::DYNAMIC);
 
-   mSceneGraph.mMeshNode.add(&mbo);
-//   mSceneGraph.mMeshNode.add(&sub);
+//   mSceneGraph.mMeshNode.add(&mbo);
+   mSceneGraph.mMeshNode.add(&sub);
 
   }
 
@@ -57,15 +57,22 @@ struct MyApp : RenderApp<State> {
     
     //AGENT MESH
     for (int i = 0;i < NUM_VERTICES;++i){
-      mbo.mesh[i].Pos = state->vec[i];
+   //   mbo.mesh[i].Pos = state->vec[i];
     }
-    mbo.update();
+   // mbo.update();
 
     //SUBSTRATE MESH
     for (int i = 0;i < NUM_VERTICES_SUBSTRATE;++i){
-   //   sub.mesh[i].Pos = Vec3f(state->vec2[i][0], state->vec2[i][1],0);
+     // sub.mesh[i].Pos = Vec3f(state->vec2[i][0], state->vec2[i][1],0);     
     }
-   // sub.update();
+
+    for (int i=0;i< NUM_CELLS_SUBSTRATE;++i){
+      for (int j =0;j<NUM_VERTEX_PER_CELL;++j){
+       int idx = i*NUM_VERTEX_PER_CELL+j;
+       sub.mesh[idx].Col.set(1,0,0,state->food[i]);
+      }
+    }
+    sub.update();
   }
 
 //  virtual void onDraw(){
