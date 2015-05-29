@@ -29,20 +29,20 @@ struct MyApp : SimApp<State>, ctl::Touch {
     //stats(dt);  // XXX comment this out if shit crashes (BUG in LOGGER)
     t += dt;
 
-    int N = 5;
-    gfx::Vec2f touch[N];
     // while (pollTouches()) {} // consider greed!?
     pollTouches();
     int k = 0;
     for (auto& e : touchPoint)
       if (e.id != 0) {
-        touch[k] =
+        state->touch[k] =
             gfx::Vec2f(CLAMP(0.5f + 0.5f * (e.x / 3200.0f), 0.01, 0.99),
                        CLAMP(0.5f + 0.5f * (e.y / -2600.0f), 0.01, 0.99));
-        population.substrate.grid.add(touch[0], 2.0 * dt);
+        population.substrate.grid.add(state->touch[k], 5.0 * dt);
         k++;
-        if (k >= N) break;
+        if (k >= MAX_TOUCHES) break;
       }
+
+    state->numtouches = k;
 
     // memcopy food data
     memcpy(
@@ -58,9 +58,6 @@ struct MyApp : SimApp<State>, ctl::Touch {
       }
     }
     
-    for (int i=0;i<NUM_VERTICES_SUBSTRATE;++i){
-       state->vec2[i] = gfx::Vec2f(population.substrate.pnt[i][0],population.substrate.pnt[i][1]);
-    }
     
   }
 };
