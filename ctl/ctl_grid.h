@@ -56,8 +56,10 @@ struct Grid {
     float y = R * __CLAMP(where.y,.0001,.9999);
     unsigned xa = __FLOOR(x);
     unsigned xb = xa + 1;
+    if (xb == C) xb = 0;
     unsigned ya = __FLOOR(y);
     unsigned yb = ya + 1;
+    if (yb == R) yb = 0;
     float xbf = __FRAC(x);
     float xaf = 1.f - xbf;
     float ybf = __FRAC(y);
@@ -74,12 +76,14 @@ struct Grid {
   }
 
   void add(const gfx::Vec2f& where, float f) {
-    float x = C * __CLAMP(where.x,.0001,.9999);
-    float y = R * __CLAMP(where.y,.0001,.9999);
+    float x = C * __CLAMP(where.x,.001,.999);
+    float y = R * __CLAMP(where.y,.001,.999);
     unsigned xa = __FLOOR(x);
-    unsigned xb = xa + 1;
+    unsigned xb = xa + 1; 
+    if (xb == C) xb = 0;
     unsigned ya = __FLOOR(y);
     unsigned yb = ya + 1;
+    if (yb == R) yb = 0;
     float xbf = __FRAC(x);
     float xaf = 1.f - xbf;
     float ybf = __FRAC(y);

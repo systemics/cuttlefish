@@ -37,7 +37,7 @@ struct MyApp : SimApp<State>, ctl::Touch {
         state->touch[k] =
             gfx::Vec2f(__CLAMP(0.5f + 0.5f * (e.x / 3200.0f), 0.01, 0.99),
                        __CLAMP(0.5f + 0.5f * (e.y / -2600.0f), 0.01, 0.99));
-//        population.substrate.grid.add(state->touch[k], 5.0 * dt);
+        population.substrate.grid.add(state->touch[k], 5.0 * dt);
         k++;
         if (k >= MAX_TOUCHES) break;
       }
