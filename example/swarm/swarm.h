@@ -265,7 +265,7 @@ struct Organism : public Frame {
          } 
         }
 
-       // dBiv += relOrientBiv( source ) * (vSourceRotVel+mPopulation->globalSourceRotVel);
+        dBiv += relOrientBiv( source ) * (vSourceRotVel+mPopulation->globalSourceRotVel);
 
   }
 
