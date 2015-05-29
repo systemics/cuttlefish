@@ -196,6 +196,12 @@ struct Organism : public Frame {
 
   virtual void onStep(float dt){}       ///<-- subclass's onStep(dt) method
 
+  void checkLocation(){
+    auto v = gridPos();
+    if ( (v[0] < -WORLD_W/2.0) || (v[0] > WORLD_W/2.0) || (v[1] > WORLD_H/2.0) || (v[1] < -WORLD_H/2.0) ){
+      this->pos() = PAO;
+    }
+  }
   virtual void step(float dt){
 
         time+=.005;
@@ -205,6 +211,9 @@ struct Organism : public Frame {
         if (energy < 2 ) behavior( Feed );
         // else if( energy < 8 ) behavior ( Follow );
         else if (energy > 8) behavior ( Follow );
+
+        //check for off screen
+        checkLocation();        
        
         if (mBehavior & Flock)  flock();
         if (mBehavior & Force)  force();
@@ -265,7 +274,13 @@ struct Organism : public Frame {
 
      vVelocity = .01;
 
-     if(!target) { target = mPopulation->member[ Rand::Int( NUM_AGENTS - 1) ] ; }
+     if(!target) { 
+       auto& m = *(mPopulation->member[ Rand::Int( NUM_AGENTS - 1) ]);
+       while ( (m.target == this) || ( this == &m ) ){
+        m = *(mPopulation->member[ Rand::Int( NUM_AGENTS - 1) ]);
+       } 
+        target = &m;        
+     }
      dBiv += relOrientBiv( target->pos() ) *  .01;
      
      //orient away from neighbors that are too close 
