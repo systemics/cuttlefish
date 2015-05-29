@@ -38,12 +38,12 @@ struct MyApp : RenderApp<State> {
     mbo = MBO(mesh, GL::DYNAMIC);
     
     ///BACKGROUND "SUBSTRATE" MESH
-    Mesh submesh = Mesh::Points(NUM_VERTICES_SUBSTRATE).mode(GL::L);
-    for (int i = 0; i<submesh.num(); ++i){
-      float t = (float)i/sub.mesh.num();
-      submesh[i].Col.set( 1, 0, .2, 1);
-    }
-    sub = MBO(submesh, GL::DYNAMIC);
+    // Mesh submesh = Mesh::Points(NUM_VERTICES_SUBSTRATE).mode(GL::L);
+    // for (int i = 0; i<submesh.num(); ++i){
+    //   float t = (float)i/sub.mesh.num();
+    //   submesh[i].Col.set( 1, 0, .2, 1);
+    // }
+    // sub = MBO(submesh, GL::DYNAMIC);
 
    mSceneGraph.mMeshNode.add(&mbo);
 //   mSceneGraph.mMeshNode.add(&sub);
