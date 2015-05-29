@@ -39,19 +39,25 @@ struct MyApp : RenderApp<State> {
     mesh.index().clear();
     
    for (int i = 0; i<NUM_AGENTS; ++i){
+     float ti = (float)i/NUM_AGENTS;
      for (int j=0; j<MAX_NUM_REFLECTIONS; ++j){
        int first = i * NUM_VERTEX_PER_AGENT + j * NUM_VERTEX_BASE;
+       float tj = (float)j/MAX_NUM_REFLECTIONS;
+
        for (int k=0;k<NUM_VERTEX_BASE;++k){
+        float tk = (float)k/NUM_VERTEX_BASE;
         int idx = first+k;
         int nxt = k<NUM_VERTEX_BASE-1 ? idx + 1 : first;
         mesh.add(idx).add(nxt);
+        mesh[idx].Col.set( ti * (Rand::Num() * .7 * (tk*ti) ), (1-(tk*.2)) + (ti * .3) , 1-(ti * tk), 1) ;
+      
        }
      }
    }
     
     for (int i = 0; i<mesh.num(); ++i){
       float t = (float)i/mesh.num();
-      mesh[i].Col.set( Rand::Num() *.5 , 1+t*.2, 1-(t), 2);
+      //mesh[i].Col.set( Rand::Num() * .7, .5 + (t * .3) , 1-(t), 3);
     }
 
     mbo = MBO(mesh, GL::DYNAMIC);
@@ -59,7 +65,6 @@ struct MyApp : RenderApp<State> {
     
     ///BACKGROUND "SUBSTRATE" MESH
     Mesh submesh = Mesh::Points(NUM_VERTICES_SUBSTRATE).mode(GL::T);
-
 
     for (int i = 0; i<submesh.num(); ++i){
        float t = (float)i/sub.mesh.num();
@@ -76,12 +81,13 @@ struct MyApp : RenderApp<State> {
 
   virtual void onAnimate() {
 
-    fps(dt);
+   // fps(dt);
     
     //AGENT MESH
     for (int i = 0;i < NUM_VERTICES;++i){
       mbo.mesh[i].Pos = state->vec[i];
     }
+
      mbo.update();
 
 
