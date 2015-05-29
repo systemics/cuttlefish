@@ -103,6 +103,8 @@ struct Grid {
   }
 };
 
+}//ctl
+
 #endif
 
 /*
@@ -133,4 +135,4 @@ int main() {
 }
 */
 
-}//ctl
+

@@ -37,19 +37,23 @@ using namespace vsr::cga;
 struct Substrate{
 
   float time =0;
-  float wSpacing = 10;
-  float hSpacing = 10;
+  float wSpacing = 70;
+  float hSpacing = 50;
   ctl::Grid grid = ctl::Grid(NUM_CELLS_WIDTH_SUBSTRATE,NUM_CELLS_HEIGHT_SUBSTRATE); ///< A Read/Write Scalar Field  
 
   //for rendering:
   Point pnt[NUM_VERTICES_SUBSTRATE];
 
   Substrate(){
+
     for (int i=0;i<NUM_CELLS_WIDTH_SUBSTRATE;++i){
       for (int j=0;j<NUM_CELLS_HEIGHT_SUBSTRATE;++j){
-          int idx = i*NUM_CELLS_HEIGHT_SUBSTRATE+j;
-          auto tmp = circle( i * wSpacing, j * hSpacing, 0 );
+          float ti = (float)i/NUM_CELLS_WIDTH_SUBSTRATE;
+          float tj = (float)j/NUM_CELLS_HEIGHT_SUBSTRATE;
+          auto tmp = circle( -wSpacing/2.0 + ti * wSpacing, -hSpacing/2.0 + tj * hSpacing, 0 );
           for (int k=0;k<NUM_VERTEX_PER_CELL;++k){
+           int idx = (i*NUM_CELLS_HEIGHT_SUBSTRATE+j)*NUM_VERTEX_PER_CELL + k;
+
             auto p = point(tmp, TWOPI*(float)k/NUM_VERTEX_PER_CELL);
             pnt[idx]=p;
           }

@@ -7,6 +7,7 @@ using namespace gfx;
 
 #include "state.hpp"
 #include "swarm.h"
+#include "ctl_grid.h"
 
 using namespace vsr;
 
@@ -16,6 +17,7 @@ struct MyApp : RenderApp<State> {
   cuttlebone::Stats fps;
 
   Substrate substrate;
+  ctl::Grid grid = ctl::Grid(NUM_CELLS_WIDTH_SUBSTRATE, NUM_CELLS_HEIGHT_SUBSTRATE);
 
   void setup() {  
     
@@ -71,11 +73,16 @@ struct MyApp : RenderApp<State> {
      // sub.mesh[i].Pos = Vec3f(state->vec2[i][0], state->vec2[i][1],0);     
     }
 
+    
+    memcpy( grid.data, state->food, sizeof(float)*NUM_CELLS_SUBSTRATE);
 
-    for (int i=0;i< NUM_CELLS_SUBSTRATE;++i){
-      for (int j =0;j<NUM_VERTEX_PER_CELL;++j){
-       int idx = i*NUM_VERTEX_PER_CELL+j;
-       sub.mesh[idx].Col.set(state->food[i],state->food[i],0,1);
+    for (int i=0;i<NUM_CELLS_WIDTH_SUBSTRATE;++i){
+      for (int j =0;j<NUM_CELLS_HEIGHT_SUBSTRATE;++j){
+       int idx = (i*NUM_CELLS_HEIGHT_SUBSTRATE+j)*NUM_VERTEX_PER_CELL;
+       float val = grid.cell(i,j);
+       for (int k = 0; k<NUM_VERTEX_PER_CELL;++k){
+         sub.mesh[idx+k].Col.set(val,val,.2,1);
+       }
       }
     }
 
