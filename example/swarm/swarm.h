@@ -229,9 +229,11 @@ struct Organism : public Frame {
   virtual void feed(float dt){
       vVelocity = 0;
       auto v = gridPos();
-     // cout << v << endl;
-      energy += mPopulation->substrate.grid.read( v ) ;
-      mPopulation->substrate.grid.add( v, -.7 * dt);       
+      float val = mPopulation->substrate.grid.read( v );
+      if (val != 0 );
+      float morsel = ( val < .7 * dt ) ? val : .7 * dt;
+      mPopulation->substrate.grid.add( v, -morsel);       
+      energy += morsel;
   }
 
   virtual void flock(){
