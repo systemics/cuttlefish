@@ -58,7 +58,7 @@ struct MyApp : SimApp<State>, ctl::Touch {
     }
     
     for (int i=0;i<NUM_VERTICES_SUBSTRATE;++i){
-       state->vec2[i] = Vec2f(population.substrate.pnt[i][0],population.substrate.pnt[i][1]);
+       state->vec2[i] = gfx::Vec2f(population.substrate.pnt[i][0],population.substrate.pnt[i][1]);
     }
     
   }
