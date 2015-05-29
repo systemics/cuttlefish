@@ -12,6 +12,7 @@ using namespace vsr;
 struct MyApp : RenderApp<State> {
  
   MBO mbo,sub;
+  cuttlebone::Stats fps;
 
   void setup() {  
     
@@ -45,13 +46,13 @@ struct MyApp : RenderApp<State> {
     sub = MBO(submesh, GL::DYNAMIC);
 
    mSceneGraph.mMeshNode.add(&mbo);
-   mSceneGraph.mMeshNode.add(&sub);
+//   mSceneGraph.mMeshNode.add(&sub);
 
   }
 
   virtual void onAnimate() {
 
-    cuttlebone::Stats fps;
+
     fps(dt);
     
     //AGENT MESH
@@ -64,7 +65,7 @@ struct MyApp : RenderApp<State> {
     for (int i = 0;i < NUM_VERTICES_SUBSTRATE;++i){
    //   sub.mesh[i].Pos = Vec3f(state->vec2[i][0], state->vec2[i][1],0);
     }
-    sub.update();
+   // sub.update();
   }
 
 //  virtual void onDraw(){
