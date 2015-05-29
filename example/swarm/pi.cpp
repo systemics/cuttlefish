@@ -51,6 +51,9 @@ struct MyApp : RenderApp<State> {
 
   virtual void onAnimate() {
 
+    cuttlebone::Stats fps;
+    fps(dt);
+    
     //AGENT MESH
     for (int i = 0;i < NUM_VERTICES;++i){
       mbo.mesh[i].Pos = state->vec[i];
