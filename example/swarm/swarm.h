@@ -230,8 +230,8 @@ struct Organism : public Frame {
       vVelocity = 0;
       auto v = gridPos();
      // cout << v << endl;
-     // energy += mPopulation->substrate.grid.read( v ) ;
-     // mPopulation->substrate.grid.add( v, -.7 * dt);       
+      energy += mPopulation->substrate.grid.read( v ) ;
+      mPopulation->substrate.grid.add( v, -.7 * dt);       
   }
 
   virtual void flock(){
