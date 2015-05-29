@@ -52,7 +52,7 @@ struct MyApp : RenderApp<State> {
 
     sub = MBO(submesh, GL::DYNAMIC);
 
-// mSceneGraph.mMeshNode.add(&mbo);
+   mSceneGraph.mMeshNode.add(&mbo);
    mSceneGraph.mMeshNode.add(&sub);
 
   }
@@ -64,9 +64,9 @@ struct MyApp : RenderApp<State> {
     
     //AGENT MESH
     for (int i = 0;i < NUM_VERTICES;++i){
-   //   mbo.mesh[i].Pos = state->vec[i];
+      mbo.mesh[i].Pos = state->vec[i];
     }
-   // mbo.update();
+     mbo.update();
 
     //SUBSTRATE MESH
     for (int i = 0;i < NUM_VERTICES_SUBSTRATE;++i){
@@ -89,10 +89,7 @@ struct MyApp : RenderApp<State> {
     sub.update();
   }
 
-//  virtual void onDraw(){
-//    render::pipe(mbo, &mSceneGraph.mSceneNode);
-//    render::pipe(sub, &mSceneGraph.mSceneNode);
-//  }
+
 };
 
 int main() {

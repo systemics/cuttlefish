@@ -33,12 +33,15 @@
 using namespace vsr;
 using namespace vsr::cga;
 
+#define WORLD_W 75.0
+#define WORLD_H 50.0
+
 //FOOD CRYSTALS
 struct Substrate{
 
   float time =0;
-  float wSpacing = 70;
-  float hSpacing = 50;
+  float wSpacing = WORLD_W;
+  float hSpacing = WORLD_H;
   ctl::Grid grid = ctl::Grid(NUM_CELLS_WIDTH_SUBSTRATE,NUM_CELLS_HEIGHT_SUBSTRATE); ///< A Read/Write Scalar Field  
 
   //for rendering:
@@ -65,47 +68,7 @@ struct Substrate{
   
 };
 
-//    SpaceGroup2D<Vec> sg = SpaceGroup2D<Vec>(3,1,false); // p3m1
-//    vector<Point> motif;
-//   
-//    Substrate() {
-//      motif = vector<Point>(NUM_VERTEX_BASE_SUBSTRATE);  
-//      for (int i =0;i<NUM_VERTEX_BASE_SUBSTRATE;++i){
-//        float t = TWOPI*(float)i/NUM_VERTEX_BASE_SUBSTRATE;
-//        motif[i] = vsr::cga::point( CXY(1), t );
-//      }
-//    }
-//  
-//    void step(float dt){
-//      time += dt;
-//      for (int i =0;i<NUM_VERTEX_BASE_SUBSTRATE;++i){
-//        float t = TWOPI*(float)i/NUM_VERTEX_BASE_SUBSTRATE;
-//        motif[i] = vsr::cga::point( CXY(1), t );
-//      }
-//  
-//      makeMeshData();
-//    }
-//    
-//    void makeMeshData(){
-//      //transpose
-//      for (int i=0;i<NUM_VERTEX_BASE_SUBSTRATE;++i){
-//         auto tmp = sg.apply( motif[i], NUM_CELLS_WIDTH_SUBSTRATE, NUM_CELLS_HEIGHT_SUBSTRATE);
-//   
-//        for (int k=0;k<NUM_CELLS_WIDTH_SUBSTRATE;++k){
-//        for (int m=0;m<NUM_CELLS_HEIGHT_SUBSTRATE;++m){
-//          
-//          int firstIn = (k*NUM_CELLS_HEIGHT_SUBSTRATE + m) * NUM_REFLECTIONS_PER_CELL;
-//          int firstOut = (k*NUM_CELLS_HEIGHT_SUBSTRATE + m) * NUM_VERTEX_PER_CELL + i;
-//          
-//          for (int j =0;j<NUM_REFLECTIONS_PER_CELL;++j){
-//           int idx = j*NUM_VERTEX_BASE_SUBSTRATE + firstOut;
-//           pnt[idx] = tmp[firstIn+j];
-//          }
-//          
-//        }}
-//         
-//      }
-//    }
+
 
 
 
@@ -196,10 +159,13 @@ struct Organism : public Frame {
 
   float time=0;
   float energy=100;
-
-
   
   Point pnt[NUM_VERTEX_PER_AGENT];      ///<-- for mesh data . . .
+
+  //gets food value at position
+  Vec2f gridPos(){
+    return Vec2f(this->mPos[0]/WORLD_W,this->mPos[1]/WORLD_H);
+  }
   
   Population * mPopulation;
   void population(Population * pop) { mPopulation = pop; }
@@ -215,10 +181,10 @@ struct Organism : public Frame {
   };
 
   Organism( Point p = point(0,0,0), Rotor r = Rot(1) ) : Frame(p,r),
-  target(NULL), mBehavior( Flock | Force | Feed )
+  target(NULL), mBehavior( Flock )
   {}
 
-
+  void behavior(int mode) { mBehavior = mode; }
   void behaviorOn(int mode){ mBehavior |= mode; }
   void behaviorOff(int mode){ mBehavior &= ~mode; }
   void behaviorToggle(int mode) { mBehavior ^= mode; }
@@ -233,16 +199,18 @@ struct Organism : public Frame {
         time+=dt+vVelocity;
         energy -= vVelocity;
 
-        onStep(dt); //subclass's onStep(dt) method
+        if (energy < 20 ) behavior( Feed );
+        else if (energy > 80) behavior (Flock);
        
         if (mBehavior & Flock)  flock();
         if (mBehavior & Force)  force();
-        if (mBehavior & Feed)   feed();
+        if (mBehavior & Feed)   feed(dt);
         if (mBehavior & Follow) follow();
         if (mBehavior & Flee)   flee();
         if (mBehavior & Fold)   fold();
         if (mBehavior & Unfold) unfold();
         
+        onStep(dt); //subclass's onStep(dt) method
          
         this->dVec += this->z() * vVelocity;
         
@@ -255,9 +223,9 @@ struct Organism : public Frame {
 
   };
 
-  virtual void feed(){
-    //orient towards food
-     dBiv += relOrientBiv( foodsource ) * (vSourceRotVel+mPopulation->globalSourceRotVel);
+  virtual void feed(float dt){
+      energy += mPopulation->substrate.grid.read( gridPos() );
+      mPopulation->substrate.grid.add( gridPos(), -.1 * dt);       
   }
 
   virtual void flock(){
@@ -280,6 +248,7 @@ struct Organism : public Frame {
          } 
         }
 
+        dBiv += relOrientBiv( source ) * (vSourceRotVel+mPopulation->globalSourceRotVel);
 
   }
 
@@ -304,7 +273,7 @@ struct Organism : public Frame {
   Population::Neighborhood mNeighborhood;
   Population::Neighborhood& neighborhood() { return mNeighborhood; }
 
-  Point foodsource = point(0,0,0);  ///<-- food source position from world
+  Point source = point(0,0,0);      ///<-- center position from world
   Organism * target;                ///<-- temporary target to chase?
 
   int mBehavior;                    ///<-- Behavior Mode
@@ -448,3 +417,46 @@ struct Jelly : Organism {
 
 #endif   /* ----- #ifndef swarm_INC  ----- */
 
+
+
+//    SpaceGroup2D<Vec> sg = SpaceGroup2D<Vec>(3,1,false); // p3m1
+//    vector<Point> motif;
+//   
+//    Substrate() {
+//      motif = vector<Point>(NUM_VERTEX_BASE_SUBSTRATE);  
+//      for (int i =0;i<NUM_VERTEX_BASE_SUBSTRATE;++i){
+//        float t = TWOPI*(float)i/NUM_VERTEX_BASE_SUBSTRATE;
+//        motif[i] = vsr::cga::point( CXY(1), t );
+//      }
+//    }
+//  
+//    void step(float dt){
+//      time += dt;
+//      for (int i =0;i<NUM_VERTEX_BASE_SUBSTRATE;++i){
+//        float t = TWOPI*(float)i/NUM_VERTEX_BASE_SUBSTRATE;
+//        motif[i] = vsr::cga::point( CXY(1), t );
+//      }
+//  
+//      makeMeshData();
+//    }
+//    
+//    void makeMeshData(){
+//      //transpose
+//      for (int i=0;i<NUM_VERTEX_BASE_SUBSTRATE;++i){
+//         auto tmp = sg.apply( motif[i], NUM_CELLS_WIDTH_SUBSTRATE, NUM_CELLS_HEIGHT_SUBSTRATE);
+//   
+//        for (int k=0;k<NUM_CELLS_WIDTH_SUBSTRATE;++k){
+//        for (int m=0;m<NUM_CELLS_HEIGHT_SUBSTRATE;++m){
+//          
+//          int firstIn = (k*NUM_CELLS_HEIGHT_SUBSTRATE + m) * NUM_REFLECTIONS_PER_CELL;
+//          int firstOut = (k*NUM_CELLS_HEIGHT_SUBSTRATE + m) * NUM_VERTEX_PER_CELL + i;
+//          
+//          for (int j =0;j<NUM_REFLECTIONS_PER_CELL;++j){
+//           int idx = j*NUM_VERTEX_BASE_SUBSTRATE + firstOut;
+//           pnt[idx] = tmp[firstIn+j];
+//          }
+//          
+//        }}
+//         
+//      }
+//    }
