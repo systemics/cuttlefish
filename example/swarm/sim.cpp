@@ -38,8 +38,8 @@ struct MyApp : SimApp<State>, ctl::Touch {
       if (e.id != 0) {
         touch[k] =
             gfx::Vec2f(CLAMP(0.5f + 0.5f * (e.x / 3200.0f), 0.01, 0.99),
-                       CLAMP(0.5f + 0.5f * (e.y / -2600.0f), 0.01, 0.99));
-        population.substrate.grid.add(touch[0], 0.4 * dt);
+                       CLAMP(0.5f + 0.5f * (e.y / 2600.0f), 0.01, 0.99));
+        population.substrate.grid.add(touch[0], 2.0 * dt);
         k++;
         if (k >= N) break;
       }

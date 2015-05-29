@@ -69,9 +69,10 @@ struct MyApp : RenderApp<State> {
     for (int i=0;i< NUM_CELLS_SUBSTRATE;++i){
       for (int j =0;j<NUM_VERTEX_PER_CELL;++j){
        int idx = i*NUM_VERTEX_PER_CELL+j;
-       sub.mesh[idx].Col.set(1,0,0,state->food[i]);
+       sub.mesh[idx].Col.set(0,0,state->food[i],1);
       }
     }
+
     sub.update();
   }
 
