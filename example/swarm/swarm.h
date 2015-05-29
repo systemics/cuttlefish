@@ -203,8 +203,8 @@ struct Organism : public Frame {
         
       //  cout << energy << endl;
         if (energy < 2 ) behavior( Feed );
-       // else if( energy < 8 ) behavior ( Follow );
-       // else if (energy > 8) behavior ( Follow );
+        // else if( energy < 8 ) behavior ( Follow );
+        else if (energy > 8) behavior ( Follow );
        
         if (mBehavior & Flock)  flock();
         if (mBehavior & Force)  force();
@@ -273,7 +273,7 @@ struct Organism : public Frame {
       } 
      }
 
-    dBiv += relOrientBiv( source ) * (vSourceRotVel+mPopulation->globalSourceRotVel);
+  //  dBiv += relOrientBiv( source ) * (vSourceRotVel+mPopulation->globalSourceRotVel);
 
    // if(target) this -> relTwist( *target, vFollowVel );
   }
@@ -366,6 +366,8 @@ void Population::step(float dt){
   buildNeighborhoods();
   for (auto& i : member) i->step(dt);
   substrate.step(dt);
+
+  cout << " ENERGY: " << member->energy << endl;
 }
   
 
