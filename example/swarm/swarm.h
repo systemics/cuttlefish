@@ -210,7 +210,7 @@ struct Organism : public Frame {
       //  cout << energy << endl;
         if (energy < 2 ) behavior( Feed );
         // else if( energy < 8 ) behavior ( Follow );
-        else if (energy > 8) behavior ( Follow );
+        else if (energy > 8) behavior ( Flock );
 
         //check for off screen
         checkLocation();        
@@ -265,7 +265,7 @@ struct Organism : public Frame {
          } 
         }
 
-        dBiv += relOrientBiv( source ) * (vSourceRotVel+mPopulation->globalSourceRotVel);
+       // dBiv += relOrientBiv( source ) * (vSourceRotVel+mPopulation->globalSourceRotVel);
 
   }
 
@@ -276,7 +276,7 @@ struct Organism : public Frame {
 
      if(!target) { 
        auto& m = *(mPopulation->member[ Rand::Int( NUM_AGENTS - 1) ]);
-       while ( (m.target == this) || ( this == &m ) ){
+       if ( (m.target == this) || ( this == &m ) ){
         m = *(mPopulation->member[ Rand::Int( NUM_AGENTS - 1) ]);
        } 
         target = &m;        
