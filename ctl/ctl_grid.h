@@ -52,8 +52,8 @@ struct Grid {
 
   //"where" is in range of (0,1)
   float read(const gfx::Vec2f& where) {
-    float x = C * where.x;
-    float y = R * where.y;
+    float x = C * __CLAMP(where.x,.0001,.9999);
+    float y = R * __CLAMP(where.y,.0001,.9999);
     unsigned xa = __FLOOR(x);
     unsigned xb = xa + 1;
     unsigned ya = __FLOOR(y);
@@ -74,8 +74,8 @@ struct Grid {
   }
 
   void add(const gfx::Vec2f& where, float f) {
-    float x = C * where.x;
-    float y = R * where.y;
+    float x = C * __CLAMP(where.x,.0001,.9999);
+    float y = R * __CLAMP(where.y,.0001,.9999);
     unsigned xa = __FLOOR(x);
     unsigned xb = xa + 1;
     unsigned ya = __FLOOR(y);

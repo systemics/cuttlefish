@@ -49,7 +49,7 @@ struct MyApp : SimApp<State>, ctl::Touch {
         state->food, population.substrate.grid.data,
         sizeof(float) * NUM_CELLS_WIDTH_SUBSTRATE * NUM_CELLS_HEIGHT_SUBSTRATE);
 
-    population.step(.01);
+    population.step(dt);
 
     for (int i = 0; i < NUM_AGENTS; ++i) {
       for (int j = 0; j < NUM_VERTEX_PER_AGENT; ++j) {

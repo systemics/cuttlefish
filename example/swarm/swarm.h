@@ -131,18 +131,18 @@ struct Population{
   /// timestep
   void step(float dt);
 
-  float mSpacing=1;               ///<-- Initial Spacing of Population
-  float maxDistance = 10;         ///<-- Threshold of influence between Members
-  float minDistance = 1;          ///<-- Minimum Spacing Between Members
+  float mSpacing=.6;               ///<-- Initial Spacing of Population
+  float maxDistance = 40;         ///<-- Threshold of influence between Members
+  float minDistance = 20;         ///<-- Minimum Spacing Between Members
   int   maxNeighbors = 3;         ///<-- Max number of influencing neighbors
   int   mNum=NUM_AGENTS;          ///<-- Size of Population
   int   maxNum = 100;             ///<-- Max Size of Population
 
 
   ///GLOBAL CONTROL OF MEMBERS
-  float globalFlockRotVel;
-  float globalAvertRotVel;
-  float globalSourceRotVel;
+  float globalFlockRotVel=.01;
+  float globalAvertRotVel=.01;
+  float globalSourceRotVel=.01;
 
 
   ///Behavior Switching
@@ -158,13 +158,15 @@ struct Population{
 struct Organism : public Frame {
 
   float time=0;
-  float energy=100;
+  float energy=0;
   
   Point pnt[NUM_VERTEX_PER_AGENT];      ///<-- for mesh data . . .
 
   //gets food value at position
-  Vec2f gridPos(){
-    return Vec2f(this->mPos[0]/WORLD_W,this->mPos[1]/WORLD_H);
+  gfx::Vec2f gridPos(){
+    float x = this->mPos[0]/WORLD_W;
+    float y = this->mPos[1]/WORLD_H;
+    return Vec2f(.5 + x, .5 + y);
   }
   
   Population * mPopulation;
@@ -181,7 +183,7 @@ struct Organism : public Frame {
   };
 
   Organism( Point p = point(0,0,0), Rotor r = Rot(1) ) : Frame(p,r),
-  target(NULL), mBehavior( Flock )
+  target(NULL), mBehavior( Feed )
   {}
 
   void behavior(int mode) { mBehavior = mode; }
@@ -196,11 +198,13 @@ struct Organism : public Frame {
 
   virtual void step(float dt){
 
-        time+=dt+vVelocity;
+        time+=.005;
         energy -= vVelocity;
-
-        if (energy < 20 ) behavior( Feed );
-        else if (energy > 80) behavior (Flock);
+        
+      //  cout << energy << endl;
+        if (energy < 2 ) behavior( Feed );
+       // else if( energy < 8 ) behavior ( Follow );
+       // else if (energy > 8) behavior ( Follow );
        
         if (mBehavior & Flock)  flock();
         if (mBehavior & Force)  force();
@@ -220,12 +224,14 @@ struct Organism : public Frame {
         this->spin();
         this->move();
 
-
   };
 
   virtual void feed(float dt){
-      energy += mPopulation->substrate.grid.read( gridPos() );
-      mPopulation->substrate.grid.add( gridPos(), -.1 * dt);       
+      vVelocity = 0;
+      auto v = gridPos();
+     // cout << v << endl;
+      energy += mPopulation->substrate.grid.read( v ) ;
+      mPopulation->substrate.grid.add( v, -.7 * dt);       
   }
 
   virtual void flock(){
@@ -254,8 +260,22 @@ struct Organism : public Frame {
 
   
   void follow(){
-    //if(!target) if (!mNeighborhood.nearest.empty()){ target = mNeighborhood.nearest[0].partner; }
-    //if(target) this -> relTwist( *target, vFollowVel );
+
+     vVelocity = .01;
+
+     if(!target) { target = mPopulation->member[ Rand::Int( NUM_AGENTS - 1) ] ; }
+     dBiv += relOrientBiv( target->pos() ) *  .01;
+     
+     //orient away from neighbors that are too close 
+     if (!mNeighborhood.toonear.empty()){
+     for (auto& n : mNeighborhood.toonear){
+       if (n.dist>FPERROR) dBiv -= this->relOrientBiv( n.partner->pos() ) * (vAvertRotVel+mPopulation->globalAvertRotVel);
+      } 
+     }
+
+    dBiv += relOrientBiv( source ) * (vSourceRotVel+mPopulation->globalSourceRotVel);
+
+   // if(target) this -> relTwist( *target, vFollowVel );
   }
 
   void flee(){
@@ -286,7 +306,7 @@ struct Organism : public Frame {
   float vFlockRotVel =.01;          ///<-- Rotational Velocity during Flocking
   float vAvertRotVel = .01;         ///<-- Rotational Velocity to Avert during Flocking
 
-  float vFlockAcc =.1;  
+  float vFlockAcc =.01;  
 };
 
 
@@ -304,8 +324,8 @@ void Population::init(){
     for (auto& i : member ){
       if (!i) i = new T();
       i->population(this);
-      i->pos() = point( -range/2.0 + Rand::Num(range), -range/2.0 + Rand::Num(range), -range/2.0 + Rand::Num(range) ); 
-      i->rot() = gen::rot( TWOPI*Rand::Num(), -PIOVERTWO + PI * Rand::Num() );  
+      i->pos() = point( -range/2.0 + Rand::Num(range), -range/2.0 + Rand::Num(range), 0 );// -range/2.0 + Rand::Num(range) ); 
+      i->rot() = gen::rot( PIOVERFOUR, -PIOVERTWO + PI * Rand::Num() );  //TWOPI*Rand::Num()
       i->init(); 
     }
 
@@ -338,10 +358,6 @@ void Population::buildNeighborhoods() {
         }
        }
 
-       //Find closest Food Source
-       for (auto& f : foodsource){
-
-       }
 
     }
 }
@@ -363,29 +379,36 @@ struct Jelly : Organism {
   TorusKnot tk;
   PointGroup3D<Vec> pg;
 
+  float offset;
+
   vector<Point> vp;
 
   Jelly( Point p = point(0,0,0), Rotor r = Rot(1) ) 
   : Organism(p,r),
     pg(3,3) 
    { 
+   //  Rand::Seed();
      init();
    }
 
 
   virtual void init(){   
     tk = TorusKnot(3,2);
+
+    offset = Rand::Num();
   }
 
 
   virtual void onStep(float dt){
     //tk.HF.cir() = this->cxz();
     //auto par = tk.par() * .01;
+
+    time += offset * .05;
     
-    auto cir = round::produce( round::dls(-1.0,0,0,0).trs(1,1,0), Biv::xz );//this->xz() );
+    auto cir = round::produce( round::dls(-1.0,0,0,0).trs(1,1,vVelocity), Biv::xz );//
     auto shrink = cir.dilate( PAO, .5 ).trs(.5,0,0);
     
-    midsection = shrink.boost( cir.dual() * time  );
+    midsection = shrink.boost( cir.dual() * time );//* time * (.5 + offset/2.0)  );
 
     makeMeshData();
 
@@ -405,7 +428,7 @@ struct Jelly : Organism {
         auto vp = pg(base[i]);
         for (int j=0;j<MAX_NUM_REFLECTIONS;++j){
           int idx = j*NUM_VERTEX_BASE + i;
-          pnt[idx] = vp[j].spin(this->rot()) + this->pos();
+          pnt[idx] = vp[j].spin(this->rot()) + this->pos(); //.spin(this->rot())
         }
     }
     

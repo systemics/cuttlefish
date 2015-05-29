@@ -5,7 +5,7 @@
 /*-----------------------------------------------------------------------------
  *  AGENTS
  *-----------------------------------------------------------------------------*/
-#define NUM_AGENTS 30
+#define NUM_AGENTS 80
 #define NUM_VERTEX_BASE 5
 #define MAX_NUM_REFLECTIONS 24
 #define NUM_VERTEX_TAIL 0

@@ -30,7 +30,7 @@ struct MyApp : RenderApp<State> {
         for (int k=0;k<NUM_VERTEX_BASE;++k){
          int idx = first+k;
          int nxt = k<NUM_VERTEX_BASE-1 ? idx + 1 : first;
-         mesh.add(idx);//.add(nxt);
+         mesh.add(idx).add(nxt);
         }
       }
     }
