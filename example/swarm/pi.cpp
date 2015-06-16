@@ -49,7 +49,10 @@ struct MyApp : RenderApp<State> {
         int idx = first+k;
         int nxt = k<NUM_VERTEX_BASE-1 ? idx + 1 : first;
         mesh.add(idx).add(nxt);
-        mesh[idx].Col.set( ti * (Rand::Num() * .7 * (tk*ti) ), (1-(tk*.2)) + (ti * .3) , 1-(ti * tk), 1) ;
+        if (i<MAX_TOUCHES){
+          mesh[idx].Col.set( Rand::Num() * .5, (1-(tk*.2)) + (ti * .3) , 1-(ti), 1);
+        }
+        else mesh[idx].Col.set( ti * (Rand::Num() * .7 * (tk*ti) ), (1-(tk*.2)) + (ti * .3) , 1-(ti * tk), 1) ;
       
        }
      }
@@ -159,7 +162,11 @@ struct MyApp : RenderApp<State> {
         int idx = j*NUM_VERTEX_BASE_SUBSTRATE + firstOut;
         int idx2 = first + j*NUM_VERTEX_PER_CELL;
         sub.mesh[idx].Pos = tmp[firstIn+j];
-        sub.mesh[firstIn].Col.set(val,val,.2,1);
+        
+        //float tj = (float)j/NUM_REFLECTIONS_PER_CELL;
+        if (j==0) sub.mesh[firstIn+i*NUM_REFLECTIONS_PER_CELL*NUM_CELLS_SUBSTRATE].Col.set(val,val,.2,val);
+        else sub.mesh[firstIn+i*NUM_REFLECTIONS_PER_CELL*NUM_CELLS_SUBSTRATE+j].Col.set(1,0,.2,val);
+
        }
        
      }}
