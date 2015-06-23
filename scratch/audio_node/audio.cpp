@@ -56,7 +56,7 @@ LOG("offset:%u", offset);
 
     for (int i = 0; i < state->numtouches; i++) {
       gain[i] += 0.09;
-      if (gain[i] > 0.7) gain[i] = 0.7;
+      if (gain[i] > 0.8) gain[i] = 0.8;
       float v = (state->touch[i] - last[i]).len();
       play[i].rate(0.4 + v * 2);
     }
@@ -65,7 +65,7 @@ LOG("offset:%u", offset);
 
     for (unsigned i = 0; i < blockSize; ++i) {
       float s = 0;
-      for (int k = 0; k < MAX_TOUCHES; k++) s += play[(k + offset) % MAX_TOUCHES]() * gain[k] / 3.7;
+      for (int k = 0; k < MAX_TOUCHES; k++) s += play[(k + offset) % MAX_TOUCHES]() * gain[k] / 3.0;
       *output++ = s;
       *output++ = s;
     }
