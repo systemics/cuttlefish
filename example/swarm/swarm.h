@@ -219,6 +219,7 @@ struct Organism : public Frame {
   virtual void step(float dt){
 
         time+=.005;
+        if (time>(RAND_MAX-10)) time=0; 
 
 
         energy -= vVelocity;
@@ -463,11 +464,11 @@ struct Jelly : Organism {
     //auto par = tk.par() * .01;
 
     time += offset *  (.01+(energy/100.0));
-    
+    if (time>(RAND_MAX-10)) time=0; 
     auto cir = round::produce( round::dls(-1.0,0,0,0).trs(1,1,vVelocity), Biv::xz );//
     auto shrink = cir.dilate( PAO, .5 ).trs(.5,0,0);
     
-    midsection = shrink.boost( cir.dual() * time );//* time * (.5 + offset/2.0)  );
+    midsection = shrink.boost( cir.dual() * sin( time) );//* time * (.5 + offset/2.0)  );
 
     makeMeshData();
 
