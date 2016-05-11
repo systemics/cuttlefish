@@ -2,7 +2,7 @@
 
 Cuttlefish is an extremely low-cost, low-power, hyper-resolution interactive
 audio-visual Display Cluster based on the Raspberry Pi, with an
-NVidia Jetson TK 1 thrown in for good measuer.
+NVidia Jetson TK 1 thrown in for good measure.
 
 A highly collaborative project, Cuttlefish includes open source code developed
 by Karl Yerkes and Pablo Colapinto at UCSB with the support of both the Systemics Lab
