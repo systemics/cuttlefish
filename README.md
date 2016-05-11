@@ -46,7 +46,8 @@ cross compiling tools
     git submodule init
     git submodule update
     cd cross
-		./get_xtools
+    ./get_xtools
+
 
 ## Configure Hardware and Network
 
