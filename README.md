@@ -1,11 +1,24 @@
 # Cuttlefish
 
 Cuttlefish is an extremely low-cost, low-power, hyper-resolution interactive
-audio-visual Display Cluster based on the Raspberry Pi. It is developed in the
-Systemics Lab at UCSB by Karl Yerkes and Pablo Colapinto under the supervision
-of Marko Peljhan.
+audio-visual Display Cluster based on the Raspberry Pi, with an
+NVidia Jetson TK 1 thrown in for good measuer.
 
-Find the latest version of [Cuttlefish][].
+A highly collaborative project, Cuttlefish includes open source code developed
+by Karl Yerkes and Pablo Colapinto at UCSB with the support of both the Systemics Lab
+(directed by Marko Peljhan) and the AlloSphere Research Facility
+(directed by JoAnn Kuchera-Morin), and two Robert W. Deutsch Foundation fellowships.
+
+
+Find the latest version of [Cuttlefish](github.com/systemics/cuttlefish.git).
+
+Current Library Components:
+
+* Cuttlebone (state synchronization)
+* GFX (Embedded Graphics Library)
+* Gamma (Generic Synthesis Library)
+* Versor (Geometric Algebra Library)
+
 
 # Getting Started with Cuttlefish
 
@@ -20,12 +33,11 @@ example/
 ## Download and Install Dependencies
 
 You'll need to download and install some software before you start developing
-with Cuttlefish. We use [Git][] to manage source code and [VirtualBox][] and
-[Vagrant][] to support our development environment.
+with Cuttlefish. We use [Git][] to manage source code and run raspberry-pi
+cross compiling tools
 
 - [Download/Install - Git][]
-- [Download/Install - VirtualBox][]
-- [Download/Install - Vagrant][]
+
 
 ## Clone the Cuttlefish working directory and start the development environment
 
@@ -33,9 +45,8 @@ with Cuttlefish. We use [Git][] to manage source code and [VirtualBox][] and
     cd cuttlefish
     git submodule init
     git submodule update
-    cd rpcc
-    vagrant up
-    vagrant ssh
+    cd cross
+		./get_xtools
 
 ## Configure Hardware and Network
 
@@ -43,9 +54,4 @@ with Cuttlefish. We use [Git][] to manage source code and [VirtualBox][] and
 [-------------------------------------------------------------------------]:
 [Git]: http://git-scm.com
 [Download/Install - Git]: http://git-scm.com/download
-[VirtualBox]:https://www.virtualbox.org
-[Download/Install - VirtualBox]:https://www.virtualbox.org/wiki/Downloads
-[Vagrant]: http://www.vagrantup.com
-[Download/Install - Vagrant]: http://www.vagrantup.com/downloads.html
 [Cuttlefish]: https://github.com/systemics/cuttlefish
-
